@@ -1,0 +1,2361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StyleMaster AI Pro — V12 + Canvas-Safe Angle Engine Status + Server Preflight + Angle Progress + True 3D Fixed-Camera Angles + Full-Screen Viewer + Live Community Chat + Never-Repeat Random + Creative Safety + 360° 3D</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .loader { border-top-color: #3498db; animation: spinner 1.5s linear infinite; }
+        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #canvasContainer { position: relative; display: inline-block; }
+        .checkerboard {
+            background-image: linear-gradient(45deg, #1e293b 25%, transparent 25%), 
+                              linear-gradient(-45deg, #1e293b 25%, transparent 25%), 
+                              linear-gradient(45deg, transparent 75%, #1e293b 75%), 
+                              linear-gradient(-45deg, transparent 75%, #1e293b 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            background-color: #0f172a;
+        }
+        .color-swatch {
+            transition: transform 0.15s ease, ring-color 0.15s ease;
+        }
+        .color-swatch:hover {
+            transform: scale(1.15);
+            z-index: 10;
+        }
+        .color-swatch.active {
+            ring: 3px solid #3b82f6;
+            transform: scale(1.1);
+        }
+    
+        .angle-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-top: 0.65rem;
+        }
+        .angle-retry-note {
+            font-size: 10px;
+            color: #94a3b8;
+            margin-top: 0.35rem;
+            text-align: center;
+        }
+        .angle-status {
+            font-size: 10px;
+            color: #a5b4fc;
+            margin-top: 0.35rem;
+            min-height: 14px;
+            text-align: center;
+        }
+
+</style>
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen font-sans">
+
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 mb-2">StyleMaster AI Pro <span class="text-xs bg-indigo-600 text-white px-2 py-0.5 rounded ml-2">Enhanced Gemini Studio</span></h1>
+            <p class="text-slate-400">High-Fidelity Gemini Image Studio | 500+ Visual Color Swatches | Infinite Procedural Generator</p>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="flex justify-center mb-8 gap-2">
+            <button onclick="switchTab('generator')" id="tabGenerator" class="px-6 py-2.5 rounded-xl font-bold text-sm bg-blue-600 text-white shadow-lg transition">Studio Generator</button>
+        </div>
+
+        <div id="viewGenerator" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Sidebar Settings -->
+            <div class="lg:col-span-1 bg-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
+                <h2 class="text-xl font-bold text-slate-200">Generator Settings</h2>
+                
+                <!-- Strong Creative Direction Toggle -->
+                <div class="bg-slate-900/90 p-3.5 rounded-xl border border-indigo-500/40 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs font-bold text-indigo-300 flex items-center gap-1.5">
+                            🎯 Strong Creative Direction
+                        </label>
+                        <input type="checkbox" id="unrestrictedOverride" checked class="accent-indigo-600 h-4 w-4">
+                    </div>
+                    <p class="text-[11px] text-slate-400 leading-tight">Keeps prompts literal, detailed and composition-focused. Gemini provider safety policies still apply.</p>
+                </div>
+
+
+                <!-- Creative Safety + Originality Guard -->
+                <div class="bg-slate-900/90 p-3.5 rounded-xl border border-emerald-500/40 space-y-2">
+                    <div class="flex justify-between items-center gap-3">
+                        <div>
+                            <label class="text-xs font-bold text-emerald-300 flex items-center gap-1.5">
+                                🛡️ Creative Safety + Originality Guard
+                            </label>
+                            <p class="text-[10px] text-slate-400 mt-1 leading-relaxed">
+                                Allows fictional horror, zombies, stylised blood, explosions, fantasy/war satire and action scenes, while blocking malicious/instructional wrongdoing and explicit realistic gore. Named franchise characters are automatically remixed into original archetypes instead of copied exactly.
+                            </p>
+                        </div>
+                        <input type="checkbox" id="creativeSafetyMode" checked class="accent-emerald-500 h-5 w-5 shrink-0">
+                    </div>
+                    <div id="safetyPreflightMessage" class="hidden text-[11px] rounded-lg px-3 py-2 border"></div>
+                </div>
+
+                <div class="space-y-1">
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs font-semibold text-slate-300">Prompt / Idea Description</label>
+                        <button id="randomizePromptBtn" class="text-xs bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded font-medium transition flex items-center gap-1">🎲 Randomize Infinite Idea</button>
+                    <div class="text-[10px] text-slate-500 mt-1">
+                        Never-repeat random mode: leave the description blank for a completely random concept, or type a core idea first and Random will creatively expand that idea without changing its subject.
+                    </div>
+                    </div>
+                    <textarea id="prompt" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white text-sm" placeholder="Enter any custom prompt, concept, or description..."></textarea>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs font-semibold text-slate-300">Exact Text / Lettering (Optional)</label>
+                    <input id="exactTextInput" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-sm" placeholder='Example: SMOKE'>
+                    <p class="text-[10px] text-slate-500">Use this only when the image must contain exact visible wording.</p>
+                </div>
+
+                <!-- Number of Variations Selector (1 to 6) -->
+                <div class="space-y-1">
+                    <label class="text-xs font-semibold text-slate-300">Number of Variations (1 to 6)</label>
+                    <select id="variationCountSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-sm">
+                        <option value="1">1 Image</option>
+                        <option value="2">2 Images</option>
+                        <option value="3">3 Images</option>
+                        <option value="4">4 Images</option>
+                        <option value="5">5 Images</option>
+                        <option value="6" selected>6 Images Grid</option>
+                    </select>
+                </div>
+
+                <!-- Aspect Ratio Selector -->
+                <div class="space-y-1">
+                    <label class="text-xs font-semibold text-slate-300">Format Size / Aspect Ratio</label>
+                    <select id="aspectRatioSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-sm">
+                        <option value="1:1">1:1 Square (1024 x 1024)</option>
+                        <option value="9:16">9:16 Story / Reel / TikTok (Vertical)</option>
+                        <option value="16:9">16:9 Landscape / Banner (Cinematic)</option>
+                        <option value="4:5">4:5 Instagram Portrait</option>
+                        <option value="3:4">3:4 Standard Portrait Print</option>
+                        <option value="2:3">2:3 Vertical Poster Print</option>
+                        <option value="21:9">21:9 Ultra-Wide Cinematic Panoramic</option>
+                    </select>
+                </div>
+
+                <!-- Output Quality -->
+                <div class="space-y-1">
+                    <label class="text-xs font-semibold text-slate-300">Output Quality</label>
+                    <select id="imageSizeSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-sm">
+                        <option value="1K" selected>1K — Standard</option>
+                        <option value="2K">2K — High Quality</option>
+                        <option value="4K">4K — Maximum Quality</option>
+                    </select>
+                </div>
+
+                <!-- Background Control Option -->
+                <div class="space-y-1 bg-slate-900 p-3 rounded-xl border border-slate-700">
+                    <label class="text-xs font-semibold text-blue-300 flex items-center justify-between">
+                        <span>🖼️ Background Style</span>
+                    </label>
+                    <select id="backgroundSelect" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-white text-sm mt-1">
+                        <option value="transparent">Transparent / Isolated on Pure White (No Background)</option>
+                        <option value="solid-black">Solid Black Background</option>
+                        <option value="solid-white">Solid White Background</option>
+                        <option value="studio-gradient">Subtle Studio Gradient Background</option>
+                        <option value="contextual">Contextual Environment Background</option>
+                    </select>
+                </div>
+
+                <!-- Up to 10 Images Upload Section -->
+                <div class="space-y-2 border-t border-slate-700 pt-4">
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs font-semibold text-slate-300">Reference Images (Up to 10): <span id="imageCountBadge">0</span>/10</label>
+                        <button onclick="document.getElementById('multiImageUpload').click()" class="bg-blue-600 hover:bg-blue-700 text-xs px-3 py-1.5 rounded-lg font-bold transition">+ Add Photos</button>
+                    </div>
+                    <input type="file" id="multiImageUpload" class="hidden" accept="image/*" multiple>
+                    <div id="uploadedThumbnailsGrid" class="grid grid-cols-5 gap-2 min-h-[40px] bg-slate-900 p-2 rounded-lg border border-slate-700">
+                        <span id="noImagesText" class="col-span-5 text-center text-xs text-slate-500 py-2">No images uploaded yet</span>
+                    </div>
+                </div>
+
+                <div class="space-y-2 pt-2">
+                    <select id="categorySelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white text-sm"><option value="">Select Category (Optional)...</option></select>
+                    <select id="styleSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white text-sm"><option value="">Select Style (Optional)...</option></select>
+                    
+                    <!-- Main Colour Families + 200 shades per family -->
+                    <div id="colorSelectorContainer" class="space-y-3 bg-slate-900/90 p-3.5 rounded-xl border border-purple-500/40">
+                        <div class="flex justify-between items-center gap-3">
+                            <label class="text-xs font-semibold text-purple-300 flex items-center gap-1">
+                                🎨 Colour Family → 200 Shades
+                            </label>
+                            <span id="selectedColorNameLabel" class="text-[11px] text-purple-200 font-bold text-right">None Selected</span>
+                        </div>
+
+                        <p class="text-[10px] text-slate-400 leading-relaxed">
+                            Pick a main colour first, then choose one of 200 shades. Metallic families also tell Gemini to preserve the selected metal finish.
+                        </p>
+
+                        <div id="colorFamilyGrid" class="grid grid-cols-4 gap-2"></div>
+
+                        <div id="shadePickerPanel" class="hidden space-y-2 pt-2 border-t border-slate-700">
+                            <div class="flex justify-between items-center">
+                                <span id="activeColorFamilyLabel" class="text-xs font-bold text-white">200 Shades</span>
+                                <button onclick="clearColorSelection()" class="bg-slate-800 hover:bg-slate-700 text-xs px-2.5 py-1.5 rounded-lg text-slate-300 transition">Clear</button>
+                            </div>
+                            <div id="colorSwatchGrid" class="grid grid-cols-10 gap-1 max-h-52 overflow-y-auto bg-slate-950 p-2 rounded-lg border border-slate-700"></div>
+                        </div>
+                    </div>
+
+                    <select id="themeSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white text-sm"><option value="">Select Theme / Atmosphere (100+ Spectrum)...</option></select>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="space-y-2 pt-2">
+                    <button id="openCommunityBtn" type="button" onclick="openCommunity()" class="w-full bg-gradient-to-r from-cyan-700 to-teal-700 hover:from-cyan-600 hover:to-teal-600 text-white font-bold py-3 rounded-lg shadow-lg transition text-sm">
+                        🌐 Open Live Community + Chat
+                    </button>
+                    <button id="generateVariationsBtn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 rounded-lg shadow-lg transition text-sm">✨ Generate Variations Grid</button>
+                    <button id="generateTenMockupsBtn" class="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold py-2.5 rounded-lg shadow transition text-sm">🖼️ Generate 10 Consistent Mockup Angles</button>
+                </div>
+
+                <div id="downloadArea" class="border-t border-slate-700 pt-4">
+                    <button id="downloadBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg transition">Download Final Image</button>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 space-y-6">
+                <div id="resultsArea" class="bg-slate-800 p-6 rounded-2xl shadow-xl min-h-[500px] flex flex-col items-center justify-center border-2 border-dashed border-slate-700">
+                    <div id="loading" class="hidden text-center">
+                        <div class="loader rounded-full border-4 h-12 w-12 mb-4 mx-auto"></div>
+                        <p id="loadingText" class="text-slate-300 font-medium text-sm">Generating Masterpieces...</p>
+                    </div>
+                    <div id="placeholder" class="text-center text-slate-500">Your unrestricted masterpiece or variation grid will appear here</div>
+                    
+                    <!-- Single Active Image Display -->
+                    <div id="resultContent" class="hidden w-full relative flex flex-col items-center">
+                        <div class="flex justify-between items-center mb-2 w-full">
+                            <h3 class="font-bold text-lg text-blue-300">Active Masterpiece</h3>
+                            <div class="flex gap-2 flex-wrap">
+                                <button onclick="backToGrid()" id="backToGridBtn" class="hidden bg-slate-700 hover:bg-slate-600 text-xs px-3 py-1.5 rounded font-semibold transition">← Back to Grid</button>
+                            </div>
+                        </div>
+                        <div id="canvasContainer" class="w-full flex justify-center p-4 rounded-xl checkerboard">
+                            <img id="outputImage" src="" class="cursor-pointer hover:opacity-90 transition rounded-xl shadow-md max-h-[600px] object-contain" alt="Generated" title="Click to enlarge">
+                        </div>
+                        <div id="preAngleSelector" class="w-full mt-4 bg-slate-950/90 border border-indigo-500/40 rounded-xl p-4">
+                            <div class="flex items-start justify-between gap-3 flex-wrap">
+                                <div>
+                                    <div class="font-bold text-indigo-300">Choose angles BEFORE generating</div>
+                                    <div class="text-[11px] text-slate-400 mt-1">
+                                        Select any 1–6 views. StyleMaster builds one consistent 3D object, then renders only the camera angles you selected.
+                                    </div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button type="button" onclick="setPreAngles(true)" class="bg-slate-800 hover:bg-slate-700 text-xs px-2.5 py-1.5 rounded-lg">All 6</button>
+                                    <button type="button" onclick="setPreAngles(false)" class="bg-slate-800 hover:bg-slate-700 text-xs px-2.5 py-1.5 rounded-lg">Clear</button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mt-3">
+                                <label class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs cursor-pointer">
+                                    <input type="checkbox" class="pre-angle-choice accent-indigo-500 mr-2" value="front">Front
+                                </label>
+                                <label class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs cursor-pointer">
+                                    <input type="checkbox" class="pre-angle-choice accent-indigo-500 mr-2" value="left">Left
+                                </label>
+                                <label class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs cursor-pointer">
+                                    <input type="checkbox" class="pre-angle-choice accent-indigo-500 mr-2" value="right">Right
+                                </label>
+                                <label class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs cursor-pointer">
+                                    <input type="checkbox" class="pre-angle-choice accent-indigo-500 mr-2" value="back">Back
+                                </label>
+                                <label class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs cursor-pointer">
+                                    <input type="checkbox" class="pre-angle-choice accent-indigo-500 mr-2" value="top">Top
+                                </label>
+                                <label class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs cursor-pointer">
+                                    <input type="checkbox" class="pre-angle-choice accent-indigo-500 mr-2" value="bottom">Bottom
+                                </label>
+                            </div>
+
+                            <div class="flex items-center justify-between gap-3 flex-wrap mt-3">
+                                <span id="preAngleCount" class="text-xs text-emerald-300 font-semibold">0 selected • 0 angle generations</span>
+                                <span id="angleServerStatus" class="text-[11px] text-slate-400">Checking accurate-angle engine…</span>
+                                <button id="generateChosenAnglesBtn" type="button" onclick="generateChosenAnglesV7()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2.5 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+                                    Build 3D + Render Selected Angles
+                                </button>
+                                <div class="w-full text-[10px] text-slate-500 mt-2">
+                                    Full Package server required for exact 3D angles. Gemini Canvas can preview the UI, but cannot run the Node.js/Meshy backend.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Variable Image Grid Display (1 to 6) -->
+                    <div id="sixImageGrid" class="hidden grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full"></div>
+
+                    <!-- 6-Angle Grid Display -->
+                    <div id="multiAngleContent" class="hidden w-full space-y-4">
+                        <div class="flex justify-between items-center mb-2 gap-2 flex-wrap">
+                            <h3 class="font-bold text-lg text-indigo-300">True 3D Fixed-Camera Angle Views — Geometry Lock V9</h3>
+                            <div class="flex gap-2 flex-wrap">
+                                <button onclick="openTrue3DBuilder()" class="bg-emerald-600 hover:bg-emerald-500 text-xs px-3 py-1.5 rounded font-semibold transition text-white">🧊 Build True 360° 3D Model</button>
+                                <button onclick="resetToStudio()" class="bg-slate-700 hover:bg-slate-600 text-xs px-3 py-1.5 rounded font-semibold transition">Back to Studio</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                            <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 flex flex-col items-center" data-angle-key="front">
+                                <span class="text-xs font-semibold text-slate-400 mb-2">1. Front View</span>
+                                <div class="checkerboard w-full rounded-lg mb-2 flex justify-center p-2"><img id="angleFront" src="" class="cursor-pointer hover:opacity-90 transition rounded-lg h-36 object-contain" alt="Front" title="Click to enlarge"></div>
+                                <div class="angle-actions">
+                            <button onclick="downloadSingleAngle('angleFront', 'front-view.png')" class="w-full bg-slate-700 hover:bg-slate-600 py-1.5 rounded text-xs transition">Download Front</button>
+                            <button onclick="regenerateAngle('front')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg font-semibold">↻ Regenerate Front</button>
+                        </div>
+                        <div id="angleStatus-front" class="angle-status"></div>
+                        <div class="angle-retry-note">First correction retry can be treated as free by your credit system.</div>
+                            </div>
+                            <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 flex flex-col items-center" data-angle-key="left">
+                                <span class="text-xs font-semibold text-slate-400 mb-2">2. Left Profile</span>
+                                <div class="checkerboard w-full rounded-lg mb-2 flex justify-center p-2"><img id="angleLeft" src="" class="cursor-pointer hover:opacity-90 transition rounded-lg h-36 object-contain" alt="Left" title="Click to enlarge"></div>
+                                <div class="angle-actions">
+                            <button onclick="downloadSingleAngle('angleLeft', 'left-view.png')" class="w-full bg-slate-700 hover:bg-slate-600 py-1.5 rounded text-xs transition">Download Left</button>
+                            <button onclick="regenerateAngle('left')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg font-semibold">↻ Regenerate Left</button>
+                        </div>
+                        <div id="angleStatus-left" class="angle-status"></div>
+                        <div class="angle-retry-note">First correction retry can be treated as free by your credit system.</div>
+                            </div>
+                            <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 flex flex-col items-center" data-angle-key="right">
+                                <span class="text-xs font-semibold text-slate-400 mb-2">3. Right Profile</span>
+                                <div class="checkerboard w-full rounded-lg mb-2 flex justify-center p-2"><img id="angleRight" src="" class="cursor-pointer hover:opacity-90 transition rounded-lg h-36 object-contain" alt="Right" title="Click to enlarge"></div>
+                                <div class="angle-actions">
+                            <button onclick="downloadSingleAngle('angleRight', 'right-view.png')" class="w-full bg-slate-700 hover:bg-slate-600 py-1.5 rounded text-xs transition">Download Right</button>
+                            <button onclick="regenerateAngle('right')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg font-semibold">↻ Regenerate Right</button>
+                        </div>
+                        <div id="angleStatus-right" class="angle-status"></div>
+                        <div class="angle-retry-note">First correction retry can be treated as free by your credit system.</div>
+                            </div>
+                            <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 flex flex-col items-center" data-angle-key="back">
+                                <span class="text-xs font-semibold text-slate-400 mb-2">4. Back View</span>
+                                <div class="checkerboard w-full rounded-lg mb-2 flex justify-center p-2"><img id="angleBack" src="" class="cursor-pointer hover:opacity-90 transition rounded-lg h-36 object-contain" alt="Back" title="Click to enlarge"></div>
+                                <div class="angle-actions">
+                            <button onclick="downloadSingleAngle('angleBack', 'back-view.png')" class="w-full bg-slate-700 hover:bg-slate-600 py-1.5 rounded text-xs transition">Download Back</button>
+                            <button onclick="regenerateAngle('back')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg font-semibold">↻ Regenerate Back</button>
+                        </div>
+                        <div id="angleStatus-back" class="angle-status"></div>
+                        <div class="angle-retry-note">First correction retry can be treated as free by your credit system.</div>
+                            </div>
+                            <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 flex flex-col items-center" data-angle-key="top">
+                                <span class="text-xs font-semibold text-slate-400 mb-2">5. Top View</span>
+                                <div class="checkerboard w-full rounded-lg mb-2 flex justify-center p-2"><img id="angleTop" src="" class="cursor-pointer hover:opacity-90 transition rounded-lg h-36 object-contain" alt="Top" title="Click to enlarge"></div>
+                                <div class="angle-actions">
+                            <button onclick="downloadSingleAngle('angleTop', 'top-view.png')" class="w-full bg-slate-700 hover:bg-slate-600 py-1.5 rounded text-xs transition">Download Top</button>
+                            <button onclick="regenerateAngle('top')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg font-semibold">↻ Regenerate Top</button>
+                        </div>
+                        <div id="angleStatus-top" class="angle-status"></div>
+                        <div class="angle-retry-note">First correction retry can be treated as free by your credit system.</div>
+                            </div>
+                            <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 flex flex-col items-center" data-angle-key="bottom">
+                                <span class="text-xs font-semibold text-slate-400 mb-2">6. Bottom View</span>
+                                <div class="checkerboard w-full rounded-lg mb-2 flex justify-center p-2"><img id="angleBottom" src="" class="cursor-pointer hover:opacity-90 transition rounded-lg h-36 object-contain" alt="Bottom" title="Click to enlarge"></div>
+                                <div class="angle-actions">
+                            <button onclick="downloadSingleAngle('angleBottom', 'bottom-view.png')" class="w-full bg-slate-700 hover:bg-slate-600 py-1.5 rounded text-xs transition">Download Bottom</button>
+                            <button onclick="regenerateAngle('bottom')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg font-semibold">↻ Regenerate Bottom</button>
+                        </div>
+                        <div id="angleStatus-bottom" class="angle-status"></div>
+                        <div class="angle-retry-note">First correction retry can be treated as free by your credit system.</div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- True 360° 3D Builder -->
+                    <div id="true3DBuilder" class="hidden w-full space-y-4 bg-slate-900/80 border border-emerald-500/40 rounded-2xl p-4">
+                        <div class="flex items-start justify-between gap-3 flex-wrap">
+                            <div>
+                                <h3 class="font-bold text-lg text-emerald-300">🧊 True 360° 3D Scale Model Builder</h3>
+                                <p class="text-xs text-slate-400 mt-1 max-w-3xl">
+                                    Uses the locked Front, Left, Right and Back views to build an actual textured mesh. When complete you can rotate it in 360° and download GLB, STL, OBJ, FBX, USDZ and 3MF.
+                                </p>
+                            </div>
+                            <button onclick="closeTrue3DBuilder()" class="bg-slate-700 hover:bg-slate-600 text-xs px-3 py-1.5 rounded font-semibold">Close</button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <label class="bg-slate-950 border border-slate-700 rounded-xl p-3 space-y-1">
+                                <span class="text-xs font-semibold text-slate-300">Exact model height (mm, optional)</span>
+                                <input id="modelHeightMm" type="number" min="1" max="10000" step="1" placeholder="Example: 120" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-sm">
+                                <span class="text-[10px] text-slate-500">If supplied, the finished model is resized to this real-world height before final exports.</span>
+                            </label>
+
+                            <label class="bg-slate-950 border border-slate-700 rounded-xl p-3 flex items-center justify-between gap-3">
+                                <div>
+                                    <span class="text-xs font-semibold text-slate-300 block">Ultra Geometry</span>
+                                    <span class="text-[10px] text-slate-500">Higher-fidelity geometry; uses more Meshy credits.</span>
+                                </div>
+                                <input id="meshyUltraMode" type="checkbox" class="accent-emerald-500 h-5 w-5">
+                            </label>
+
+                            <label class="bg-slate-950 border border-slate-700 rounded-xl p-3 flex items-center justify-between gap-3">
+                                <div>
+                                    <span class="text-xs font-semibold text-slate-300 block">PBR Materials</span>
+                                    <span class="text-[10px] text-slate-500">Creates richer metallic/roughness material data for GLB/FBX workflows.</span>
+                                </div>
+                                <input id="meshyPbrMode" type="checkbox" checked class="accent-emerald-500 h-5 w-5">
+                            </label>
+                        </div>
+
+                        <button id="build3DModelBtn" onclick="buildTrue3DModel()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-bold transition">
+                            Generate True 3D Model from 4 Locked Views
+                        </button>
+
+                        <div id="true3DStatusBox" class="hidden bg-slate-950 border border-slate-700 rounded-xl p-3">
+                            <div class="flex justify-between gap-3 items-center">
+                                <span id="true3DStatusText" class="text-xs text-emerald-300 font-semibold">Preparing…</span>
+                                <span id="true3DProgressText" class="text-xs text-slate-400">0%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-2">
+                                <div id="true3DProgressBar" class="bg-emerald-500 h-full rounded-full" style="width:0%"></div>
+                            </div>
+                        </div>
+
+                        <div id="true3DResult" class="hidden space-y-4">
+                            <div class="bg-slate-950 border border-slate-700 rounded-xl overflow-hidden">
+                                <model-viewer id="true3DViewer"
+                                    camera-controls
+                                    auto-rotate
+                                    shadow-intensity="1"
+                                    exposure="1"
+                                    style="width:100%;height:480px;background:#0f172a;"
+                                    alt="Interactive 360 degree 3D model preview">
+                                </model-viewer>
+                            </div>
+
+                            <div>
+                                <h4 class="text-sm font-bold text-white mb-2">Download 3D Files</h4>
+                                <div id="true3DDownloadGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2"></div>
+                                <p class="text-[10px] text-slate-500 mt-2">
+                                    GLB is best for web/360 preview, STL and 3MF are commonly used for 3D printing, OBJ/FBX for modelling software, and USDZ for Apple AR workflows.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 10 Consistent Mockups Grid Display -->
+                    <div id="tenMockupsContent" class="hidden w-full space-y-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-lg text-amber-300">10 Consistent Mockup Angles</h3>
+                            <button onclick="resetToStudio()" class="bg-slate-700 hover:bg-slate-600 text-xs px-3 py-1.5 rounded font-semibold transition">Back to Studio</button>
+                        </div>
+                        <div id="tenMockupsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"></div>
+                    </div>
+                </div>
+
+                <!-- Resin Mixing Calculator Box -->
+                <div id="resinMixingCalculatorBox" class="hidden bg-slate-800 p-6 rounded-2xl shadow-xl border border-purple-500/50 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">🧪</span>
+                            <h3 class="font-bold text-lg text-purple-300">3D Resin Printer Color Mixing Calculator</h3>
+                        </div>
+                        <span id="resinActiveColorBadge" class="text-xs bg-purple-900 text-purple-200 px-3 py-1 rounded-full font-semibold border border-purple-500">Selected: None</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-1">
+                            <span class="text-xs font-semibold text-slate-400">Base UV Resin Type</span>
+                            <p id="resinBaseType" class="font-bold text-white text-base">Standard Clear UV Resin</p>
+                        </div>
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-1">
+                            <span class="text-xs font-semibold text-slate-400">Required Pigment Drops</span>
+                            <p id="resinPigmentDrops" class="font-bold text-purple-300 text-base">3 Drops per 100ml</p>
+                        </div>
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-1">
+                            <span class="text-xs font-semibold text-slate-400">Mixing Instructions</span>
+                            <p id="resinMixingNotes" class="font-bold text-emerald-300 text-base">Stir gently for 60s, let rest 5m</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    
+
+                <!-- Full-screen image viewer -->
+                <div id="imageLightbox" class="hidden fixed inset-0 z-[80] bg-black/95 p-3 sm:p-6">
+                    <div class="w-full h-full flex flex-col">
+                        <div class="flex items-center justify-between gap-3 mb-3">
+                            <div>
+                                <div id="imageLightboxTitle" class="font-bold text-white">Image Preview</div>
+                                <div class="text-[11px] text-slate-400">Click the image to toggle fit / full-size. Mouse wheel or buttons zoom.</div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button type="button" onclick="lightboxZoom(-0.25)" class="bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-lg">−</button>
+                                <button type="button" onclick="lightboxReset()" class="bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-lg text-xs">Fit</button>
+                                <button type="button" onclick="lightboxZoom(0.25)" class="bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-lg">+</button>
+                                <button type="button" onclick="closeImageLightbox()" class="bg-red-700 hover:bg-red-600 px-3 py-2 rounded-lg text-xs font-bold">Close</button>
+                            </div>
+                        </div>
+                        <div id="imageLightboxStage" class="flex-1 min-h-0 overflow-auto rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center">
+                            <img id="imageLightboxImage" src="" alt="Large preview" class="select-none object-contain cursor-zoom-in" draggable="false">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="communityPanel" class="hidden fixed inset-0 z-50 bg-slate-950/95 overflow-y-auto p-4">
+                    <div class="max-w-6xl mx-auto space-y-4">
+                        <div class="flex justify-between gap-3 items-start flex-wrap">
+                            <div>
+                                <h2 class="text-2xl font-bold text-cyan-300">🌐 StyleMaster Live Community</h2>
+                                <p class="text-sm text-slate-400 mt-1">Share creations and prompts, or chat live with other creators.</p>
+                            </div>
+                            <button onclick="closeCommunity()" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg">Close</button>
+                        </div>
+
+                        <div class="flex gap-2 flex-wrap">
+                            <button id="communityFeedTabBtn" onclick="showCommunityTab('feed')" class="bg-cyan-700 px-4 py-2 rounded-lg text-sm font-bold">Inspiration Feed</button>
+                            <button id="communityChatTabBtn" onclick="showCommunityTab('chat')" class="bg-slate-800 px-4 py-2 rounded-lg text-sm font-bold">Live Chat</button>
+                        </div>
+
+                        <div id="communityFeedTab">
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                                <section class="bg-slate-900 border border-slate-700 rounded-xl p-4 space-y-3">
+                                    <h3 class="font-bold">Share a creation</h3>
+                                    <input id="communityName" maxlength="40" placeholder="Display name" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5">
+                                    <textarea id="communityPrompt" maxlength="1200" rows="5" placeholder="Share your prompt or tips..." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5"></textarea>
+                                    <input id="communityImageUpload" type="file" accept="image/*" class="w-full text-xs">
+                                    <button onclick="shareCommunityPost()" class="w-full bg-cyan-700 hover:bg-cyan-600 py-2.5 rounded-lg font-bold">Post to Community</button>
+                                    <div id="communityStatus" class="text-[11px] text-slate-500">Connecting to community…</div>
+                                </section>
+                                <section class="lg:col-span-2 bg-slate-900 border border-slate-700 rounded-xl p-4">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <h3 class="font-bold">Live Inspiration Feed</h3>
+                                        <button onclick="loadCommunityFeed()" class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded text-xs">Refresh</button>
+                                    </div>
+                                    <div id="communityFeed" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                                </section>
+                            </div>
+                        </div>
+
+                        <div id="communityChatTab" class="hidden">
+                            <div class="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
+                                <div class="p-3 border-b border-slate-700 flex justify-between items-center">
+                                    <div>
+                                        <h3 class="font-bold text-white">Live Creator Chat</h3>
+                                        <p class="text-[11px] text-slate-400">Ask for prompt ideas, share techniques and help other creators.</p>
+                                    </div>
+                                    <span id="communityOnlineCount" class="text-xs text-emerald-300">0 online</span>
+                                </div>
+                                <div id="communityChatMessages" class="h-[420px] overflow-y-auto p-4 space-y-3 bg-slate-950">
+                                    <div class="text-sm text-slate-500">Connect to the server to join live chat.</div>
+                                </div>
+                                <div class="p-3 border-t border-slate-700 grid grid-cols-1 md:grid-cols-[180px_1fr_auto] gap-2">
+                                    <input id="chatDisplayName" maxlength="40" placeholder="Display name" class="bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm">
+                                    <input id="chatMessageInput" maxlength="800" placeholder="Type a message…" class="bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm" onkeydown="if(event.key==='Enter'){sendCommunityChatMessage();}">
+                                    <button onclick="sendCommunityChatMessage()" class="bg-cyan-700 hover:bg-cyan-600 px-4 py-2 rounded-lg font-bold">Send</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+<script>
+        const styles = {
+            "Vector & 3D Objects": ["Vector SVG 3D", "Laser Cut Silhouette", "Resin Model", "Embossed Metal Relief", "CNC Wood Carving", "Resin Cast Model", "Minimalist Line Art Vector"],
+            "Photorealistic": ["Hyper-realistic", "Cinematic Photography", "Portrait Photography", "Landscape Photography", "Macro Photography", "Street Photography", "Black & White Film", "Vintage 35mm", "Polaroid Effect", "Aerial View", "Studio Portrait", "Night Photography"],
+            "Cartoon & Animation": ["Disney Pixar 3D", "Anime Style", "Studio Ghibli", "Classic 2D Animation", "Claymation", "Stop Motion", "Chibi", "Kawaii", "Comic Book", "Graphic Novel", "Vector Art"],
+            "Artistic & Painting": ["Oil Painting", "Watercolor", "Impressionism", "Expressionism", "Surrealism", "Cubism", "Renaissance", "Baroque", "Ukiyo-e", "Pop Art", "Minimalism"],
+            "Digital Art": ["Cyberpunk", "Synthwave", "Vaporwave", "Glitch Art", "Isometric", "Low Poly", "3D Rendered", "Octane Render", "Unreal Engine 5", "Ray Traced", "Concept Art"],
+            "Abstract": ["Minimalist Geometric", "Fluid Acrylic", "Drip Painting", "Splatter Art", "Symmetry", "Kaleidoscope", "Dynamic Motion", "Textural", "Gradient", "Psychedelic"]
+        };
+
+        const themes = [
+            "Child Friendly Playful", "Whimsical Fairy Tale", "Cartoon Preschool", "Crayons & Pastel", "Cute Chibi Magic",
+            "Bubblegum Pop", "Candy Land Dream", "Lego Brick Toy", "Plush Stuffed Animal", "Gummy Bear Jelly",
+            "Magical Unicorn", "Floating Cloud Castle", "Happy Sunburst", "Rainbow Meadow", "Teddy Bear Picnic",
+            "Action-Packed Superhero", "Comic Book Pop Art", "Skateboarding Streetwear", "Neon Arcade 80s", "Cybernetic Future",
+            "Synthwave Sunset", "Vaporwave Nostalgia", "Graffiti Mural", "Hip Hop Gold", "Extreme Sports Energy",
+            "Anime Shonen Hero", "Mecha Giant Robot", "Sci-Fi Starfighter", "Pixelated Retro 8-Bit", "Laser Grid Cyber",
+            "Ethereal Dreamscape", "Serene Zen Garden", "Misty Morning Forest", "Cottagecore Wildflower", "Deep Ocean Abyss",
+            "Starlit Galaxy", "Aurora Borealis Northern Lights", "Desert Oasis Sunset", "Autumn Harvest Gold", "Spring Blossom Breeze",
+            "Alpine Mountain Snow", "Tropical Rainforest", "Bioluminescent Jungle", "Crystal Cave Stalactite", "Volcanic Magma Flow",
+            "Ancient Ruin Temple", "Steampunk Victorian Brass", "Dieselpunk Industrial", "Solarpunk Eco-Future", "Ghibli Pastoral Charm",
+            "Serious Cinematic Drama", "Gritty Noir Detective", "Monochrome Film Noir", "Neo-Noir Rain", "Cyberpunk Alleyway",
+            "Military Tactical", "Post-Apocalyptic Wasteland", "Rust & Steel Junkyard", "Mafia Crime Thriller", "Espionage Spy Tech",
+            "Medieval Knight Armor", "Dark Fantasy Kingdom", "High Renaissance Royal", "Baroque Drama", "Victorian Gothic",
+            "Edwardian Elegance", "Roaring 20s Art Deco", "Great Depression Realism", "Cold War Bunker", "Deep Space Odyssey",
+            "Serious Horror Gore", "Psychological Thriller", "Cosmic Lovecraftian Horror", "Gothic Vampire Crypt", "Zombie Apocalypse",
+            "Haunted Asylum", "Slasher Film 80s", "Demonic Possession", "Occult Ritual Circle", "Shadow Monster Slime",
+            "Body Horror Mutation", "Cursed Artifact Relic", "Abandoned Creepy Doll", "Foggy Graveyard Midnight", "Torture Dungeon Iron",
+            "Necromancer Skull Throne", "Plague Doctor Mask", "Alien Xenomorph Hive", "Mutant Wasteland Beast", "Dark Witch Cauldron",
+            "Abyssal Sea Monster", "Phantom Spectre Ghost", "Rotting Flesh Zombie", "Infernal Hellfire Demon", "Pure Unadulterated Nightmare"
+        ];
+
+        const COLOR_FAMILIES = [
+            { key: "black",    label: "Black",    hue: 220, sat: 8,  light: 8,  type: "solid",    preview: "#111318" },
+            { key: "white",    label: "White",    hue: 210, sat: 8,  light: 96, type: "solid",    preview: "#f4f6f8" },
+            { key: "grey",     label: "Grey",     hue: 210, sat: 8,  light: 50, type: "solid",    preview: "#7c838d" },
+            { key: "blue",     label: "Blue",     hue: 220, sat: 82, light: 50, type: "solid",    preview: "#2563eb" },
+            { key: "green",    label: "Green",    hue: 135, sat: 72, light: 42, type: "solid",    preview: "#22a447" },
+            { key: "yellow",   label: "Yellow",   hue: 52,  sat: 92, light: 52, type: "solid",    preview: "#f2d21a" },
+            { key: "orange",   label: "Orange",   hue: 28,  sat: 92, light: 52, type: "solid",    preview: "#f47b20" },
+            { key: "pink",     label: "Pink",     hue: 335, sat: 78, light: 62, type: "solid",    preview: "#ec4899" },
+            { key: "purple",   label: "Purple",   hue: 275, sat: 72, light: 52, type: "solid",    preview: "#8b3fd1" },
+            { key: "red",      label: "Red",      hue: 2,   sat: 84, light: 48, type: "solid",    preview: "#dc2626" },
+
+            { key: "brass",    label: "Brass",    hue: 44,  sat: 58, light: 43, type: "metallic", preview: "#b08d35" },
+            { key: "bronze",   label: "Bronze",   hue: 28,  sat: 55, light: 36, type: "metallic", preview: "#8c5a2b" },
+            { key: "silver",   label: "Silver",   hue: 210, sat: 7,  light: 72, type: "metallic", preview: "#bfc5ca" },
+            { key: "gold",     label: "Gold",     hue: 45,  sat: 82, light: 50, type: "metallic", preview: "#d4af37" },
+            { key: "platinum", label: "Platinum", hue: 200, sat: 6,  light: 78, type: "metallic", preview: "#d7d9d8" },
+            { key: "chrome",   label: "Chrome",   hue: 210, sat: 4,  light: 66, type: "metallic", preview: "#aeb4ba" }
+        ];
+
+        let activeSelectedColor = null;
+        let activeSelectedColorData = null;
+        let activeColorFamily = null;
+
+        const categorySelect = document.getElementById('categorySelect');
+        const styleSelect = document.getElementById('styleSelect');
+        const themeSelect = document.getElementById('themeSelect');
+        const backgroundSelect = document.getElementById('backgroundSelect');
+        const colorFamilyGrid = document.getElementById('colorFamilyGrid');
+        const shadePickerPanel = document.getElementById('shadePickerPanel');
+        const activeColorFamilyLabel = document.getElementById('activeColorFamilyLabel');
+        const colorSwatchGrid = document.getElementById('colorSwatchGrid');
+        const selectedColorNameLabel = document.getElementById('selectedColorNameLabel');
+        const img = document.getElementById('outputImage');
+        const loading = document.getElementById('loading');
+        const loadingText = document.getElementById('loadingText');
+
+        function clamp(value, min, max) {
+            return Math.min(max, Math.max(min, value));
+        }
+
+        function hslToHex(h, s, l) {
+            h = ((h % 360) + 360) % 360;
+            s /= 100;
+            l /= 100;
+            const c = (1 - Math.abs(2 * l - 1)) * s;
+            const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+            const m = l - c / 2;
+            let r = 0, g = 0, b = 0;
+
+            if (h < 60)      [r, g, b] = [c, x, 0];
+            else if (h < 120)[r, g, b] = [x, c, 0];
+            else if (h < 180)[r, g, b] = [0, c, x];
+            else if (h < 240)[r, g, b] = [0, x, c];
+            else if (h < 300)[r, g, b] = [x, 0, c];
+            else             [r, g, b] = [c, 0, x];
+
+            const toHex = v => Math.round((v + m) * 255).toString(16).padStart(2, '0');
+            return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+        }
+
+        function generate200Shades(family) {
+            const shades = [];
+
+            // 20 lightness levels × 10 saturation/hue micro-variations = exactly 200.
+            for (let row = 0; row < 20; row++) {
+                for (let col = 0; col < 10; col++) {
+                    let hue = family.hue;
+                    let sat = family.sat;
+                    let light = family.light;
+
+                    if (family.key === "black") {
+                        hue += (col - 4.5) * 2.2;
+                        sat = clamp(2 + col * 1.8, 2, 20);
+                        light = clamp(2 + row * 1.25, 2, 26);
+                    } else if (family.key === "white") {
+                        hue += (col - 4.5) * 2.0;
+                        sat = clamp(1 + col * 1.4, 1, 16);
+                        light = clamp(78 + row * 1.05, 78, 98);
+                    } else if (family.key === "grey") {
+                        hue += (col - 4.5) * 2.2;
+                        sat = clamp(1 + col * 1.5, 1, 18);
+                        light = clamp(12 + row * 4.0, 12, 88);
+                    } else if (family.type === "metallic") {
+                        hue += (col - 4.5) * 1.6;
+                        sat = clamp(family.sat + (col - 4.5) * 3.0, 2, 96);
+                        light = clamp(18 + row * 3.4, 18, 83);
+                    } else {
+                        hue += (col - 4.5) * 2.0;
+                        sat = clamp(42 + col * 5.5, 42, 96);
+                        light = clamp(15 + row * 3.7, 15, 85);
+                    }
+
+                    const index = row * 10 + col + 1;
+                    const hex = hslToHex(hue, sat, light);
+                    shades.push({
+                        family: family.label,
+                        familyKey: family.key,
+                        type: family.type,
+                        name: `${family.label} Shade ${index}`,
+                        hex,
+                        hsl: `hsl(${Math.round(hue)}, ${Math.round(sat)}%, ${Math.round(light)}%)`
+                    });
+                }
+            }
+            return shades;
+        }
+
+        function metallicPreview(hex) {
+            return `linear-gradient(135deg, #111 0%, ${hex} 22%, #f8fafc 48%, ${hex} 68%, #20242a 100%)`;
+        }
+
+        function renderColorFamilies() {
+            colorFamilyGrid.innerHTML = "";
+            COLOR_FAMILIES.forEach(family => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "rounded-lg border border-slate-700 bg-slate-950 hover:border-purple-400 transition p-2 flex flex-col items-center gap-1 min-h-[58px]";
+                btn.dataset.familyKey = family.key;
+
+                const chip = document.createElement("span");
+                chip.className = "block w-full h-6 rounded border border-white/10";
+                chip.style.background = family.type === "metallic"
+                    ? metallicPreview(family.preview)
+                    : family.preview;
+
+                const label = document.createElement("span");
+                label.className = "text-[10px] font-semibold text-slate-200";
+                label.textContent = family.label;
+
+                btn.appendChild(chip);
+                btn.appendChild(label);
+                btn.onclick = () => selectColorFamily(family.key);
+                colorFamilyGrid.appendChild(btn);
+            });
+        }
+
+        function selectColorFamily(familyKey) {
+            const family = COLOR_FAMILIES.find(f => f.key === familyKey);
+            if (!family) return;
+
+            activeColorFamily = family;
+            document.querySelectorAll("[data-family-key]").forEach(btn => {
+                btn.classList.toggle("ring-2", btn.dataset.familyKey === familyKey);
+                btn.classList.toggle("ring-purple-400", btn.dataset.familyKey === familyKey);
+            });
+
+            activeColorFamilyLabel.textContent = `${family.label} — choose 1 of 200 shades`;
+            shadePickerPanel.classList.remove("hidden");
+            renderColorSwatches(generate200Shades(family));
+        }
+
+        function renderColorSwatches(shades) {
+            colorSwatchGrid.innerHTML = "";
+            shades.forEach(col => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "color-swatch w-full h-7 rounded shadow-sm border border-slate-700 relative";
+                btn.style.background = col.type === "metallic"
+                    ? metallicPreview(col.hex)
+                    : col.hex;
+                btn.title = `${col.name} • ${col.hex}`;
+                btn.onclick = () => selectColorSwatch(col);
+                colorSwatchGrid.appendChild(btn);
+            });
+        }
+
+        window.selectColorFamily = selectColorFamily;
+
+        window.selectColorSwatch = function(col) {
+            activeSelectedColorData = col;
+            activeSelectedColor = col.type === "metallic"
+                ? `${col.name} (${col.hex}), realistic reflective ${col.family.toLowerCase()} metallic finish`
+                : `${col.name} (${col.hex})`;
+
+            selectedColorNameLabel.textContent = `${col.name} • ${col.hex}`;
+            selectedColorNameLabel.style.color = col.hex;
+
+            document.querySelectorAll("#colorSwatchGrid .color-swatch").forEach(btn => btn.classList.remove("active"));
+            if (event?.currentTarget) event.currentTarget.classList.add("active");
+
+            updateResinCalculator(col.name, col);
+        };
+
+        window.clearColorSelection = function() {
+            activeSelectedColor = null;
+            activeSelectedColorData = null;
+            activeColorFamily = null;
+            selectedColorNameLabel.textContent = "None Selected";
+            selectedColorNameLabel.style.color = "#e2e8f0";
+            shadePickerPanel.classList.add("hidden");
+            colorSwatchGrid.innerHTML = "";
+            document.querySelectorAll("[data-family-key]").forEach(btn => {
+                btn.classList.remove("ring-2", "ring-purple-400");
+            });
+            document.getElementById('resinMixingCalculatorBox').classList.add('hidden');
+        };
+
+        renderColorFamilies();
+
+        function updateResinCalculator(colorName, colorData = null) {
+            const calcBox = document.getElementById('resinMixingCalculatorBox');
+            const badge = document.getElementById('resinActiveColorBadge');
+            const baseType = document.getElementById('resinBaseType');
+            const drops = document.getElementById('resinPigmentDrops');
+            const notes = document.getElementById('resinMixingNotes');
+
+            calcBox.classList.remove('hidden');
+            badge.textContent = `Selected: ${colorName}`;
+
+            if (colorData?.type === "metallic") {
+                baseType.textContent = "Clear / Neutral Resin Base (100ml)";
+                drops.textContent = "Metallic pigment amount depends on the pigment manufacturer's concentration";
+                notes.textContent = `Target finish: ${colorData.family} metallic • visual reference ${colorData.hex}. Test a small batch first because metallic powders vary by brand.`;
+            } else {
+                baseType.textContent = "Standard Clear UV Resin Base (100ml)";
+                drops.textContent = "Pigment amount depends on pigment concentration";
+                notes.textContent = `Target visual shade: ${colorData?.hex || colorName}. Test a small batch first and adjust gradually.`;
+            }
+        }
+
+        categorySelect.addEventListener('change', (e) => {
+            styleSelect.innerHTML = '<option value="">Select Style (Optional)...</option>';
+            if (e.target.value) {
+                styles[e.target.value].forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s;
+                    opt.textContent = s;
+                    styleSelect.appendChild(opt);
+                });
+            }
+        });
+
+        window.switchTab = function(tabName) {
+            document.getElementById('viewGenerator')?.classList.remove('hidden');
+        };
+
+        let uploadedImages = [];
+        window.activeSelectedImage = null;
+
+        document.getElementById('multiImageUpload').addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            if (uploadedImages.length + files.length > 10) return;
+
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const resultParts = event.target.result.split(',');
+                    const mimeType = resultParts[0].match(/:(.*?);/)[1];
+                    const base64 = resultParts[1];
+                    uploadedImages.push({ base64, mimeType, dataUrl: event.target.result });
+                    updateThumbnailsUI();
+                };
+                reader.readAsDataURL(file);
+            });
+            e.target.value = '';
+        });
+
+        window.removeUploadedImage = function(index) {
+            uploadedImages.splice(index, 1);
+            updateThumbnailsUI();
+        };
+
+        function updateThumbnailsUI() {
+            const grid = document.getElementById('uploadedThumbnailsGrid');
+            const badge = document.getElementById('imageCountBadge');
+            badge.textContent = uploadedImages.length;
+
+            if (uploadedImages.length === 0) {
+                grid.innerHTML = '<span id="noImagesText" class="col-span-5 text-center text-xs text-slate-500 py-2">No images uploaded yet</span>';
+                return;
+            }
+
+            grid.innerHTML = '';
+            uploadedImages.forEach((imgObj, idx) => {
+                const thumb = document.createElement('div');
+                thumb.className = 'relative group bg-slate-950 rounded border border-slate-700 overflow-hidden h-14 flex items-center justify-center';
+                thumb.innerHTML = `
+                    <img src="${imgObj.dataUrl}" class="h-full w-full object-cover">
+                    <button onclick="removeUploadedImage(${idx})" class="absolute top-0.5 right-0.5 bg-red-600 hover:bg-red-700 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold opacity-0 group-hover:opacity-100 transition">×</button>
+                `;
+                grid.appendChild(thumb);
+            });
+        }
+
+        const subjectsBank = ["cybernetic samurai warrior", "steampunk mechanical owl", "bioluminescent cosmic jellyfish", "fantasy dragon", "futuristic starfighter spaceship", "zombie apocalypse survivor", "ancient rune monolith", "synthwave sports car", "magical floating island", "crystal skull", "mecha giant robot", "elven forest spirit", "retro arcade cabinet", "haunted gothic gargoyle", "quantum core reactor"];
+        const settingsBank = ["in neon rain", "on an alien planet", "inside an ancient temple", "floating in deep space", "surrounded by wildflowers", "on a volcanic cliffside", "in a dark cyberpunk alleyway", "under northern lights", "inside a wizard's laboratory", "on a desert highway"];
+        const detailsBank = ["glowing with blue plasma energy", "adorned with gold filigree", "weathered and battle-scarred", "carved from sparkling glacial ice", "covered in glowing moss and roots", "emitting holographic light", "with intricate brass gears", "radiating mystical aura"];
+
+        document.getElementById('randomizePromptBtn').addEventListener('click', () => {
+            const subj = subjectsBank[Math.floor(Math.random() * subjectsBank.length)];
+            const sett = settingsBank[Math.floor(Math.random() * settingsBank.length)];
+            const det = detailsBank[Math.floor(Math.random() * detailsBank.length)];
+            const seedNum = Math.floor(Math.random() * 999999);
+
+            const infiniteProceduralPrompt = `A detailed masterpiece of a ${subj} ${sett}, ${det} [Procedural Unique Seed #${seedNum}]`;
+
+            const promptBox = document.getElementById('prompt');
+            promptBox.value = "";
+            promptBox.value = infiniteProceduralPrompt;
+            
+            categorySelect.value = "Vector & 3D Objects";
+            categorySelect.dispatchEvent(new Event('change'));
+            styleSelect.value = "Resin Model";
+        });
+
+        async function callGeminiImageAPI(promptText, customAspectRatio = null) {
+            const ratio = customAspectRatio || document.getElementById('aspectRatioSelect').value || "1:1";
+            const unrestricted = document.getElementById('unrestrictedOverride').checked;
+            const bgChoice = backgroundSelect ? backgroundSelect.value : "transparent";
+
+            let bgInstruction = "";
+            if (bgChoice === "transparent") {
+                bgInstruction = "ISOLATED OBJECT, NO BACKGROUND: Render the subject completely isolated against a solid pure white background with clean silhouette edges.";
+            } else if (bgChoice === "solid-black") {
+                bgInstruction = "SOLID BACKGROUND: Render the subject against a clean, flat solid pitch-black background.";
+            } else if (bgChoice === "solid-white") {
+                bgInstruction = "SOLID BACKGROUND: Render the subject against a clean, flat solid pure white background.";
+            } else if (bgChoice === "studio-gradient") {
+                bgInstruction = "STUDIO BACKGROUND: Render with a subtle professional neutral studio gradient lighting background.";
+            } else if (bgChoice === "contextual") {
+                bgInstruction = "CONTEXTUAL BACKGROUND: Render with a fully detailed environmental background.";
+            }
+
+            let colorInstruction = activeSelectedColor
+                ? `COLOR / MATERIAL SPECIFICATION: Use the selected shade as the dominant requested colour: [${activeSelectedColor}]. Match the selected shade closely. If it is a metallic family, preserve a physically plausible reflective metal appearance with highlights and reflections appropriate to that metal rather than rendering it as flat paint.`
+                : "";
+            const exactText = document.getElementById('exactTextInput')?.value.trim() || "";
+            const exactTextInstruction = exactText
+                ? `EXACT VISIBLE TEXT REQUIREMENT: The image must visibly contain exactly "${exactText}". Preserve spelling, capitalization, spacing and punctuation exactly. Do not paraphrase or alter the wording.`
+                : "";
+            const fidelityInstruction = unrestricted
+                ? `HIGH-FIDELITY PROMPT EXECUTION: Follow every requested object, object count, accessory, position, material, colour, text element, atmosphere and scene relationship as literally as possible. Do not silently omit important requested details.`
+                : "";
+
+            let finalPromptText = `${fidelityInstruction} ${promptText}. ${exactTextInstruction} ${colorInstruction} ${bgInstruction}`;
+            if (uploadedImages.length > 0) {
+                finalPromptText = `REFERENCE-LOCKED IMAGE TRANSFORMATION: Use the provided reference image(s) as the authoritative visual base. Preserve identity, object count, proportions, markings, colours, materials and distinctive details unless the prompt explicitly changes them. Apply: "${promptText}". ${exactTextInstruction} ${colorInstruction} ${bgInstruction}`;
+            } else if (unrestricted) {
+                finalPromptText = `LITERAL CREATIVE DIRECTIVE: Render precisely according to the user's prompt: "${promptText}". ${exactTextInstruction} ${colorInstruction} ${bgInstruction}`;
+            }
+
+            const parts = [{ text: finalPromptText }];
+            
+            uploadedImages.forEach(imgObj => {
+                parts.push({
+                    inlineData: { mimeType: imgObj.mimeType, data: imgObj.base64 }
+                });
+            });
+
+            const payload = {
+                contents: [{ role: 'user', parts: parts }],
+                generationConfig: { 
+                    responseModalities: ['IMAGE'],
+                    imageConfig: { aspectRatio: ratio, imageSize: document.getElementById('imageSizeSelect')?.value || "1K" }
+                }
+            };
+
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+            const inlineData = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData;
+            if (!inlineData) throw new Error("API did not return image data.");
+            return `data:${inlineData.mimeType};base64,${inlineData.data}`;
+        }
+
+        document.getElementById('generateVariationsBtn').addEventListener('click', async () => {
+            const p = document.getElementById('prompt').value.trim();
+            const s = styleSelect.value;
+            const t = themeSelect.value;
+            const count = parseInt(document.getElementById('variationCountSelect').value) || 1;
+            if (!p && uploadedImages.length === 0) return;
+
+            let basePrompt = p || "transformed subject";
+            if (s) basePrompt += `, style: ${s}`;
+            if (activeSelectedColor) basePrompt += `, color: ${activeSelectedColor}`;
+            const finalQuery = t ? `${basePrompt}, theme: ${t}` : basePrompt;
+
+            loading.classList.remove('hidden');
+            loadingText.textContent = `Generating ${count} Masterpiece Variation(s)...`;
+            document.getElementById('placeholder').classList.add('hidden');
+            document.getElementById('resultContent').classList.add('hidden');
+            document.getElementById('sixImageGrid').classList.add('hidden');
+            document.getElementById('multiAngleContent').classList.add('hidden');
+            document.getElementById('tenMockupsContent').classList.add('hidden');
+
+            const grid = document.getElementById('sixImageGrid');
+            grid.innerHTML = '';
+            grid.classList.remove('hidden');
+
+            for (let i = 0; i < count; i++) {
+                const skel = document.createElement('div');
+                skel.className = 'bg-slate-900 rounded-xl h-64 flex flex-col items-center justify-center border border-slate-700 animate-pulse';
+                skel.innerHTML = `<div class="loader rounded-full border-4 h-8 w-8 mb-2"></div><span class="text-xs text-slate-500">Variation #${i+1}</span>`;
+                grid.appendChild(skel);
+            }
+
+            const promises = [];
+            for (let i = 0; i < count; i++) {
+                promises.push(callGeminiImageAPI(`${finalQuery} (Variation ${i+1})`).then(url => ({url})).catch(err => ({error: err.message})));
+            }
+
+            try {
+                const results = await Promise.all(promises);
+                grid.innerHTML = '';
+
+                results.forEach((resultItem, idx) => {
+                    const dataUrl = resultItem?.url || null;
+                    const card = document.createElement('div');
+                    card.className = 'bg-slate-900 p-3 rounded-xl border border-slate-700 flex flex-col items-center space-y-2 shadow-md';
+                    if (dataUrl) {
+                        card.innerHTML = `
+                            <span class="text-xs font-semibold text-blue-300">Variation #${idx + 1}</span>
+                            <div class="checkerboard w-full rounded-lg h-48 flex items-center justify-center p-2 overflow-hidden">
+                                <img src="${dataUrl}" class="rounded-lg h-full object-contain cursor-pointer hover:opacity-90 transition" onclick="selectFavoriteImage('${dataUrl}')">
+                            </div>
+                            <div class="flex gap-2 w-full">
+                                <button onclick="selectFavoriteImage('${dataUrl}')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-xs py-1.5 rounded font-semibold text-white transition">Select Active</button>
+                                <button onclick="downloadSingleUrl('${dataUrl}', 'variation-${idx+1}.png')" class="bg-slate-700 hover:bg-slate-600 text-xs px-3 py-1.5 rounded font-semibold text-white transition">DL</button>
+                            </div>
+                        `;
+                    } else {
+                        card.innerHTML = `<span class="text-xs text-red-400">Failed #${idx+1}</span><span class="text-[10px] text-slate-500 text-center">${resultItem?.error || "Unknown error"}</span>`;
+                    }
+                    grid.appendChild(card);
+                });
+                document.getElementById('resultsArea').scrollIntoView({ behavior: 'smooth' });
+
+            } catch (err) {
+                console.error(err);
+            } finally {
+                loading.classList.add('hidden');
+            }
+        });
+
+        window.selectFavoriteImage = function(dataUrl) {
+            img.src = dataUrl;
+            window.activeSelectedImage = dataUrl;
+            document.getElementById('sixImageGrid').classList.add('hidden');
+            document.getElementById('resultContent').classList.remove('hidden');
+            document.getElementById('backToGridBtn').classList.remove('hidden');
+            document.getElementById('resultsArea').scrollIntoView({ behavior: 'smooth' });
+        };
+
+        window.backToGrid = function() {
+            document.getElementById('resultContent').classList.add('hidden');
+            document.getElementById('sixImageGrid').classList.remove('hidden');
+        };
+
+        window.resetToStudio = function() {
+            document.getElementById('multiAngleContent').classList.add('hidden');
+            document.getElementById('tenMockupsContent').classList.add('hidden');
+            if (window.activeSelectedImage || img.src) {
+                document.getElementById('placeholder').classList.add('hidden');
+                document.getElementById('resultContent').classList.remove('hidden');
+            } else {
+                document.getElementById('placeholder').classList.remove('hidden');
+            }
+        };
+
+        
+
+        document.getElementById('generateTenMockupsBtn').addEventListener('click', async () => {
+            if (uploadedImages.length === 0) {
+                alert("Please upload at least one reference image for mockups!");
+                return;
+            }
+            const p = document.getElementById('prompt').value.trim() || "place uploaded image into professional mockups";
+
+            loading.classList.remove('hidden');
+            loadingText.textContent = "Generating 10 Consistent Mockup Angles...";
+            document.getElementById('resultContent').classList.add('hidden');
+            document.getElementById('sixImageGrid').classList.add('hidden');
+            document.getElementById('multiAngleContent').classList.add('hidden');
+            document.getElementById('tenMockupsContent').classList.add('hidden');
+            document.getElementById('placeholder').classList.add('hidden');
+
+            const grid = document.getElementById('tenMockupsGrid');
+            grid.innerHTML = '';
+            document.getElementById('tenMockupsContent').classList.remove('hidden');
+
+            for (let i = 0; i < 10; i++) {
+                const skel = document.createElement('div');
+                skel.className = 'bg-slate-900 rounded-xl h-56 flex flex-col items-center justify-center border border-slate-700 animate-pulse';
+                skel.innerHTML = `<div class="loader rounded-full border-4 h-8 w-8 mb-2"></div><span class="text-xs text-slate-500">Mockup #${i+1}</span>`;
+                grid.appendChild(skel);
+            }
+
+            const environmentAngles = [
+                "Eye-level straight on view", "Wide angle room view", "Close-up focal crop", 
+                "Overhead perspective", "Morning lighting angle", "Evening ambiance angle", 
+                "Side profile view", "Magazine editorial angle", "Centered symmetrical perspective", "Lifestyle staging angle"
+            ];
+
+            const promises = environmentAngles.map((angleDesc) => {
+                const anglePrompt = `Professional mockup. ${p}. Camera angle: ${angleDesc}.`;
+                return callGeminiImageAPI(anglePrompt).catch(err => null);
+            });
+
+            try {
+                const results = await Promise.all(promises);
+                grid.innerHTML = '';
+
+                results.forEach((dataUrl, idx) => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-slate-900 p-3 rounded-xl border border-slate-700 flex flex-col items-center space-y-2 shadow-md';
+                    if (dataUrl) {
+                        card.innerHTML = `
+                            <span class="text-xs font-semibold text-amber-300">Mockup #${idx + 1}</span>
+                            <div class="checkerboard w-full rounded-lg h-40 flex items-center justify-center p-1">
+                                <img src="${dataUrl}" class="rounded-lg h-full object-contain cursor-pointer hover:opacity-90 transition" onclick="selectFavoriteImage('${dataUrl}')">
+                            </div>
+                            <div class="flex gap-2 w-full">
+                                <button onclick="selectFavoriteImage('${dataUrl}')" class="flex-1 bg-amber-600 hover:bg-amber-700 text-xs py-1.5 rounded font-semibold text-white transition">Select</button>
+                                <button onclick="downloadSingleUrl('${dataUrl}', 'consistent-mockup-${idx+1}.png')" class="bg-slate-700 hover:bg-slate-600 text-xs px-3 py-1.5 rounded font-semibold text-white transition">DL</button>
+                            </div>
+                        `;
+                    } else {
+                        card.innerHTML = `<span class="text-xs text-red-400">Failed #${idx+1}</span>`;
+                    }
+                    grid.appendChild(card);
+                });
+                document.getElementById('resultsArea').scrollIntoView({ behavior: 'smooth' });
+
+            } catch (err) {
+                console.error(err);
+            } finally {
+                loading.classList.add('hidden');
+            }
+        });
+
+        window.downloadSingleAngle = function(imgId, filename) {
+            const src = document.getElementById(imgId).src;
+            if (!src) return;
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = src;
+            link.click();
+        };
+
+        window.downloadSingleUrl = function(url, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = url;
+            link.click();
+        };
+
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            const src = img.src;
+            if (!src) return;
+            const link = document.createElement('a');
+            link.download = `stylemaster-masterpiece.png`;
+            link.href = src;
+            link.click();
+        });
+    
+        // ---------- Angle correction helpers ----------
+        window.angleLockMasterImage = window.angleLockMasterImage || null;
+
+        function dataUrlToRefObject(dataUrl) {
+            const m = /^data:(.*?);base64,(.*)$/.exec(dataUrl || "");
+            if (!m) return null;
+            return { mimeType: m[1], base64: m[2] };
+        }
+
+        async function generateLockedAngle(promptText, masterDataUrl) {
+            const ref = dataUrlToRefObject(masterDataUrl);
+            if (!ref) throw new Error("Locked master image is unavailable.");
+
+            const ratio = document.getElementById('aspectRatioSelect')?.value || "1:1";
+            const payload = {
+                contents: [{
+                    role: 'user',
+                    parts: [
+                        { text: promptText },
+                        { inlineData: { mimeType: ref.mimeType, data: ref.base64 } }
+                    ]
+                }],
+                generationConfig: {
+                    responseModalities: ['IMAGE'],
+                    imageConfig: {
+                        aspectRatio: ratio,
+                        imageSize: document.getElementById('imageSizeSelect')?.value || "1K"
+                    }
+                }
+            };
+
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            const inlineData = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData;
+            if (!inlineData) throw new Error(result?.error?.message || "Gemini did not return an angle image.");
+            return `data:${inlineData.mimeType};base64,${inlineData.data}`;
+        }
+
+
+        window.regenerateAngle = async function(angleKey) {
+            const glbUrl = window.true3DAngleModelUrl;
+            if(!glbUrl) {
+                alert("Generate the selected angles first so StyleMaster can build the consistent 3D model.");
+                return;
+            }
+            try {
+                const loading = document.getElementById("loading");
+                const loadingText = document.getElementById("loadingText");
+                loading?.classList.remove("hidden");
+                if(loadingText) loadingText.textContent = `Re-rendering exact ${angleKey} camera view from the same 3D model…`;
+                const url = await renderFixed3DAngle(glbUrl,angleKey);
+                window.angleResults = window.angleResults || {};
+                window.angleResults[angleKey] = url;
+                const img = document.getElementById(V7_ANGLE_IMG[angleKey]);
+                if(img) img.src = url;
+                const card = document.querySelector(`[data-angle-key="${angleKey}"]`);
+                if(card) card.classList.remove("hidden");
+                loading?.classList.add("hidden");
+            } catch(err) {
+                document.getElementById("loading")?.classList.add("hidden");
+                alert(`Could not re-render ${angleKey}: ${err.message}`);
+            }
+        };
+
+        // ---------- True 360° Meshy 3D Builder ----------
+        const THREE_D_BACKEND = (location.hostname === "gemini.google.com")
+            ? "http://localhost:3000"
+            : location.origin;
+
+        window.openTrue3DBuilder = function() {
+            document.getElementById('true3DBuilder')?.classList.remove('hidden');
+            document.getElementById('true3DBuilder')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+
+        window.closeTrue3DBuilder = function() {
+            document.getElementById('true3DBuilder')?.classList.add('hidden');
+        };
+
+        function set3DProgress(message, progress) {
+            const box = document.getElementById('true3DStatusBox');
+            const text = document.getElementById('true3DStatusText');
+            const ptext = document.getElementById('true3DProgressText');
+            const bar = document.getElementById('true3DProgressBar');
+            box?.classList.remove('hidden');
+            if (text) text.textContent = message;
+            const safe = Math.max(0, Math.min(100, Number(progress) || 0));
+            if (ptext) ptext.textContent = `${Math.round(safe)}%`;
+            if (bar) bar.style.width = `${safe}%`;
+        }
+
+        async function backendJson(path, options = {}) {
+            const response = await fetch(`${THREE_D_BACKEND}${path}`, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(options.headers || {})
+                }
+            });
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(data.error || `3D backend error (${response.status})`);
+            return data;
+        }
+
+        async function pollTask(path, label, startProgress = 5, endProgress = 85) {
+            while (true) {
+                const data = await backendJson(path);
+                const raw = Number(data.progress) || 0;
+                const mapped = startProgress + (raw / 100) * (endProgress - startProgress);
+                set3DProgress(`${label}: ${data.status || "working"}…`, mapped);
+
+                if (data.status === "SUCCEEDED") return data;
+                if (["FAILED", "CANCELED"].includes(data.status)) {
+                    throw new Error(data.task_error?.message || data.task_error || `${label} failed.`);
+                }
+                await new Promise(resolve => setTimeout(resolve, 4000));
+            }
+        }
+
+        function render3DDownloads(modelUrls) {
+            const grid = document.getElementById('true3DDownloadGrid');
+            grid.innerHTML = "";
+            const labels = {
+                glb: "GLB", stl: "STL", obj: "OBJ", fbx: "FBX", usdz: "USDZ", "3mf": "3MF"
+            };
+            ["glb","stl","3mf","obj","fbx","usdz"].forEach(fmt => {
+                const url = modelUrls?.[fmt];
+                if (!url) return;
+                const a = document.createElement("a");
+                a.href = url;
+                a.target = "_blank";
+                a.rel = "noopener";
+                a.className = "bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold text-center py-2.5 px-2 rounded-lg transition";
+                a.textContent = `Download ${labels[fmt]}`;
+                grid.appendChild(a);
+            });
+        }
+
+        window.buildTrue3DModel = async function() {
+            const ids = ['angleFront', 'angleLeft', 'angleRight', 'angleBack'];
+            const images = ids.map(id => document.getElementById(id)?.src).filter(src => src && src.startsWith("data:image/"));
+            if (images.length < 4) {
+                alert("Please generate the Front, Left, Right and Back angle views first.");
+                return;
+            }
+
+            const btn = document.getElementById('build3DModelBtn');
+            const heightMmRaw = document.getElementById('modelHeightMm')?.value;
+            const heightMm = heightMmRaw ? Number(heightMmRaw) : null;
+            if (heightMm !== null && (!Number.isFinite(heightMm) || heightMm < 1 || heightMm > 10000)) {
+                alert("Enter a model height between 1 mm and 10,000 mm, or leave it blank.");
+                return;
+            }
+
+            const ultra = !!document.getElementById('meshyUltraMode')?.checked;
+            const pbr = !!document.getElementById('meshyPbrMode')?.checked;
+
+            btn.disabled = true;
+            btn.textContent = "Building 3D model…";
+            document.getElementById('true3DResult')?.classList.add('hidden');
+
+            try {
+                set3DProgress("Sending the four locked views to the 3D engine…", 3);
+
+                const created = await backendJson('/api/3d/create', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        images,
+                        ultra_mode: ultra,
+                        enable_pbr: pbr
+                    })
+                });
+
+                const base = await pollTask(`/api/3d/status/${encodeURIComponent(created.id)}`, "Building geometry and textures", 5, heightMm ? 66 : 94);
+                let finalUrls = base.model_urls || {};
+
+                if (heightMm) {
+                    set3DProgress(`Applying exact ${heightMm} mm model height…`, 68);
+                    const resizedCreated = await backendJson('/api/3d/resize', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            input_task_id: created.id,
+                            height_mm: heightMm
+                        })
+                    });
+
+                    const resized = await pollTask(`/api/3d/resize-status/${encodeURIComponent(resizedCreated.id)}`, "Resizing to real-world scale", 68, 82);
+                    const resizedGlb = resized?.model_urls?.glb;
+                    if (!resizedGlb) throw new Error("Scaled GLB was not returned.");
+
+                    set3DProgress("Creating all scaled export formats…", 84);
+                    const convertedCreated = await backendJson('/api/3d/convert', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            model_url: resizedGlb
+                        })
+                    });
+                    const converted = await pollTask(`/api/3d/convert-status/${encodeURIComponent(convertedCreated.id)}`, "Exporting GLB / STL / 3MF / OBJ / FBX / USDZ", 84, 98);
+                    finalUrls = converted.model_urls || {};
+                    if (!finalUrls.glb) finalUrls.glb = resizedGlb;
+                }
+
+                set3DProgress("3D model ready.", 100);
+                const viewer = document.getElementById('true3DViewer');
+                if (viewer && finalUrls.glb) viewer.src = finalUrls.glb;
+
+                render3DDownloads(finalUrls);
+                document.getElementById('true3DResult')?.classList.remove('hidden');
+                document.getElementById('true3DResult')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (err) {
+                set3DProgress(`3D generation failed: ${err.message}`, 0);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Generate True 3D Model from 4 Locked Views";
+            }
+        };
+
+
+        // ---------- Selective Angle Generation ----------
+        const SELECTABLE_ANGLES = ["front","left","right","back","top","bottom"];
+
+        function selectedAnglesNow() {
+            return [...document.querySelectorAll(".angle-choice:checked")].map(x => x.value);
+        }
+
+        function refreshAngleCount() {
+            const n = selectedAnglesNow().length;
+            const el = document.getElementById("selectedAngleCostHint");
+            if (el) el.textContent = `${n} selected • ${n} generation${n === 1 ? "" : "s"}`;
+        }
+
+        window.selectAllAngles = function(value) {
+            document.querySelectorAll(".angle-choice").forEach(x => x.checked = value);
+            refreshAngleCount();
+        };
+
+        document.querySelectorAll(".angle-choice").forEach(x => x.addEventListener("change", refreshAngleCount));
+        refreshAngleCount();
+
+        // ---------- Live StyleMaster Community ----------
+        const COMMUNITY_BASE = (location.hostname === "gemini.google.com") ? "http://localhost:3000" : location.origin;
+        let styleMasterSocket = null;
+
+        window.openCommunity = function() {
+            document.getElementById("communityPanel")?.classList.remove("hidden");
+            connectCommunity();
+            loadCommunityFeed();
+        };
+        window.closeCommunity = function() {
+            document.getElementById("communityPanel")?.classList.add("hidden");
+        };
+        function safeText(v) {
+            return String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+        }
+        function communityCard(p) {
+            const image = p.imageUrl ? `<img src="${safeText(COMMUNITY_BASE + p.imageUrl)}" class="w-full aspect-square object-cover rounded-lg" alt="Community creation">` : "";
+            return `<article class="community-card bg-slate-950 border border-slate-700 rounded-xl p-3 space-y-2" data-id="${safeText(p.id)}">
+                ${image}
+                <div class="flex justify-between gap-2"><b class="text-xs text-cyan-300">${safeText(p.name)}</b><span class="text-[10px] text-slate-500">${safeText(p.createdAt)}</span></div>
+                <p class="text-xs text-slate-300 whitespace-pre-wrap">${safeText(p.prompt)}</p>
+                <textarea class="hidden stored-prompt">${safeText(p.prompt)}</textarea>
+                <div class="flex gap-2">
+                    <button onclick="useCommunityPrompt('${safeText(p.id)}')" class="bg-slate-800 hover:bg-slate-700 px-2 py-1.5 rounded text-[11px]">Use Prompt</button>
+                    <button onclick="likeCommunityPost('${safeText(p.id)}')" class="bg-slate-800 hover:bg-slate-700 px-2 py-1.5 rounded text-[11px]">❤ ${Number(p.likes||0)}</button>
+                </div>
+            </article>`;
+        }
+        async function connectCommunity() {
+            const status = document.getElementById("communityStatus");
+            try {
+                if (!window.io) {
+                    await new Promise((resolve,reject) => {
+                        const s = document.createElement("script");
+                        s.src = `${COMMUNITY_BASE}/socket.io/socket.io.js`;
+                        s.onload = resolve; s.onerror = reject;
+                        document.head.appendChild(s);
+                    });
+                }
+                if (!styleMasterSocket) {
+                    styleMasterSocket = io(COMMUNITY_BASE);
+                    styleMasterSocket.on("connect", () => { if(status) status.textContent="Live community connected."; });
+                    styleMasterSocket.on("community:new-post", () => loadCommunityFeed());
+                    styleMasterSocket.on("community:updated", () => loadCommunityFeed());
+                }
+            } catch {
+                if(status) status.textContent="Community server is offline.";
+            }
+        }
+        window.loadCommunityFeed = async function() {
+            const feed = document.getElementById("communityFeed");
+            try {
+                const r = await fetch(`${COMMUNITY_BASE}/api/community/posts`);
+                const d = await r.json();
+                feed.innerHTML = d.posts?.length ? d.posts.map(communityCard).join("") : `<p class="text-sm text-slate-500">No posts yet — be the first.</p>`;
+            } catch(e) {
+                feed.innerHTML = `<p class="text-sm text-slate-500">Start the StyleMaster server to use the live community.</p>`;
+            }
+        };
+        window.shareCommunityPost = async function() {
+            const name = document.getElementById("communityName").value.trim();
+            const prompt = document.getElementById("communityPrompt").value.trim();
+            const file = document.getElementById("communityImageUpload").files[0];
+            if(!name) return alert("Enter a display name.");
+            if(!prompt && !file) return alert("Add an image or prompt.");
+            const fd = new FormData();
+            fd.append("name",name); fd.append("prompt",prompt);
+            if(file) fd.append("image",file);
+            const r = await fetch(`${COMMUNITY_BASE}/api/community/posts`,{method:"POST",body:fd});
+            const d = await r.json().catch(()=>({}));
+            if(!r.ok) return alert(d.error || "Post failed.");
+            document.getElementById("communityPrompt").value="";
+            document.getElementById("communityImageUpload").value="";
+            loadCommunityFeed();
+        };
+        window.useCommunityPrompt = function(id) {
+            const card = [...document.querySelectorAll(".community-card")].find(x => x.dataset.id === id);
+            const value = card?.querySelector(".stored-prompt")?.value || "";
+            const promptBox = document.getElementById("prompt");
+            if(promptBox) promptBox.value=value;
+            closeCommunity();
+        };
+        window.likeCommunityPost = async function(id) {
+            await fetch(`${COMMUNITY_BASE}/api/community/posts/${encodeURIComponent(id)}/like`,{method:"POST"});
+            loadCommunityFeed();
+        };
+
+
+        // ---------- Creative Safety + Originality Guard ----------
+        const ORIGINALITY_CHARACTER_MAP = [
+            { names: ["batman"], replacement: "an original nocturnal urban vigilante in a unique matte-black armored suit, with an abstract wing-like silhouette, no bat logo, no copied costume details, no franchise insignia" },
+            { names: ["superman"], replacement: "an original solar-powered heroic guardian in a unique blue-and-crimson futuristic suit, no chest emblem, no cape/costume replication, no franchise insignia" },
+            { names: ["spider-man","spiderman"], replacement: "an original agile wall-crawling masked hero with a unique geometric suit pattern, no spider logo, no copied mask design, no franchise insignia" },
+            { names: ["hulk"], replacement: "an original colossal super-strong green-skinned fantasy brute with distinct anatomy and clothing design, not matching any existing franchise character" },
+            { names: ["iron man"], replacement: "an original high-tech armored flying hero with a unique exosuit silhouette, helmet and energy system, no copied armor design or chest reactor" },
+            { names: ["deadpool"], replacement: "an original irreverent masked red-and-charcoal mercenary antihero with a unique costume, no copied mask markings or franchise insignia" },
+            { names: ["wolverine"], replacement: "an original rugged enhanced fighter with retractable forearm blades and a unique costume, no copied mask/costume details or franchise insignia" },
+            { names: ["wonder woman"], replacement: "an original mythic warrior heroine with unique ancient-inspired armor, no copied insignia, tiara or costume design" },
+            { names: ["joker"], replacement: "an original theatrical chaos-themed villain with pale stage makeup, a unique tailored outfit and distinct facial design, not matching any existing franchise version" },
+            { names: ["harley quinn"], replacement: "an original chaotic acrobat-inspired antiheroine with unique carnival-punk styling, no copied costume, makeup pattern or insignia" },
+            { names: ["mickey mouse"], replacement: "an original cheerful vintage cartoon mascot with round expressive features and a wholly unique silhouette, clothing and proportions" },
+            { names: ["sonic"], replacement: "an original fast-moving electric-blue fantasy creature with a unique species design, silhouette, footwear and facial structure" }
+        ];
+
+        const BLOCK_PATTERNS = [
+            {
+                re: /\b(how\s+to|step[-\s]?by[-\s]?step|instructions?|recipe|blueprint|setup|build|make|manufacture|synthesize|cook)\b.{0,80}\b(meth|cocaine|fentanyl|heroin|mdma|drug\s+lab|narcotics?)\b/i,
+                reason: "I can help with fictional crime or horror imagery, but not instructions or realistic depictions intended to help build or operate a drug laboratory."
+            },
+            {
+                re: /\b(realistic|photorealistic|ultra[-\s]?realistic)?\b.{0,35}\b(decapitat(?:e|ed|ion)|dismember(?:ed|ment)?|behead(?:ed|ing)?|severed\s+head|guts\s+spilling|exposed\s+organs|graphic\s+gore)\b/i,
+                reason: "That request is too explicitly graphic. You can still create a horror-film version with implied injury, stylised blood, silhouettes, aftermath, monsters or non-graphic violence."
+            },
+            {
+                re: /\b(how\s+to|instructions?|blueprint|build|make|assemble|construct)\b.{0,80}\b(bomb|grenade|explosive\s+device|detonator|weapon)\b/i,
+                reason: "Action and explosion scenes are fine, but the generator will not provide instructional weapon/explosive construction content."
+            },
+            {
+                re: /\b(kill|murder|assassinate|attack|shoot|stab)\b.{0,50}\b(real\s+person|politician|celebrity|my\s+boss|my\s+teacher|my\s+neighbor|my\s+neighbour)\b/i,
+                reason: "Fictional action/horror is allowed, but targeted violent depictions involving identifiable real people are restricted."
+            }
+        ];
+
+        const ALLOWED_FICTION_HINTS = /\b(zombie|zombies|apocalypse|horror|monster|undead|slasher|haunted|demon|creature|fantasy\s+battle|war\s+satire|parody|comic|cartoon|cinematic|movie\s+scene|film\s+scene)\b/i;
+
+        function remixProtectedCharacters(prompt) {
+            let result = prompt;
+            const replaced = [];
+            ORIGINALITY_CHARACTER_MAP.forEach(entry => {
+                entry.names.forEach(name => {
+                    const re = new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "ig");
+                    if (re.test(result)) {
+                        result = result.replace(re, entry.replacement);
+                        replaced.push(name);
+                    }
+                });
+            });
+
+            if (replaced.length) {
+                result += `
+
+ORIGINALITY REQUIREMENT:
+Create a genuinely original design rather than an exact franchise reproduction.
+Do not copy protected logos, symbols, signature costume paneling, exact masks, emblems, typography, prop designs, or distinctive franchise-specific visual identifiers.
+Keep only the broad creative idea requested by the user, then develop new shapes, costume details, materials, colors, accessories and surface design.`;
+            }
+            return { prompt: result, replaced };
+        }
+
+        function creativeSafetyPreflight(prompt) {
+            const enabled = document.getElementById("creativeSafetyMode")?.checked !== false;
+            if (!enabled) return { ok: true, prompt, notice: "" };
+
+            for (const rule of BLOCK_PATTERNS) {
+                if (rule.re.test(prompt)) {
+                    return { ok: false, prompt, notice: rule.reason };
+                }
+            }
+
+            let guarded = prompt;
+            let notice = "";
+
+            // Fictional horror/action is intentionally permitted, while keeping it non-instructional and non-explicitly graphic.
+            if (ALLOWED_FICTION_HINTS.test(prompt)) {
+                guarded += `
+
+FICTIONAL HORROR / ACTION BOUNDARY:
+This is a fictional creative scene. Non-graphic blood, zombie wounds, monsters, explosions, battlefield chaos, horror atmosphere and cinematic action are allowed.
+Keep gore non-explicit: no exposed internal organs, graphic dismemberment, lingering anatomical mutilation or realistic torture detail.
+Do not turn the image into real-world instructions for weapons, drugs or wrongdoing.`;
+            }
+
+            const remixed = remixProtectedCharacters(guarded);
+            guarded = remixed.prompt;
+            if (remixed.replaced.length) {
+                notice = "Named franchise character(s) detected — StyleMaster will create an original remix instead of an exact copy.";
+            }
+
+            return { ok: true, prompt: guarded, notice };
+        }
+
+        function showSafetyMessage(message, blocked = false) {
+            const box = document.getElementById("safetyPreflightMessage");
+            if (!box) return;
+            if (!message) {
+                box.classList.add("hidden");
+                return;
+            }
+            box.classList.remove("hidden");
+            box.className = `text-[11px] rounded-lg px-3 py-2 border ${blocked ? "text-red-300 border-red-500/40 bg-red-950/30" : "text-emerald-300 border-emerald-500/40 bg-emerald-950/20"}`;
+            box.textContent = message;
+        }
+
+        // Wrap the main Gemini image caller so every generation path receives the same preflight safety/originality logic.
+        const _styleMasterOriginalCallGeminiImageAPI = window.callGeminiImageAPI || (typeof callGeminiImageAPI === "function" ? callGeminiImageAPI : null);
+        if (_styleMasterOriginalCallGeminiImageAPI) {
+            window.callGeminiImageAPI = async function(promptText, ...rest) {
+                const check = creativeSafetyPreflight(promptText);
+                if (!check.ok) {
+                    showSafetyMessage(check.notice, true);
+                    throw new Error(check.notice);
+                }
+                showSafetyMessage(check.notice, false);
+                return _styleMasterOriginalCallGeminiImageAPI(check.prompt, ...rest);
+            };
+        }
+
+        // Main prompt box preflight helper for flows that build prompts before the shared API caller.
+        window.styleMasterGuardPrompt = function(promptText) {
+            const check = creativeSafetyPreflight(promptText);
+            showSafetyMessage(check.notice, !check.ok);
+            return check;
+        };
+
+
+        // Block disallowed direct prompts before the existing Generate handler runs.
+        const _generateBtn = document.getElementById("generateBtn");
+        if (_generateBtn) {
+            _generateBtn.addEventListener("click", function(e) {
+                const raw = document.getElementById("prompt")?.value || "";
+                const check = creativeSafetyPreflight(raw);
+                if (!check.ok) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    showSafetyMessage(check.notice, true);
+                    alert(check.notice);
+                } else {
+                    showSafetyMessage(check.notice, false);
+                }
+            }, true);
+        }
+
+
+        // ---------- Infinite Random Description Engine V6 ----------
+        // Goal:
+        // 1) Every click creates a new description.
+        // 2) If the user already wrote a concept, randomisation stays faithful to that concept.
+        // 3) Exact duplicate ideas are rejected for the lifetime of this browser profile.
+        // 4) The generator combines many independent dimensions, producing an effectively enormous idea space.
+
+        const RANDOM_HISTORY_KEY = "stylemaster_random_idea_history_v6";
+        const RANDOM_MAX_HISTORY = 50000;
+
+        const rnd = arr => arr[Math.floor(Math.random() * arr.length)];
+        const maybe = (p, value) => Math.random() < p ? value : "";
+        const uniquePick = (arr, count) => {
+            const copy = [...arr];
+            const out = [];
+            while (copy.length && out.length < count) out.push(copy.splice(Math.floor(Math.random()*copy.length),1)[0]);
+            return out;
+        };
+
+        const randomIdeaBanks = {
+            moods: [
+                "eerie but playful","cinematic and intense","darkly humorous","surreal and dreamlike","high-energy and chaotic",
+                "ominous and atmospheric","retro-futuristic","gritty and dramatic","whimsical and bizarre","luxurious and theatrical",
+                "moody neon-noir","post-apocalyptic","punk and rebellious","mysterious and elegant","hyper-stylised and energetic",
+                "cold and dystopian","warm but uncanny","epic and mythic","campy horror","clean premium studio aesthetic"
+            ],
+            settings: [
+                "an underground nightclub","a flooded city street","an abandoned luxury hotel","a rooftop during a lightning storm",
+                "a ruined amusement park","a neon-lit warehouse","a frozen wasteland","a desert rave","an overgrown shopping mall",
+                "a gothic cathedral converted into a club","a derelict spaceship hangar","a cyberpunk alley","a secret bunker",
+                "a haunted theatre","a post-apocalyptic festival","an underwater glass tunnel","a volcanic landscape",
+                "a rain-soaked city square","a moonlit cemetery","a futuristic broadcast studio","an abandoned subway station",
+                "a gigantic industrial arena","a surreal floating island","a retro 1980s arcade hall","a luxury penthouse party",
+                "a misty forest clearing","a massive festival main stage","a dystopian megacity plaza"
+            ],
+            actions: [
+                "performing to a packed crowd","mixing tracks with frantic precision","raising one hand as the bass drops",
+                "leaning over a futuristic console","hyping a chaotic audience","triggering a dramatic light show",
+                "standing calmly while the environment erupts around them","interacting with bizarre background characters",
+                "performing beneath moving spotlights","caught mid-motion in a dynamic hero shot","surrounded by flying confetti and debris",
+                "controlling holographic equipment","turning toward camera with a striking expression","performing during a blackout",
+                "leading a strange parade","hosting an impossible late-night broadcast","performing as the crowd surges forward"
+            ],
+            visualStyles: [
+                "photoreal cinematic concept art","high-end 3D character render","premium collectible-statue render","gritty horror film still",
+                "stylised dark-comedy poster","ultra-detailed game cinematic","retro VHS horror aesthetic","luxury advertising photography",
+                "hyperreal Unreal-style render","graphic-novel realism","high-fashion editorial photography","neon synthwave cinema",
+                "stop-motion-inspired 3D","polished animated-feature 3D","industrial sci-fi concept art","surreal fine-art photography",
+                "practical-effects horror aesthetic","80s creature-feature poster style","premium toy photography","epic key-art composition"
+            ],
+            lighting: [
+                "deep red emergency lighting","acid-green lasers","purple-and-cyan club lighting","hard white spotlights through smoke",
+                "flickering fluorescent lights","moonlight mixed with orange firelight","blue strobes and thick haze","warm tungsten practicals",
+                "harsh backlighting and silhouettes","multi-colour festival lasers","soft volumetric fog lighting","cold industrial overhead lights",
+                "flashing amber hazard lights","dramatic rim lighting","high-contrast noir lighting","glowing holographic light sources"
+            ],
+            lenses: [
+                "24mm wide-angle","35mm cinematic lens","50mm natural perspective","85mm portrait compression","ultra-wide 18mm perspective",
+                "low-angle hero framing","slight overhead framing","eye-level documentary framing","close cinematic medium shot",
+                "full-body environmental composition"
+            ],
+            details: [
+                "dense atmospheric smoke","wet reflective floors","subtle dust in the air","flying paper and debris","sparks in the background",
+                "animated LED panels","old CRT screens","fog spilling across the floor","laser beams cutting through haze",
+                "scattered props telling a story","crowd silhouettes","dramatic signage","reflective metal surfaces","gritty textured walls",
+                "glowing cables","broken glass catching the light","confetti mixed with ash","layered foreground silhouettes"
+            ],
+            twists: [
+                "with one completely unexpected comedic background detail","with a strange luxury element that contrasts with the chaos",
+                "with a subtle visual joke hidden in the scene","with a bizarre mascot character in the background",
+                "with an elegant high-fashion element","with a surreal environmental anomaly","with a retro technology twist",
+                "with a deliberately absurd prop","with a background event that tells a second story","with a premium collectible aesthetic"
+            ],
+            compositions: [
+                "strong central composition","dynamic diagonal composition","symmetrical poster composition","off-centre cinematic framing",
+                "layered foreground-midground-background composition","low-angle monumental framing","wide environmental storytelling shot",
+                "tight medium shot with deep background detail","hero composition with strong silhouette","crowd-framed performance shot"
+            ]
+        };
+
+        function getRandomHistory() {
+            try {
+                const arr = JSON.parse(localStorage.getItem(RANDOM_HISTORY_KEY) || "[]");
+                return Array.isArray(arr) ? arr : [];
+            } catch { return []; }
+        }
+
+        function saveRandomHistory(history) {
+            try {
+                localStorage.setItem(RANDOM_HISTORY_KEY, JSON.stringify(history.slice(-RANDOM_MAX_HISTORY)));
+            } catch {}
+        }
+
+        function normaliseIdeaForHistory(text) {
+            return String(text || "")
+                .toLowerCase()
+                .replace(/\s+/g, " ")
+                .replace(/[^\p{L}\p{N}\s]/gu, "")
+                .trim();
+        }
+
+        function makeIdeaFingerprint(text) {
+            const normalized = normaliseIdeaForHistory(text);
+            // lightweight deterministic browser-safe hash
+            let h1 = 2166136261;
+            for (let i=0;i<normalized.length;i++) {
+                h1 ^= normalized.charCodeAt(i);
+                h1 = Math.imul(h1, 16777619);
+            }
+            return (h1 >>> 0).toString(36) + ":" + normalized.slice(0,120);
+        }
+
+        function extractConceptSeed(raw) {
+            const clean = String(raw || "").trim();
+            if (!clean) return "";
+            return clean
+                .replace(/\s+/g, " ")
+                .replace(/^\s*(create|make|generate|show me|design)\s+/i, "")
+                .trim();
+        }
+
+        function buildRandomDescription(seedText) {
+            const hasSeed = !!seedText;
+            const mood = rnd(randomIdeaBanks.moods);
+            const setting = rnd(randomIdeaBanks.settings);
+            const action = rnd(randomIdeaBanks.actions);
+            const style = rnd(randomIdeaBanks.visualStyles);
+            const lighting = rnd(randomIdeaBanks.lighting);
+            const lens = rnd(randomIdeaBanks.lenses);
+            const composition = rnd(randomIdeaBanks.compositions);
+            const details = uniquePick(randomIdeaBanks.details, 3);
+            const twist = rnd(randomIdeaBanks.twists);
+
+            const seedOpening = hasSeed
+                ? `Keep the core concept unmistakably centred on: ${seedText}. Reinvent the scene around that exact idea without changing its subject or intent.`
+                : `Create a completely original concept with no connection to previous ideas.`;
+
+            const originalitySalt = Array.from({length:4},()=>Math.floor(Math.random()*9999)).join("-");
+            const optionalBeat = maybe(0.5, ` Add a secondary storytelling beat in the background that feels natural rather than random.`);
+            const optionalContrast = maybe(0.45, ` Introduce one visual contrast between beauty and chaos.`);
+            const optionalMotion = maybe(0.55, ` Include believable motion cues such as fabric movement, drifting haze, sparks, crowd movement or environmental debris.`);
+
+            return `${seedOpening}
+
+Scene direction: ${mood}, set in ${setting}, with the main subject ${action}. Present it as ${style}, using ${lighting}, ${lens}, and a ${composition}.
+
+Key visual details: ${details.join(", ")}. Add ${twist}.${optionalBeat}${optionalContrast}${optionalMotion}
+
+Originality rule: do not repeat a previous composition, environment, prop arrangement, lighting setup, camera treatment, supporting-character arrangement or storytelling beat. Keep the user's core concept if one was supplied, but vary everything else as creatively as possible.
+
+Variation seed: ${originalitySalt}`;
+        }
+
+        function getPromptElement() {
+            return document.getElementById("prompt") ||
+                   document.querySelector("textarea[placeholder*='prompt' i]") ||
+                   document.querySelector("textarea");
+        }
+
+        function generateNeverRepeatRandomDescription() {
+            const promptEl = getPromptElement();
+            if (!promptEl) return;
+
+            const userSeed = extractConceptSeed(promptEl.value);
+            const history = getRandomHistory();
+            const seen = new Set(history);
+
+            let candidate = "";
+            let fingerprint = "";
+
+            // Try many times to avoid any exact repeat in stored history.
+            for (let attempt = 0; attempt < 250; attempt++) {
+                candidate = buildRandomDescription(userSeed);
+                fingerprint = makeIdeaFingerprint(candidate);
+                if (!seen.has(fingerprint)) break;
+            }
+
+            // Absolute fallback adds a high-entropy creative identifier.
+            if (seen.has(fingerprint)) {
+                candidate += `\nUnique creative nonce: ${Date.now()}-${Math.random().toString(36).slice(2)}-${crypto?.randomUUID?.() || Math.random().toString(36).slice(2)}`;
+                fingerprint = makeIdeaFingerprint(candidate);
+            }
+
+            history.push(fingerprint);
+            saveRandomHistory(history);
+
+            promptEl.value = candidate;
+            promptEl.dispatchEvent(new Event("input", { bubbles: true }));
+            promptEl.focus();
+        }
+
+        window.generateNeverRepeatRandomDescription = generateNeverRepeatRandomDescription;
+
+        // Attach to likely random-description buttons without removing existing UI.
+        function bindRandomDescriptionButtons() {
+            const candidates = [
+                document.getElementById("randomPromptBtn"),
+                document.getElementById("randomDescriptionBtn"),
+                document.getElementById("randomBtn"),
+                ...[...document.querySelectorAll("button")].filter(b => /random\s*(description|prompt)?/i.test(b.textContent || ""))
+            ].filter(Boolean);
+
+            [...new Set(candidates)].forEach(btn => {
+                btn.addEventListener("click", e => {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    generateNeverRepeatRandomDescription();
+                }, true);
+            });
+        }
+
+        bindRandomDescriptionButtons();
+
+
+        // ---------- Angle Lock V7: pre-select 1–6 angles, no hidden extra generations ----------
+        const V7_ANGLE_ORDER = ["front","left","right","back","top","bottom"];
+        const V7_ANGLE_IMG = {
+            front:"angleFront", left:"angleLeft", right:"angleRight",
+            back:"angleBack", top:"angleTop", bottom:"angleBottom"
+        };
+
+        function getPreSelectedAngles() {
+            return [...document.querySelectorAll(".pre-angle-choice:checked")].map(x => x.value);
+        }
+
+        window.setPreAngles = function(on) {
+            document.querySelectorAll(".pre-angle-choice").forEach(x => x.checked = on);
+            updatePreAngleCount();
+        };
+
+        function updatePreAngleCount() {
+            const n = getPreSelectedAngles().length;
+            const count = document.getElementById("preAngleCount");
+            if (count) count.textContent = `${n} selected • ${n} angle generation${n === 1 ? "" : "s"}`;
+
+            // Re-check backend availability so selecting a checkbox cannot accidentally
+            // enable the accurate-angle button while the backend is unavailable.
+            check3DAngleServer();
+        }
+
+        document.querySelectorAll(".pre-angle-choice").forEach(x => x.addEventListener("change", updatePreAngleCount));
+        updatePreAngleCount();
+
+        function dataUrlRefV7(src) {
+            if (!src || !src.startsWith("data:")) return null;
+            const comma = src.indexOf(",");
+            const head = src.slice(0, comma);
+            const m = head.match(/^data:(.*?);base64$/);
+            if (!m) return null;
+            return { mimeType:m[1], data:src.slice(comma+1) };
+        }
+
+        // ---------- V9 TRUE 3D ANGLE PIPELINE ----------
+        // The image model is no longer used to invent left/right views.
+        // One 3D reconstruction is created from the selected master image,
+        // then only the user-selected views are rendered from that same geometry.
+
+        const TRUE3D_ANGLE_ORDER = ["front","left","right","back","top","bottom"];
+        const TRUE3D_ORBITS = {
+            front:  "0deg 90deg 105%",
+            right:  "90deg 90deg 105%",
+            back:   "180deg 90deg 105%",
+            left:   "270deg 90deg 105%",
+            top:    "0deg 0.1deg 105%",
+            bottom: "0deg 179.9deg 105%"
+        };
+
+        function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+        function absolute3DServerBase() {
+            return (location.hostname === "gemini.google.com") ? "http://localhost:3000" : location.origin;
+        }
+
+        function fetchWithTimeout(url, options = {}, timeoutMs = 12000) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+            return fetch(url, {...options, signal: controller.signal})
+                .finally(() => clearTimeout(timer));
+        }
+
+        function setAngleEngineAvailability(available, message, tone = "slate") {
+            const status = document.getElementById("angleServerStatus");
+            const btn = document.getElementById("generateChosenAnglesBtn");
+            if (status) {
+                status.textContent = message;
+                status.className =
+                    tone === "green" ? "text-[11px] text-emerald-300" :
+                    tone === "amber" ? "text-[11px] text-amber-300" :
+                    tone === "red"   ? "text-[11px] text-red-300" :
+                                       "text-[11px] text-slate-400";
+            }
+            if (btn) {
+                btn.disabled = !available || getPreSelectedAngles().length === 0;
+                btn.title = available ? "" : message;
+            }
+        }
+
+        async function check3DAngleServer() {
+            const base = absolute3DServerBase();
+            const inGeminiCanvas = location.hostname === "gemini.google.com";
+
+            try {
+                const r = await fetchWithTimeout(`${base}/api/health`, {}, 5000);
+                const d = await r.json().catch(()=>({}));
+
+                if (!r.ok || !d.ok) throw new Error(d.error || "Server health check failed.");
+
+                if (!d.meshy_key_configured) {
+                    const reason = "Accurate-angle server connected, but the Meshy key is not configured.";
+                    setAngleEngineAvailability(false, reason, "amber");
+                    return {ok:false, reason};
+                }
+
+                setAngleEngineAvailability(true, "Accurate 3D angle engine connected", "green");
+                return {ok:true};
+
+            } catch (err) {
+                if (inGeminiCanvas) {
+                    const reason = "Gemini Canvas preview only — accurate 3D angles run from the Full Package server.";
+                    setAngleEngineAvailability(false, reason, "amber");
+                    return {ok:false, reason};
+                }
+
+                const reason = "Accurate 3D angle server is offline. Start the StyleMaster Full Package server.";
+                setAngleEngineAvailability(false, reason, "red");
+                return {ok:false, reason};
+            }
+        }
+
+        async function createSingleImage3D(masterImage) {
+            const base = absolute3DServerBase();
+            let r;
+            try {
+                r = await fetchWithTimeout(`${base}/api/3d/from-image`, {
+                    method:"POST",
+                    headers:{"Content-Type":"application/json"},
+                    body:JSON.stringify({
+                        image_url: masterImage,
+                        ultra_mode: true,
+                        enable_pbr: true,
+                        auto_size: true,
+                        multi_view_thumbnails: true
+                    })
+                }, 20000);
+            } catch (err) {
+                if (err?.name === "AbortError") {
+                    throw new Error("The 3D server did not respond in time. Check that the StyleMaster backend is running.");
+                }
+                throw new Error("Could not connect to the StyleMaster 3D server.");
+            }
+            const d = await r.json().catch(()=>({}));
+            if(!r.ok) throw new Error(d.error || `3D reconstruction could not be started (HTTP ${r.status}).`);
+            if(!d.id) throw new Error("The 3D server responded, but no Meshy task ID was returned.");
+            return d.id;
+        }
+
+        async function pollSingleImage3D(id, loadingText) {
+            for(let i=0;i<180;i++) {
+                const r = await fetch(`${absolute3DServerBase()}/api/3d/from-image/status/${encodeURIComponent(id)}`);
+                const d = await r.json().catch(()=>({}));
+                if(!r.ok) throw new Error(d.error || "3D reconstruction status failed.");
+                if(loadingText) loadingText.textContent = `Building one consistent 3D model… ${Number(d.progress||0)}%`;
+                if(d.status === "SUCCEEDED") return d;
+                if(["FAILED","CANCELED"].includes(d.status)) throw new Error(d.task_error?.message || d.error || `3D reconstruction ${d.status.toLowerCase()}.`);
+                await wait(2000);
+            }
+            throw new Error("3D reconstruction timed out.");
+        }
+
+        async function ensureAngleRenderModelViewer() {
+            let mv = document.getElementById("angleRenderModelViewer");
+            if(mv) return mv;
+
+            mv = document.createElement("model-viewer");
+            mv.id = "angleRenderModelViewer";
+            mv.setAttribute("camera-target","auto auto auto");
+            mv.setAttribute("field-of-view","18deg");
+            mv.setAttribute("shadow-intensity","0.35");
+            mv.setAttribute("exposure","1");
+            mv.setAttribute("environment-image","neutral");
+            mv.style.position = "fixed";
+            mv.style.left = "-10000px";
+            mv.style.top = "0";
+            mv.style.width = "1024px";
+            mv.style.height = "1024px";
+            mv.style.background = "white";
+            mv.style.pointerEvents = "none";
+            document.body.appendChild(mv);
+            return mv;
+        }
+
+        async function loadModelIntoAngleRenderer(glbUrl) {
+            const mv = await ensureAngleRenderModelViewer();
+            if(mv.src !== glbUrl) {
+                await new Promise((resolve,reject)=>{
+                    const done = ()=>{ cleanup(); resolve(); };
+                    const fail = e=>{ cleanup(); reject(new Error("The reconstructed 3D model could not be loaded for angle rendering.")); };
+                    const cleanup = ()=>{
+                        mv.removeEventListener("load",done);
+                        mv.removeEventListener("error",fail);
+                    };
+                    mv.addEventListener("load",done,{once:true});
+                    mv.addEventListener("error",fail,{once:true});
+                    mv.src = glbUrl;
+                });
+            }
+            return mv;
+        }
+
+        async function renderFixed3DAngle(glbUrl, angleKey) {
+            const mv = await loadModelIntoAngleRenderer(glbUrl);
+            mv.cameraTarget = "auto auto auto";
+            mv.fieldOfView = "18deg";
+            mv.cameraOrbit = TRUE3D_ORBITS[angleKey];
+            mv.jumpCameraToGoal();
+            if(typeof mv.updateFraming === "function") mv.updateFraming();
+            await wait(350);
+            mv.jumpCameraToGoal();
+            await wait(150);
+            if(typeof mv.toDataURL !== "function") throw new Error("This browser cannot capture the fixed 3D camera view.");
+            return mv.toDataURL("image/png",1);
+        }
+
+        window.generateChosenAnglesV7 = async function() {
+            const selected = getPreSelectedAngles();
+            if(!selected.length) return alert("Select at least one angle first.");
+
+            const master = window.activeSelectedImage || document.getElementById("outputImage")?.src;
+            if(!master) return alert("Select your favourite generated image first.");
+
+            const loading = document.getElementById("loading");
+            const loadingText = document.getElementById("loadingText");
+
+            const serverCheck = await check3DAngleServer();
+            if (!serverCheck.ok) {
+                if (location.hostname === "gemini.google.com") {
+                    alert("The accurate angle engine is not broken. Gemini Canvas cannot run the Node.js + Meshy backend. Use the Full Package server to test true fixed-camera angles.");
+                } else {
+                    alert(serverCheck.reason);
+                }
+                return;
+            }
+
+            loading?.classList.remove("hidden");
+
+            const ordered = TRUE3D_ANGLE_ORDER.filter(k=>selected.includes(k));
+            const total = ordered.length;
+
+            try {
+                // From the user's point of view, the first selected angle is "1 of N"
+                // while the shared 3D model is being reconstructed.
+                const firstLabel = ordered[0] ? ordered[0][0].toUpperCase() + ordered[0].slice(1) : "Angle";
+                if(loadingText) loadingText.textContent = `1 of ${total} — preparing ${firstLabel} view from one consistent 3D model…`;
+
+                const taskId = await createSingleImage3D(master);
+
+                // Poll 3D build progress but always keep X of N visible so users know it is active.
+                let task = null;
+                for(let i=0;i<180;i++) {
+                    let r;
+                    try {
+                        r = await fetchWithTimeout(`${absolute3DServerBase()}/api/3d/from-image/status/${encodeURIComponent(taskId)}`, {}, 12000);
+                    } catch (err) {
+                        throw new Error("Lost connection to the 3D server while the model was being built.");
+                    }
+                    const d = await r.json().catch(()=>({}));
+                    if(!r.ok) throw new Error(d.error || "3D reconstruction status failed.");
+
+                    const pct = Number(d.progress||0);
+                    if(loadingText) loadingText.textContent = `1 of ${total} — building the 3D source model… ${pct}%`;
+
+                    if(d.status === "SUCCEEDED") { task = d; break; }
+                    if(["FAILED","CANCELED"].includes(d.status)) throw new Error(d.task_error?.message || d.error || `3D reconstruction ${d.status.toLowerCase()}.`);
+                    await wait(2000);
+                }
+                if(!task) throw new Error("3D reconstruction timed out.");
+
+                const glbUrl = task?.model_urls?.glb;
+                if(!glbUrl) throw new Error("3D model completed but no GLB file was returned.");
+
+                window.angleLockMasterImage = master;
+                window.true3DAngleModelTask = taskId;
+                window.true3DAngleModelUrl = glbUrl;
+                window.angleResults = {};
+
+                TRUE3D_ANGLE_ORDER.forEach(key=>{
+                    const img = document.getElementById(V7_ANGLE_IMG[key]);
+                    if(img) img.removeAttribute("src");
+                    const card = document.querySelector(`[data-angle-key="${key}"]`);
+                    if(card) card.classList.add("hidden");
+                });
+
+                const cardinals = task.thumbnail_urls || {};
+                const cardinalLookup = {
+                    front: cardinals.front,
+                    right: cardinals.right,
+                    back: cardinals.back,
+                    left: cardinals.left
+                };
+
+                for(let i=0;i<ordered.length;i++) {
+                    const key = ordered[i];
+                    const label = key[0].toUpperCase() + key.slice(1);
+                    if(loadingText) loadingText.textContent = `${i+1} of ${total} — rendering ${label} view…`;
+
+                    let url = cardinalLookup[key] || null;
+
+                    // Top/bottom (and cardinal fallback) are rendered from the same GLB
+                    // with fixed, non-generative camera positions.
+                    if(!url) url = await renderFixed3DAngle(glbUrl,key);
+
+                    window.angleResults[key] = url;
+                    const img = document.getElementById(V7_ANGLE_IMG[key]);
+                    if(img) img.src = url;
+                    const card = document.querySelector(`[data-angle-key="${key}"]`);
+                    if(card) card.classList.remove("hidden");
+                }
+
+                if(loadingText) loadingText.textContent = `${total} of ${total} — complete`;
+
+                const modelViewer = document.getElementById("true3DModelViewer");
+                if(modelViewer) modelViewer.src = glbUrl;
+
+                document.getElementById("resultContent")?.classList.add("hidden");
+                document.getElementById("multiAngleContent")?.classList.remove("hidden");
+                document.getElementById("placeholder")?.classList.add("hidden");
+                document.getElementById("multiAngleContent")?.scrollIntoView({behavior:"smooth"});
+
+                await wait(450);
+
+            } catch(err) {
+                console.error(err);
+                const msg = `True 3D angle generation failed: ${err.message}`;
+                console.error(msg);
+                const status = document.getElementById("angleServerStatus");
+                if (status) {
+                    status.textContent = err.message;
+                    status.className = "text-[11px] text-red-300";
+                }
+                alert(msg);
+            } finally {
+                loading?.classList.add("hidden");
+            }
+        };
+
+        // Old six-angle entry point is intentionally disabled in V7.
+        window.generateSixAngleViews = function() {
+            alert("V7 uses pre-selected angles only. Choose the exact views you want under your selected image.");
+        };
+
+
+        // ---------- Live Community Chat ----------
+        window.showCommunityTab = function(tab) {
+            const feed = document.getElementById("communityFeedTab");
+            const chat = document.getElementById("communityChatTab");
+            const feedBtn = document.getElementById("communityFeedTabBtn");
+            const chatBtn = document.getElementById("communityChatTabBtn");
+            const isChat = tab === "chat";
+            feed?.classList.toggle("hidden", isChat);
+            chat?.classList.toggle("hidden", !isChat);
+            feedBtn?.classList.toggle("bg-cyan-700", !isChat);
+            feedBtn?.classList.toggle("bg-slate-800", isChat);
+            chatBtn?.classList.toggle("bg-cyan-700", isChat);
+            chatBtn?.classList.toggle("bg-slate-800", !isChat);
+            if (isChat) {
+                connectCommunity();
+                loadCommunityChatHistory();
+            }
+        };
+
+        function renderChatMessage(m) {
+            const box = document.getElementById("communityChatMessages");
+            if (!box) return;
+            if (box.querySelector(`[data-chat-id="${CSS.escape(m.id)}"]`)) return;
+            const row = document.createElement("div");
+            row.dataset.chatId = m.id;
+            row.className = "bg-slate-900 border border-slate-800 rounded-lg p-3";
+            row.innerHTML = `<div class="flex justify-between gap-2"><b class="text-xs text-cyan-300">${safeText(m.name)}</b><span class="text-[10px] text-slate-500">${safeText(m.createdAt)}</span></div>
+                             <div class="text-sm text-slate-200 mt-1 whitespace-pre-wrap">${safeText(m.message)}</div>`;
+            box.appendChild(row);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        window.loadCommunityChatHistory = async function() {
+            const box = document.getElementById("communityChatMessages");
+            try {
+                const r = await fetch(`${COMMUNITY_BASE}/api/community/chat`);
+                const d = await r.json();
+                box.innerHTML = "";
+                (d.messages || []).forEach(renderChatMessage);
+                if (!(d.messages || []).length) box.innerHTML = `<div class="text-sm text-slate-500">No chat messages yet.</div>`;
+            } catch {
+                box.innerHTML = `<div class="text-sm text-slate-500">Start the StyleMaster server to use live chat.</div>`;
+            }
+        };
+
+        window.sendCommunityChatMessage = function() {
+            const name = document.getElementById("chatDisplayName")?.value?.trim();
+            const message = document.getElementById("chatMessageInput")?.value?.trim();
+            if (!name) return alert("Enter a display name.");
+            if (!message) return;
+            if (!styleMasterSocket?.connected) return alert("Community server is not connected.");
+            styleMasterSocket.emit("community:chat-send", {name, message});
+            document.getElementById("chatMessageInput").value = "";
+        };
+
+        // Extend existing connector when socket becomes available.
+        const _v7OldConnectCommunity = window.connectCommunity || (typeof connectCommunity === "function" ? connectCommunity : null);
+        window.connectCommunity = async function() {
+            if (_v7OldConnectCommunity) await _v7OldConnectCommunity();
+            // Existing connectCommunity may initialize styleMasterSocket asynchronously.
+            setTimeout(() => {
+                if (!styleMasterSocket) return;
+                if (!styleMasterSocket.__v7ChatBound) {
+                    styleMasterSocket.__v7ChatBound = true;
+                    styleMasterSocket.on("community:chat-message", renderChatMessage);
+                    styleMasterSocket.on("community:online", count => {
+                        const el = document.getElementById("communityOnlineCount");
+                        if (el) el.textContent = `${Number(count)||0} online`;
+                    });
+                }
+            }, 250);
+        };
+
+
+        // ---------- V8 Full-Screen Image Viewer ----------
+        let _lightboxScale = 1;
+        let _lightboxNaturalMode = false;
+
+        window.openImageLightbox = function(src, title = "Image Preview") {
+            if (!src) return;
+            const box = document.getElementById("imageLightbox");
+            const img = document.getElementById("imageLightboxImage");
+            const label = document.getElementById("imageLightboxTitle");
+            if (!box || !img) return;
+            img.src = src;
+            if (label) label.textContent = title;
+            box.classList.remove("hidden");
+            document.body.style.overflow = "hidden";
+            lightboxReset();
+        };
+
+        window.closeImageLightbox = function() {
+            document.getElementById("imageLightbox")?.classList.add("hidden");
+            document.body.style.overflow = "";
+        };
+
+        window.lightboxReset = function() {
+            _lightboxScale = 1;
+            _lightboxNaturalMode = false;
+            const img = document.getElementById("imageLightboxImage");
+            if (!img) return;
+            img.style.width = "auto";
+            img.style.height = "auto";
+            img.style.maxWidth = "100%";
+            img.style.maxHeight = "100%";
+            img.style.transform = "none";
+            img.style.cursor = "zoom-in";
+        };
+
+        window.lightboxZoom = function(delta) {
+            const img = document.getElementById("imageLightboxImage");
+            if (!img) return;
+            _lightboxNaturalMode = true;
+            _lightboxScale = Math.max(0.25, Math.min(5, _lightboxScale + delta));
+            img.style.maxWidth = "none";
+            img.style.maxHeight = "none";
+            img.style.width = `${Math.max(1, img.naturalWidth) * _lightboxScale}px`;
+            img.style.height = "auto";
+            img.style.cursor = _lightboxScale > 1 ? "zoom-out" : "zoom-in";
+        };
+
+        function bindImageLightboxClicks() {
+            const names = {
+                outputImage:"Selected Masterpiece",
+                angleFront:"Front View",
+                angleLeft:"Left View",
+                angleRight:"Right View",
+                angleBack:"Back View",
+                angleTop:"Top View",
+                angleBottom:"Bottom View"
+            };
+            Object.entries(names).forEach(([id,title]) => {
+                const img = document.getElementById(id);
+                if (!img || img.dataset.lightboxBound) return;
+                img.dataset.lightboxBound = "1";
+                img.addEventListener("click", () => {
+                    if (img.src) openImageLightbox(img.src, title);
+                });
+            });
+
+            // Variation/grid images are dynamic, so use event delegation.
+            document.addEventListener("click", e => {
+                const img = e.target?.closest?.("img");
+                if (!img || img.id === "imageLightboxImage") return;
+                if (["outputImage","angleFront","angleLeft","angleRight","angleBack","angleTop","angleBottom"].includes(img.id)) return;
+                const inGeneratedArea =
+                    img.closest("#gridContent") ||
+                    img.closest("#resultContent") ||
+                    img.closest("#multiAngleContent");
+                if (inGeneratedArea && img.src) {
+                    openImageLightbox(img.src, img.alt || "Generated Image");
+                }
+            }, true);
+        }
+
+        bindImageLightboxClicks();
+
+        document.getElementById("imageLightboxImage")?.addEventListener("click", function() {
+            if (_lightboxNaturalMode) lightboxReset();
+            else lightboxZoom(1);
+        });
+
+        document.getElementById("imageLightboxStage")?.addEventListener("wheel", e => {
+            if (document.getElementById("imageLightbox")?.classList.contains("hidden")) return;
+            e.preventDefault();
+            lightboxZoom(e.deltaY < 0 ? 0.15 : -0.15);
+        }, {passive:false});
+
+        document.addEventListener("keydown", e => {
+            if (e.key === "Escape" && !document.getElementById("imageLightbox")?.classList.contains("hidden")) {
+                closeImageLightbox();
+            }
+        });
+
+
+        // Check the external 3D backend without blocking normal image generation.
+        setTimeout(() => { check3DAngleServer(); }, 800);
+
+</script>
+</body>
+</html>
