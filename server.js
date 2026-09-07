@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express=require("express"), cors=require("cors"), path=require("path"), fs=require("fs"), crypto=require("crypto"), multer=require("multer"), http=require("http");
 const {Server}=require("socket.io");
-const app=express(), server=http.createServer(app), PORT=Number(process.env.PORT||3000), MESHY_API_KEY=process.env.MESHY_API_KEY;
+const app=express(), server=http.createServer(app), PORT=Number(process.env.PORT||3000), MESHY_API_KEY=process.env.MESHY_API_KEY;const GEMINI_API_KEY=process.env.GEMINI_API_KEY;
 app.use(cors({origin:true})); app.use(express.json({limit:"50mb"})); app.use("/uploads",express.static(path.join(__dirname,"uploads"))); app.use(express.static(__dirname));
 const io=new Server(server,{cors:{origin:"*"}});
 const db=path.join(__dirname,"data","community-posts.json");
