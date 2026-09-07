@@ -62,7 +62,7 @@ app.post("/api/3d/from-image",key,async(req,res)=>{
         enable_pbr:req.body.enable_pbr !== false,
         texture_resolution:"2k",
         should_remesh:false,
-        image_enhancement:false,
+        image_enhancement:true,
         moderation:true,
         target_formats:["glb","obj","fbx","stl","usdz","3mf"],
         auto_size:true,
