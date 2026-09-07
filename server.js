@@ -2,6 +2,7 @@ require("dotenv").config();
 const express=require("express"), cors=require("cors"), path=require("path"), fs=require("fs"), crypto=require("crypto"), multer=require("multer"), http=require("http");
 const {Server}=require("socket.io");
 const app=express(), server=http.createServer(app), PORT=Number(process.env.PORT||3000), MESHY_API_KEY=process.env.MESHY_API_KEY;const GEMINI_API_KEY=process.env.GEMINI_API_KEY;
+app.post("/api/gemini/generate",async(req,res)=>{if(!GEMINI_API_KEY)return res.status(500).json({error:"Gemini API key is not configured."});try{const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key="+encodeURIComponent(GEMINI_API_KEY),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(req.body)});const data=await r.json();return res.status(r.status).json(data);}catch(e){return res.status(500).json({error:e.message||"Gemini request failed."});}});
 app.use(cors({origin:true})); app.use(express.json({limit:"50mb"})); app.use("/uploads",express.static(path.join(__dirname,"uploads"))); app.use(express.static(__dirname));
 const io=new Server(server,{cors:{origin:"*"}});
 const db=path.join(__dirname,"data","community-posts.json");
