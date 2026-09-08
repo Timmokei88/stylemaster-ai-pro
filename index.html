@@ -33,13 +33,206 @@ button:hover{filter:brightness(1.08)}
 .mixo-loader-line{height:2px;margin:16px auto 0;max-width:430px;background:linear-gradient(90deg,transparent,#22d3ee,#8b5cf6,#e879f9,transparent);background-size:220% 100%;animation:mixoSweep 1.4s linear infinite;box-shadow:0 0 18px rgba(139,92,246,.5)}
 @keyframes mixoSweep{to{background-position:-220% 0}}
 
+
+/* =========================================================
+   MIXOLABS CINEMATIC SKIN — production visual layer
+   ========================================================= */
+:root{
+ --mx-ink:#02040d;
+ --mx-midnight:#050817;
+ --mx-panel:#081127;
+ --mx-panel2:#0b1530;
+ --mx-line:rgba(105,190,255,.18);
+ --mx-cyan:#12d9ff;
+ --mx-blue:#3b82f6;
+ --mx-violet:#8b5cf6;
+ --mx-magenta:#f044ff;
+ --mx-text:#f5f7ff;
+ --mx-muted:#91a0c2;
+}
+html{background:#02040d}
+body{
+ color:var(--mx-text);
+ background:
+   radial-gradient(900px 520px at -8% 13%,rgba(21,91,255,.20),transparent 64%),
+   radial-gradient(720px 520px at 104% 28%,rgba(240,68,255,.16),transparent 66%),
+   radial-gradient(620px 420px at 74% 4%,rgba(67,56,202,.15),transparent 62%),
+   linear-gradient(180deg,#02040d 0%,#040817 42%,#02040d 100%) !important;
+ min-height:100vh;
+ position:relative;
+ overflow-x:hidden;
+}
+body:before,body:after{
+ content:"";position:fixed;z-index:-1;pointer-events:none;border-radius:50%;filter:blur(4px)
+}
+body:before{
+ width:440px;height:440px;left:-260px;top:180px;
+ background:radial-gradient(circle,rgba(12,183,255,.22),rgba(56,23,190,.08) 45%,transparent 70%);
+ box-shadow:180px 0 120px rgba(139,92,246,.07)
+}
+body:after{
+ width:520px;height:520px;right:-310px;top:280px;
+ background:radial-gradient(circle,rgba(240,68,255,.20),rgba(30,64,175,.08) 45%,transparent 72%)
+}
+.max-w-7xl{max-width:1460px}
+.mixo-brand-header{display:flex;justify-content:center;align-items:center;margin:0 0 22px;padding:4px 0 0}
+.mixo-brand-logo{
+ width:min(760px,82vw);max-height:190px;object-fit:contain;
+ filter:drop-shadow(0 0 16px rgba(35,211,238,.12)) drop-shadow(0 0 30px rgba(168,85,247,.10))
+}
+.grid.lg\:grid-cols-3{gap:24px}
+aside,main section{
+ position:relative;
+ background:
+ linear-gradient(180deg,rgba(10,19,43,.93),rgba(5,11,28,.96)) !important;
+ border:1px solid rgba(84,164,255,.20) !important;
+ border-radius:24px !important;
+ box-shadow:
+ 0 32px 90px rgba(0,0,0,.46),
+ 0 0 0 1px rgba(139,92,246,.035),
+ inset 0 1px 0 rgba(255,255,255,.035);
+ backdrop-filter:blur(16px);
+ overflow:hidden;
+}
+aside:before,main section:before{
+ content:"";position:absolute;left:12%;right:12%;top:0;height:1px;
+ background:linear-gradient(90deg,transparent,var(--mx-cyan),var(--mx-violet),var(--mx-magenta),transparent);
+ opacity:.65;box-shadow:0 0 18px rgba(139,92,246,.55)
+}
+aside:after,main section:after{
+ content:"";position:absolute;pointer-events:none;inset:0;
+ background:
+ radial-gradient(420px 190px at 12% -10%,rgba(18,217,255,.065),transparent 65%),
+ radial-gradient(420px 210px at 95% 105%,rgba(240,68,255,.055),transparent 68%);
+}
+aside>* , main section>*{position:relative;z-index:1}
+h2{
+ font-size:1.24rem!important;letter-spacing:-.025em;
+ background:linear-gradient(90deg,#fff,#b9d9ff 60%,#c4b5fd);
+ -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+h2:before{content:"✦";color:var(--mx-cyan);margin-right:.55rem;text-shadow:0 0 16px var(--mx-cyan)}
+label{color:#cbd5e1!important;font-weight:650!important}
+textarea,input,select{
+ background:linear-gradient(180deg,rgba(2,6,23,.92),rgba(4,9,25,.88))!important;
+ border:1px solid rgba(102,143,214,.25)!important;
+ color:#f8fafc!important;
+ border-radius:11px!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.018),0 6px 18px rgba(0,0,0,.12);
+ transition:.18s ease;
+}
+textarea:hover,input:hover,select:hover{border-color:rgba(96,165,250,.42)!important}
+textarea:focus,input:focus,select:focus{
+ outline:none!important;border-color:rgba(18,217,255,.64)!important;
+ box-shadow:0 0 0 3px rgba(18,217,255,.07),0 0 28px rgba(139,92,246,.12)!important
+}
+button{border:1px solid rgba(255,255,255,.07)!important;transition:.17s ease!important}
+button:hover{transform:translateY(-1px);filter:brightness(1.08)}
+#randomBtn{
+ background:linear-gradient(95deg,#06b6d4 0%,#4f46e5 48%,#d946ef 100%)!important;
+ box-shadow:0 10px 28px rgba(99,102,241,.22),0 0 24px rgba(217,70,239,.10)
+}
+#generateBtn{
+ background:linear-gradient(95deg,#0ea5e9,#4f46e5 46%,#9333ea 72%,#e879f9)!important;
+ border-color:rgba(192,132,252,.38)!important;
+ box-shadow:0 13px 35px rgba(79,70,229,.30),0 0 28px rgba(217,70,239,.14)!important;
+ min-height:50px;font-size:1rem
+}
+#generateChosenAnglesBtn{
+ background:linear-gradient(95deg,#2563eb,#6366f1,#9333ea)!important;
+ box-shadow:0 10px 26px rgba(99,102,241,.23)
+}
+#downloadBtn{background:linear-gradient(95deg,#047857,#0d9488)!important}
+#fullscreenBtn,#backBtn,#clearBtn{background:linear-gradient(180deg,#334155,#1e293b)!important}
+#addPhotos{background:linear-gradient(95deg,#2563eb,#4f46e5)!important}
+#placeholder{
+ border:1px dashed rgba(96,165,250,.17);border-radius:19px;
+ background:
+ radial-gradient(circle at 50% 38%,rgba(79,70,229,.08),transparent 16rem),
+ linear-gradient(180deg,rgba(3,8,24,.36),rgba(2,6,23,.14));
+ color:#7180a4!important
+}
+#grid{gap:18px!important}
+#grid>div{
+ background:linear-gradient(180deg,rgba(5,12,31,.9),rgba(3,8,21,.96))!important;
+ border:1px solid rgba(96,165,250,.17)!important;
+ border-radius:16px!important;
+ box-shadow:0 14px 34px rgba(0,0,0,.28);
+ overflow:hidden;transition:.17s ease
+}
+#grid>div:hover{
+ transform:translateY(-3px);
+ border-color:rgba(192,132,252,.40)!important;
+ box-shadow:0 20px 44px rgba(0,0,0,.34),0 0 30px rgba(139,92,246,.11)
+}
+#activeArea h3,.mt-5 h3{
+ color:#dbeafe!important;text-shadow:0 0 14px rgba(96,165,250,.22)
+}
+.checker{
+ border:1px solid rgba(96,165,250,.17);
+ border-radius:16px!important;
+ box-shadow:inset 0 0 44px rgba(2,6,23,.5),0 15px 36px rgba(0,0,0,.22)
+}
+#activeArea .mt-5{
+ background:linear-gradient(180deg,rgba(3,8,25,.78),rgba(7,10,31,.9))!important;
+ border:1px solid rgba(139,92,246,.24)!important;
+ box-shadow:0 14px 36px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.02)
+}
+#angleChoices label{
+ display:flex;align-items:center;gap:5px;
+ background:rgba(13,22,48,.72);border:1px solid rgba(96,165,250,.15);
+ padding:8px 7px;border-radius:10px!important
+}
+#angleChoices input{accent-color:#a855f7}
+.bg-slate-950.border.border-purple-900{
+ background:linear-gradient(180deg,rgba(3,8,25,.86),rgba(8,7,30,.90))!important;
+ border-color:rgba(192,132,252,.25)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.02)
+}
+details{
+ background:rgba(2,6,23,.62)!important;
+ border-color:rgba(96,165,250,.14)!important
+}
+.swatch.active,.family.active{
+ outline:2px solid #c084fc!important;outline-offset:2px;
+ box-shadow:0 0 0 4px rgba(168,85,247,.10),0 0 24px rgba(168,85,247,.24)!important
+}
+#lightbox{background:rgba(0,0,0,.93)!important;backdrop-filter:blur(12px)}
+/* Exact generated MixoLabs logo as progress animation */
+.mixo-cinematic-loader{position:relative;width:min(760px,88%);height:250px;display:flex;align-items:center;justify-content:center}
+.mixo-logo-ghost,.mixo-logo-reveal{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.mixo-logo-ghost img,.mixo-logo-reveal img{width:100%;height:100%;object-fit:contain}
+.mixo-logo-ghost{opacity:.11;filter:saturate(.55) brightness(.55)}
+.mixo-logo-reveal{overflow:hidden;clip-path:inset(0 100% 0 0);animation:mixoExactReveal 3.2s ease-in-out infinite}
+.mixo-logo-reveal img{filter:drop-shadow(0 0 14px rgba(34,211,238,.25)) drop-shadow(0 0 25px rgba(217,70,239,.18))}
+@keyframes mixoExactReveal{
+ 0%{clip-path:inset(0 100% 0 0)}
+ 72%{clip-path:inset(0 0 0 0)}
+ 88%{clip-path:inset(0 0 0 0)}
+ 100%{clip-path:inset(0 100% 0 0)}
+}
+.mixo-loader-beam{
+ position:absolute;left:5%;right:5%;bottom:28px;height:2px;
+ background:linear-gradient(90deg,transparent,#12d9ff,#8b5cf6,#f044ff,transparent);
+ background-size:240% 100%;animation:mixoBeam 1.6s linear infinite;
+ box-shadow:0 0 20px rgba(139,92,246,.55)
+}
+@keyframes mixoBeam{to{background-position:-240% 0}}
+.mixo-loader-copy{
+ position:absolute;bottom:0;left:0;right:0;text-align:center;
+ color:#b8c2df;letter-spacing:.18em;text-transform:uppercase;font-size:.72rem
+}
+@media(max-width:900px){
+ .mixo-brand-logo{width:min(620px,94vw)}
+ .mixo-cinematic-loader{height:190px}
+}
+
 </style>
 </head>
 <body class="bg-slate-950 text-white min-h-screen">
 <div class="max-w-7xl mx-auto p-4 md:p-8">
-<header class="text-center mb-7">
-<h1 class="mixolabs-wordmark" aria-label="MixoLabs"><span class="mixo">MI<span class="x">X</span>O</span><span class="labs">LABS</span></h1>
-<p class="text-slate-400 mt-2 tracking-wide">IMAGINE • GENERATE • CREATE</p>
+<header class="mixo-brand-header">
+  <img class="mixo-brand-logo" src="/mixolabs-logo.png" alt="MixoLabs — Imagine • Generate • Create • Without Limits">
 </header>
 
 <div class="grid lg:grid-cols-3 gap-6">
@@ -122,8 +315,15 @@ button:hover{filter:brightness(1.08)}
 
 <main class="lg:col-span-2 space-y-5">
 <section class="bg-slate-900 border border-slate-800 rounded-2xl p-5 min-h-[520px]">
-<div id="loading" class="hidden h-96 flex flex-col items-center justify-center"><div class="mixo-loader"><div class="mixo-loader-logo" aria-label="MixoLabs"><span class="letter">M</span><span class="letter">I</span><span class="letter">X</span><span class="letter">O</span><span class="letter">L</span><span class="letter">A</span><span class="letter">B</span><span class="letter">S</span></div><div class="mixo-loader-line"></div><p id="loadingText" class="mt-5 text-slate-300 tracking-wide">Creating your image...</p></div></div>
-<div id="placeholder" class="h-96 flex items-center justify-center text-center text-slate-500">Your generated images will appear here.</div>
+<div id="loading" class="hidden h-96 flex flex-col items-center justify-center">
+      <div class="mixo-cinematic-loader">
+        <div class="mixo-logo-ghost"><img src="/mixolabs-logo.png" alt=""></div>
+        <div class="mixo-logo-reveal"><img src="/mixolabs-logo.png" alt="MixoLabs"></div>
+        <div class="mixo-loader-beam"></div>
+        <p id="loadingText" class="mixo-loader-copy">Creating your image...</p>
+      </div>
+    </div>
+    <div id="placeholder" class="h-96 flex items-center justify-center text-center text-slate-500">Your generated images will appear here.</div>
 <div id="grid" class="hidden grid sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
 
 <div id="activeArea" class="hidden">
