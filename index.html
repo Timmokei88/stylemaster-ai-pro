@@ -561,14 +561,289 @@
                 </div>
 
 <script>
-        const styles = {
-            "Vector & 3D Objects": ["Vector SVG 3D", "Laser Cut Silhouette", "Resin Model", "Embossed Metal Relief", "CNC Wood Carving", "Resin Cast Model", "Minimalist Line Art Vector"],
-            "Photorealistic": ["Hyper-realistic", "Cinematic Photography", "Portrait Photography", "Landscape Photography", "Macro Photography", "Street Photography", "Black & White Film", "Vintage 35mm", "Polaroid Effect", "Aerial View", "Studio Portrait", "Night Photography"],
-            "Cartoon & Animation": ["Disney Pixar 3D", "Anime Style", "Studio Ghibli", "Classic 2D Animation", "Claymation", "Stop Motion", "Chibi", "Kawaii", "Comic Book", "Graphic Novel", "Vector Art"],
-            "Artistic & Painting": ["Oil Painting", "Watercolor", "Impressionism", "Expressionism", "Surrealism", "Cubism", "Renaissance", "Baroque", "Ukiyo-e", "Pop Art", "Minimalism"],
-            "Digital Art": ["Cyberpunk", "Synthwave", "Vaporwave", "Glitch Art", "Isometric", "Low Poly", "3D Rendered", "Octane Render", "Unreal Engine 5", "Ray Traced", "Concept Art"],
-            "Abstract": ["Minimalist Geometric", "Fluid Acrylic", "Drip Painting", "Splatter Art", "Symmetry", "Kaleidoscope", "Dynamic Motion", "Textural", "Gradient", "Psychedelic"]
-        };
+const styles = {
+    "3D & Product Models": [
+        "Highly Detailed 3D Model",
+        "3D Printable Sculpture",
+        "Resin Ornament",
+        "Resin Cast Model",
+        "Collectible Figurine",
+        "Designer Toy",
+        "Premium Product Render",
+        "PBR Product Visualization",
+        "Photorealistic 3D Render",
+        "Clay Model",
+        "Ceramic Ornament",
+        "Porcelain Sculpture",
+        "Carved Wood Sculpture",
+        "Stone Sculpture",
+        "Marble Sculpture",
+        "Bronze Statue",
+        "Brass Ornament",
+        "Gold Ornament",
+        "Silver Ornament",
+        "Chrome Sculpture",
+        "Embossed Metal Relief",
+        "CNC Wood Carving",
+        "Laser Cut Model",
+        "Low Poly 3D",
+        "Isometric 3D",
+        "Miniature Model",
+        "Tabletop Miniature",
+        "Architectural Model",
+        "Jewellery Visualization",
+        "Packaging Mockup",
+        "Unreal Engine 3D",
+        "Octane Render",
+        "Ray Traced Render"
+    ],
+
+    "Photorealistic & Photography": [
+        "Hyper-Realistic",
+        "Professional Studio Photography",
+        "Cinematic Photography",
+        "Product Photography",
+        "Portrait Photography",
+        "Fashion Photography",
+        "Food Photography",
+        "Macro Photography",
+        "Landscape Photography",
+        "Wildlife Photography",
+        "Street Photography",
+        "Architectural Photography",
+        "Editorial Photography",
+        "Luxury Advertising Photography",
+        "Black & White Film",
+        "Vintage 35mm Film",
+        "Polaroid",
+        "Shallow Depth of Field",
+        "Golden Hour",
+        "Dramatic Lighting",
+        "High-Key Studio",
+        "Low-Key Studio"
+    ],
+
+    "Digital Art & Concept Art": [
+        "Digital Painting",
+        "Concept Art",
+        "Character Concept Art",
+        "Environment Concept Art",
+        "Fantasy Concept Art",
+        "Sci-Fi Concept Art",
+        "Matte Painting",
+        "Cinematic Concept Art",
+        "Game Art",
+        "Highly Detailed Digital Art",
+        "Semi-Realistic Digital Art",
+        "Epic Fantasy Illustration",
+        "Dark Fantasy Art",
+        "Surreal Digital Art",
+        "Isometric Art",
+        "Vector Art",
+        "Pixel Art"
+    ],
+
+    "Illustration & Graphic Art": [
+        "Editorial Illustration",
+        "Children's Book Illustration",
+        "Storybook Illustration",
+        "Vintage Illustration",
+        "Retro Poster",
+        "Comic Book Art",
+        "Graphic Novel",
+        "Ink Illustration",
+        "Pen and Ink",
+        "Line Art",
+        "Vector Illustration",
+        "Flat Illustration",
+        "Paper Cut Illustration",
+        "Screen Print",
+        "Risograph",
+        "Engraving",
+        "Etching",
+        "Woodcut"
+    ],
+
+    "Anime, Manga & Cartoon": [
+        "Anime",
+        "Manga",
+        "Chibi",
+        "Kawaii",
+        "Classic 2D Animation",
+        "Modern 2D Animation",
+        "3D Animated Movie",
+        "Cel Shaded",
+        "Cartoon",
+        "Saturday Morning Cartoon",
+        "Comic Cartoon",
+        "Claymation",
+        "Stop Motion",
+        "Cute Mascot",
+        "Webtoon"
+    ],
+
+    "Painting & Fine Art": [
+        "Oil Painting",
+        "Watercolor",
+        "Acrylic Painting",
+        "Gouache",
+        "Pastel",
+        "Charcoal Drawing",
+        "Pencil Drawing",
+        "Ink Wash",
+        "Impressionism",
+        "Expressionism",
+        "Surrealism",
+        "Cubism",
+        "Art Nouveau",
+        "Art Deco",
+        "Renaissance",
+        "Baroque",
+        "Ukiyo-e",
+        "Pop Art",
+        "Minimalist Fine Art"
+    ],
+
+    "Fantasy & Mythology": [
+        "Epic Fantasy",
+        "Dark Fantasy",
+        "High Fantasy",
+        "Mythological Art",
+        "Ancient Deity Sculpture",
+        "Sacred Ornament",
+        "Mystical Temple",
+        "Fairy Tale",
+        "Enchanted Forest",
+        "Dragon Fantasy",
+        "Medieval Fantasy",
+        "Gothic Fantasy",
+        "Celestial Fantasy",
+        "Magical Realism",
+        "Ethereal Fantasy"
+    ],
+
+    "Sci-Fi, Cyberpunk & Futuristic": [
+        "Science Fiction",
+        "Cyberpunk",
+        "Solarpunk",
+        "Dieselpunk",
+        "Steampunk",
+        "Biopunk",
+        "Futuristic",
+        "Space Opera",
+        "Alien World",
+        "Retro Futurism",
+        "Synthwave",
+        "Vaporwave",
+        "Neon Future",
+        "Mecha",
+        "Holographic",
+        "Dystopian Future"
+    ],
+
+    "Architecture & Interior Design": [
+        "Architectural Visualization",
+        "Modern Architecture",
+        "Luxury Interior",
+        "Minimalist Interior",
+        "Scandinavian Interior",
+        "Industrial Interior",
+        "Art Deco Interior",
+        "Gothic Architecture",
+        "Classical Architecture",
+        "Futuristic Architecture",
+        "Brutalist Architecture",
+        "Japanese Interior",
+        "Mediterranean Interior",
+        "Tiny House",
+        "Landscape Architecture"
+    ],
+
+    "Fashion & Beauty": [
+        "High Fashion",
+        "Editorial Fashion",
+        "Luxury Fashion Campaign",
+        "Streetwear",
+        "Avant-Garde Fashion",
+        "Couture",
+        "Beauty Editorial",
+        "Cosmetics Campaign",
+        "Jewellery Campaign",
+        "Fantasy Fashion",
+        "Cyberpunk Fashion",
+        "Vintage Fashion",
+        "Minimalist Fashion"
+    ],
+
+    "Logo, Branding & Graphic Design": [
+        "Minimal Logo",
+        "Luxury Logo",
+        "3D Logo",
+        "Mascot Logo",
+        "Emblem",
+        "Badge Design",
+        "Monogram",
+        "Vintage Logo",
+        "Modern Branding",
+        "Packaging Design",
+        "Poster Design",
+        "Album Cover",
+        "Book Cover",
+        "Typography Poster",
+        "Sticker Design",
+        "T-Shirt Graphic"
+    ],
+
+    "Tattoo, Linework & Engraving": [
+        "Fine Line Tattoo",
+        "Blackwork Tattoo",
+        "Traditional Tattoo",
+        "Neo-Traditional Tattoo",
+        "Geometric Tattoo",
+        "Mandala",
+        "Dotwork",
+        "Ornamental Tattoo",
+        "Japanese Tattoo",
+        "Engraving",
+        "Woodcut",
+        "Etching",
+        "Stencil",
+        "CNC Line Art"
+    ],
+
+    "Horror & Dark Art": [
+        "Gothic Horror",
+        "Dark Fantasy Horror",
+        "Cosmic Horror",
+        "Haunted",
+        "Zombie Horror",
+        "Creature Design",
+        "Monster Concept",
+        "Occult Gothic",
+        "Victorian Horror",
+        "Dark Surrealism",
+        "Post-Apocalyptic",
+        "Creepy Storybook"
+    ],
+
+    "Abstract & Experimental": [
+        "Abstract",
+        "Minimalist Geometric",
+        "Fluid Art",
+        "Alcohol Ink",
+        "Acrylic Pour",
+        "Drip Painting",
+        "Splatter Art",
+        "Kaleidoscope",
+        "Psychedelic",
+        "Fractal Art",
+        "Glitch Art",
+        "Op Art",
+        "Generative Abstract",
+        "Textural Abstract",
+        "Gradient Art"
+    ]
+};        
 
         const themes = [
             "Child Friendly Playful", "Whimsical Fairy Tale", "Cartoon Preschool", "Crayons & Pastel", "Cute Chibi Magic",
@@ -812,7 +1087,12 @@
                 notes.textContent = `Target visual shade: ${colorData?.hex || colorName}. Test a small batch first and adjust gradually.`;
             }
         }
-
+Object.keys(styles).forEach(category => {
+    const opt = document.createElement('option');
+    opt.value = category;
+    opt.textContent = category;
+    categorySelect.appendChild(opt);
+});
         categorySelect.addEventListener('change', (e) => {
             styleSelect.innerHTML = '<option value="">Select Style (Optional)...</option>';
             if (e.target.value) {
@@ -1984,7 +2264,7 @@ Variation seed: ${originalitySalt}`;
         }
 
         async function pollSingleImage3D(id, loadingText) {
-            for(let i=0;i<180;i++) {
+            for(let i=0;i<450;i++) {
                 const r = await fetch(`${absolute3DServerBase()}/api/3d/from-image/status/${encodeURIComponent(id)}`);
                 const d = await r.json().catch(()=>({}));
                 if(!r.ok) throw new Error(d.error || "3D reconstruction status failed.");
