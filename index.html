@@ -3,20 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>StyleMaster AI Pro</title>
+<title>MixoLabs</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 .loader{border:4px solid #334155;border-top-color:#60a5fa;border-radius:50%;width:46px;height:46px;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .checker{background-color:#0f172a;background-image:linear-gradient(45deg,#1e293b 25%,transparent 25%),linear-gradient(-45deg,#1e293b 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#1e293b 75%),linear-gradient(-45deg,transparent 75%,#1e293b 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0}
 .swatch.active,.family.active{outline:3px solid #818cf8;outline-offset:2px}
+
+:root{--mixo-cyan:#22d3ee;--mixo-blue:#60a5fa;--mixo-violet:#8b5cf6;--mixo-pink:#e879f9}
+body{background:
+ radial-gradient(circle at 50% -15%,rgba(99,102,241,.16),transparent 34rem),
+ radial-gradient(circle at 8% 28%,rgba(34,211,238,.06),transparent 24rem),
+ #020617}
+.mixolabs-wordmark{font-family:Inter,ui-sans-serif,system-ui,sans-serif;font-weight:900;letter-spacing:-.065em;font-size:clamp(2.4rem,6vw,4.7rem);line-height:1;text-shadow:0 0 28px rgba(99,102,241,.18)}
+.mixolabs-wordmark .mixo{background:linear-gradient(100deg,#67e8f9 0%,#60a5fa 34%,#8b5cf6 67%,#e879f9 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.mixolabs-wordmark .x{display:inline-block;font-style:italic;text-shadow:0 0 18px rgba(168,85,247,.6)}
+.mixolabs-wordmark .labs{margin-left:.18em;letter-spacing:.08em;font-weight:500;background:linear-gradient(90deg,#e2e8f0,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:.72em}
+aside,main section{box-shadow:0 18px 70px rgba(0,0,0,.22)}
+button{transition:transform .15s ease,filter .15s ease,box-shadow .15s ease}
+button:hover{filter:brightness(1.08)}
+#generateBtn,#generateChosenAnglesBtn,#randomBtn{box-shadow:0 0 24px rgba(99,102,241,.14)}
+#generateBtn:hover,#generateChosenAnglesBtn:hover,#randomBtn:hover{box-shadow:0 0 30px rgba(139,92,246,.25)}
+.mixo-loader{width:min(520px,90%);text-align:center}
+.mixo-loader-logo{font-family:Inter,ui-sans-serif,system-ui,sans-serif;font-size:clamp(2.3rem,7vw,4.5rem);font-weight:900;letter-spacing:-.055em;white-space:nowrap}
+.mixo-loader-logo .letter{display:inline-block;color:#172033;text-shadow:none;animation:mixoReveal 2.2s ease-in-out infinite}
+.mixo-loader-logo .letter:nth-child(1){animation-delay:0s}.mixo-loader-logo .letter:nth-child(2){animation-delay:.16s}.mixo-loader-logo .letter:nth-child(3){animation-delay:.32s}.mixo-loader-logo .letter:nth-child(4){animation-delay:.48s}.mixo-loader-logo .letter:nth-child(5){animation-delay:.64s;margin-left:.22em}.mixo-loader-logo .letter:nth-child(6){animation-delay:.80s}.mixo-loader-logo .letter:nth-child(7){animation-delay:.96s}.mixo-loader-logo .letter:nth-child(8){animation-delay:1.12s}
+@keyframes mixoReveal{0%,12%{color:#172033;text-shadow:none;transform:translateY(2px)}38%,72%{color:#a5b4fc;text-shadow:0 0 12px #22d3ee,0 0 28px #8b5cf6;transform:translateY(0)}100%{color:#334155;text-shadow:none}}
+.mixo-loader-line{height:2px;margin:16px auto 0;max-width:430px;background:linear-gradient(90deg,transparent,#22d3ee,#8b5cf6,#e879f9,transparent);background-size:220% 100%;animation:mixoSweep 1.4s linear infinite;box-shadow:0 0 18px rgba(139,92,246,.5)}
+@keyframes mixoSweep{to{background-position:-220% 0}}
+
 </style>
 </head>
 <body class="bg-slate-950 text-white min-h-screen">
 <div class="max-w-7xl mx-auto p-4 md:p-8">
 <header class="text-center mb-7">
-<h1 class="text-4xl font-black bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text">StyleMaster AI Pro</h1>
-<p class="text-slate-400 mt-2">Gemini Image Studio • Consistent Angle Sheets • 200-Shade Colour Families</p>
+<h1 class="mixolabs-wordmark" aria-label="MixoLabs"><span class="mixo">MI<span class="x">X</span>O</span><span class="labs">LABS</span></h1>
+<p class="text-slate-400 mt-2 tracking-wide">IMAGINE • GENERATE • CREATE</p>
 </header>
 
 <div class="grid lg:grid-cols-3 gap-6">
@@ -99,7 +122,7 @@
 
 <main class="lg:col-span-2 space-y-5">
 <section class="bg-slate-900 border border-slate-800 rounded-2xl p-5 min-h-[520px]">
-<div id="loading" class="hidden h-96 flex flex-col items-center justify-center"><div class="loader"></div><p id="loadingText" class="mt-4 text-slate-300">Generating...</p></div>
+<div id="loading" class="hidden h-96 flex flex-col items-center justify-center"><div class="mixo-loader"><div class="mixo-loader-logo" aria-label="MixoLabs"><span class="letter">M</span><span class="letter">I</span><span class="letter">X</span><span class="letter">O</span><span class="letter">L</span><span class="letter">A</span><span class="letter">B</span><span class="letter">S</span></div><div class="mixo-loader-line"></div><p id="loadingText" class="mt-5 text-slate-300 tracking-wide">Creating your image...</p></div></div>
 <div id="placeholder" class="h-96 flex items-center justify-center text-center text-slate-500">Your generated images will appear here.</div>
 <div id="grid" class="hidden grid sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
 
@@ -248,7 +271,7 @@ $("placeholder").classList.add("hidden");$("activeArea").classList.add("hidden")
 $("loading").classList.remove("hidden");$("loadingText").textContent=`Generating ${count} variation${count===1?"":"s"}...`;
 for(let i=1;i<=count;i++){
 const card=document.createElement("div");card.className="bg-slate-950 border border-slate-800 rounded-xl p-3 min-h-52 flex items-center justify-center";card.innerHTML=`<span class="text-xs text-slate-500">Generating #${i}...</span>`;$("grid").appendChild(card);
-try{const url=await callGemini(buildPrompt(i),uploadedImages);card.innerHTML=`<img src="${url}" class="w-full rounded-lg cursor-pointer" alt="Variation ${i}"><div class="grid grid-cols-2 gap-2 mt-2 w-full"><button class="select bg-blue-700 py-1.5 rounded text-xs font-bold">Select</button><button class="dl bg-slate-700 py-1.5 rounded text-xs font-bold">Download</button></div>`;card.querySelector("img").onclick=card.querySelector(".select").onclick=()=>selectImage(url);card.querySelector(".dl").onclick=()=>download(url,`stylemaster-variation-${i}.png`);}
+try{const url=await callGemini(buildPrompt(i),uploadedImages);card.innerHTML=`<img src="${url}" class="w-full rounded-lg cursor-pointer" alt="Variation ${i}"><div class="grid grid-cols-2 gap-2 mt-2 w-full"><button class="select bg-blue-700 py-1.5 rounded text-xs font-bold">Select</button><button class="dl bg-slate-700 py-1.5 rounded text-xs font-bold">Download</button></div>`;card.querySelector("img").onclick=card.querySelector(".select").onclick=()=>selectImage(url);card.querySelector(".dl").onclick=()=>download(url,`mixolabs-variation-${i}.png`);}
 catch(e){card.innerHTML=`<div class="text-red-400 text-xs text-center">Variation ${i} failed<br>${escapeHtml(e.message)}</div>`;}
 }
 $("loading").classList.add("hidden");
@@ -256,7 +279,7 @@ $("loading").classList.add("hidden");
 
 function selectImage(url){activeSelectedImage=url;$("outputImage").src=url;$("grid").classList.add("hidden");$("activeArea").classList.remove("hidden");$("angleArea").classList.add("hidden");}
 $("backBtn").onclick=()=>{$("activeArea").classList.add("hidden");$("angleArea").classList.add("hidden");$("grid").classList.remove("hidden");};
-$("downloadBtn").onclick=()=>activeSelectedImage&&download(activeSelectedImage,"stylemaster-masterpiece.png");
+$("downloadBtn").onclick=()=>activeSelectedImage&&download(activeSelectedImage,"mixolabs-masterpiece.png");
 function download(url,name){const a=document.createElement("a");a.href=url;a.download=name;a.click();}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
 
@@ -276,12 +299,19 @@ Use the supplied reference image as the absolute visual reference.
 Include ONLY these requested views: ${requested.join(", ")}.
 Put all requested views together inside ONE image in a clean model-sheet grid and clearly label each view.
 IDENTITY LOCK: every panel must show the same subject. Preserve face, body proportions, fur/hair, markings, clothing, accessories, colours, materials, textures and distinctive details. Do not redesign or simplify.
-ANGLE DIRECTIONS: FRONT = straight-on. LEFT PROFILE = true left-side profile. RIGHT PROFILE = true right-side profile. BACK = straight-on rear. TOP = directly overhead. BOTTOM = directly underneath.
+ANGLE DIRECTIONS ARE CAMERA-CRITICAL:
+FRONT = camera directly in front of the subject, 0 degrees.
+LEFT PROFILE = the SUBJECT'S ANATOMICAL LEFT SIDE. Camera is positioned exactly 90 degrees to the subject's LEFT side, showing the subject's left ear/left cheek/left side. True side elevation only.
+RIGHT PROFILE = the SUBJECT'S ANATOMICAL RIGHT SIDE. Camera is positioned exactly 90 degrees to the subject's RIGHT side, showing the subject's right ear/right cheek/right side. True side elevation only.
+BACK = camera directly behind the subject, 180 degrees.
+TOP = camera directly overhead, looking vertically down.
+BOTTOM = camera directly underneath, looking vertically up.
+LEFT and RIGHT must be opposite sides of the SAME subject. Do not mirror one panel to fake the other side. Do not use three-quarter, 45-degree, turned, oblique or perspective profile views. Keep the camera height, subject scale and pose consistent across the horizontal views.
 Keep the subject fully visible. Preserve photorealism and fine surface detail. Neutral studio background. No extra or duplicate views.`;
 const url=await callGemini(prompt,[activeSelectedImage],"16:9");
 $("angleArea").innerHTML=`<div class="border-t border-slate-800 pt-5"><div class="flex justify-between items-center"><h3 class="font-bold text-indigo-300">Angle Sheet</h3><button id="backFromAngles" class="bg-slate-700 px-3 py-1.5 rounded text-xs">Back to Masterpiece</button></div><p class="text-xs text-slate-400 my-2">${requested.join(" • ")}</p><div class="checker rounded-xl p-3 flex justify-center"><img id="angleSheetImage" src="${url}" class="max-w-full max-h-[75vh] object-contain rounded-lg cursor-zoom-in"></div><button id="downloadAngleSheet" class="mt-3 bg-emerald-700 px-4 py-2 rounded-lg font-bold">Download Angle Sheet</button></div>`;
 $("activeArea").classList.add("hidden");$("angleArea").classList.remove("hidden");
-$("downloadAngleSheet").onclick=()=>download(url,"stylemaster-angle-sheet.png");$("backFromAngles").onclick=()=>{$("angleArea").classList.add("hidden");$("activeArea").classList.remove("hidden");};$("angleSheetImage").onclick=()=>openLightbox(url);
+$("downloadAngleSheet").onclick=()=>download(url,"mixolabs-angle-sheet.png");$("backFromAngles").onclick=()=>{$("angleArea").classList.add("hidden");$("activeArea").classList.remove("hidden");};$("angleSheetImage").onclick=()=>openLightbox(url);
 }catch(e){alert(`Angle sheet failed: ${e.message}`);}
 finally{$("loading").classList.add("hidden");}
 };
