@@ -60,7 +60,7 @@ app.post("/api/3d/from-image",key,async(req,res)=>{
         ultra_mode:req.body.ultra_mode !== false,
         should_texture:true,
         enable_pbr:req.body.enable_pbr !== false,
-        texture_resolution:"8k",,
+        texture_resolution:"8k",
         should_remesh:false,
 image_enhancement:true,        moderation:true,
         target_formats:["glb","obj","fbx","stl","usdz","3mf"],
