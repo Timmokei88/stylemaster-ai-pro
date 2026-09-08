@@ -476,6 +476,97 @@ html,body{overflow-x:hidden!important}
 .mixo-legal,.footer-links,.legal-links,[class*="privacy-links"]{display:none!important}
 .mixo-footer{padding-bottom:10px!important}
 </style>
+
+<style id="mixo-skin-flow-fix">
+/* Make the cinematic skin part of the scrolling page rather than a blocked-off backdrop */
+html,body{
+  min-height:100%;
+  overflow-x:hidden!important;
+}
+body{
+  position:relative!important;
+  background:#010617!important;
+}
+
+/* Decorative side artwork stays visible as framing, but no longer sits behind a giant opaque slab */
+.mixo-side-art{
+  position:fixed!important;
+  top:0!important;
+  bottom:0!important;
+  pointer-events:none!important;
+  z-index:0!important;
+}
+
+/* The central shell is transparent so the skin visually carries through the whole page */
+.mixo-shell,
+.mixo-shell.mixo-solid-layout{
+  position:relative!important;
+  z-index:2!important;
+  background:transparent!important;
+  min-height:0!important;
+}
+
+/* Remove any solid mega-block effect from the main wrapper */
+.mixo-shell > .grid,
+.mixo-shell > .grid > main,
+.mixo-shell > .grid > aside{
+  background:transparent!important;
+}
+
+/* Only the actual UI panels should be solid/glass */
+.mixo-shell aside,
+.mixo-shell main section,
+.mixo-main-feature,
+.mixo-promo{
+  backdrop-filter:blur(14px)!important;
+}
+
+/* Let the creation section size naturally with content instead of looking like one giant opaque page slab */
+.mixo-shell main section{
+  min-height:0!important;
+}
+#placeholder{
+  min-height:320px!important;
+  height:auto!important;
+  padding:90px 20px!important;
+}
+
+/* Footer is part of the normal page flow and always visible after all generator controls */
+.mixo-site-footer{
+  position:relative!important;
+  z-index:3!important;
+  width:100%!important;
+  margin:28px 0 8px!important;
+  padding:18px 12px 10px!important;
+  display:flex!important;
+  justify-content:space-between!important;
+  align-items:center!important;
+  gap:18px!important;
+  flex-wrap:wrap!important;
+  color:#9ba8c5!important;
+  font-size:12px!important;
+  border-top:1px solid rgba(120,150,220,.16)!important;
+  background:linear-gradient(180deg,rgba(2,6,23,.10),rgba(2,6,23,.42))!important;
+}
+.mixo-site-footer .copyright{
+  white-space:nowrap;
+}
+.mixo-site-footer .footer-nav{
+  display:flex;
+  gap:18px;
+  flex-wrap:wrap;
+}
+.mixo-site-footer .footer-nav span{
+  color:#aab5cf;
+}
+@media(max-width:700px){
+  .mixo-site-footer{
+    justify-content:center!important;
+    text-align:center!important;
+  }
+}
+</style>
+
 </head>
 <body class="bg-slate-950 text-white min-h-screen">
 <div class="mixo-side-art left" aria-hidden="true"></div>
@@ -623,9 +714,16 @@ html,body{overflow-x:hidden!important}
 </div>
 
 
-<footer class="mixo-footer">
-  <img src="/mixolabs-logo.png" alt="MixoLabs">
-  IMAGINE • GENERATE • CREATE • WITHOUT LIMITS
+
+
+
+<footer class="mixo-site-footer">
+  <div class="copyright">© 2026 MixoLabs</div>
+  <div class="footer-nav" aria-label="Site information">
+    <span>Privacy</span>
+    <span>Terms</span>
+    <span>Support</span>
+  </div>
 </footer>
 
 <script>
