@@ -567,11 +567,234 @@ body{
 }
 </style>
 
+
+<style id="mixo-pro-studio-rebuild">
+/* =========================================================
+   MIXOLABS PRO STUDIO REBUILD
+   Full-page skin + one large central internally-scrollable app
+   ========================================================= */
+html,body{margin:0;min-height:100%;background:#01040c!important}
+body{
+  min-height:100vh!important;
+  overflow:hidden!important;
+  color:#f8fbff;
+}
+.mixo-skin-backdrop{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background-image:
+    linear-gradient(180deg,rgba(0,4,17,.18),rgba(0,3,14,.34)),
+    url('/mixolabs-default-skin.jpg');
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  transform:scale(1.015);
+  filter:saturate(1.03) contrast(1.02);
+}
+.mixo-skin-backdrop:after{
+  content:"";
+  position:absolute;inset:0;
+  background:
+    radial-gradient(circle at center,transparent 25%,rgba(1,4,15,.13) 62%,rgba(1,4,15,.34) 100%);
+}
+.mixo-page{
+  position:relative;
+  z-index:2;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  padding:18px clamp(16px,3vw,44px) 10px;
+  box-sizing:border-box;
+}
+.mixo-page-toolbar{
+  position:relative;
+  display:flex;
+  justify-content:flex-end;
+  min-height:44px;
+  flex:0 0 auto;
+}
+.mixo-skin-button{
+  border:1px solid rgba(232,121,249,.58)!important;
+  background:linear-gradient(135deg,rgba(8,19,43,.92),rgba(61,24,95,.90))!important;
+  color:white!important;
+  border-radius:12px!important;
+  padding:9px 15px!important;
+  font-weight:800!important;
+  box-shadow:0 0 24px rgba(217,70,239,.17)!important;
+  backdrop-filter:blur(14px);
+}
+.mixo-skin-panel{
+  position:absolute;
+  top:48px;right:0;
+  width:min(360px,calc(100vw - 32px));
+  z-index:80;
+  border:1px solid rgba(111,203,255,.36);
+  border-radius:16px;
+  padding:15px;
+  background:linear-gradient(180deg,rgba(5,12,30,.97),rgba(6,9,25,.98));
+  box-shadow:0 22px 70px rgba(0,0,0,.55),0 0 34px rgba(139,92,246,.16);
+  backdrop-filter:blur(20px);
+}
+.mixo-skin-panel.hidden{display:none!important}
+.mixo-skin-panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.mixo-skin-panel-head strong{font-size:15px}
+.mixo-skin-panel-head button{font-size:24px;line-height:1;color:#cbd5e1;background:none!important;border:0!important}
+.mixo-skin-panel p{font-size:12px;color:#9aa8c7;line-height:1.45;margin:8px 0 12px}
+.mixo-skin-presets{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.mixo-skin-presets button,.mixo-skin-reset{
+  min-height:42px;border-radius:10px!important;
+  background:rgba(17,29,58,.90)!important;color:#e9efff!important;
+  border:1px solid rgba(105,164,236,.22)!important;
+  font-size:11px;font-weight:750;
+}
+.mixo-upload-skin{
+  display:flex;align-items:center;justify-content:center;
+  min-height:44px;margin-top:9px;border-radius:10px;
+  border:1px dashed rgba(192,132,252,.44);
+  background:rgba(69,34,115,.18);
+  color:#e9d5ff;font-size:12px;font-weight:800;cursor:pointer;
+}
+.mixo-upload-skin input{display:none}
+.mixo-skin-reset{width:100%;margin-top:8px}
+.mixo-skin-status{min-height:16px;margin-top:8px;font-size:11px;color:#8ee8ff}
+
+.mixo-studio-window{
+  width:min(1460px,96vw)!important;
+  max-width:none!important;
+  margin:0 auto!important;
+  padding:20px 22px 26px!important;
+  flex:1 1 auto;
+  min-height:0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  border:1px solid rgba(102,191,255,.34)!important;
+  border-radius:28px!important;
+  background:
+    radial-gradient(circle at 80% 0%,rgba(107,61,216,.08),transparent 26rem),
+    linear-gradient(180deg,rgba(2,8,24,.91),rgba(3,8,23,.94))!important;
+  box-shadow:
+    0 28px 90px rgba(0,0,0,.58),
+    0 0 0 1px rgba(154,94,255,.07),
+    0 0 50px rgba(37,99,235,.10)!important;
+  backdrop-filter:blur(18px);
+  scrollbar-width:thin;
+  scrollbar-color:#8354e8 rgba(9,17,39,.75);
+}
+.mixo-studio-window::-webkit-scrollbar{width:11px}
+.mixo-studio-window::-webkit-scrollbar-track{background:rgba(6,12,29,.65);border-radius:12px}
+.mixo-studio-window::-webkit-scrollbar-thumb{
+  background:linear-gradient(#22d3ee,#8b5cf6,#e879f9);
+  border:3px solid rgba(6,12,29,.78);border-radius:12px
+}
+/* The background is the skin; the app itself remains one clean professional window. */
+.mixo-studio-window .mixo-topbar{
+  position:sticky!important;top:-20px!important;z-index:25!important;
+  margin:-20px -22px 0!important;padding:14px 22px 10px!important;
+  background:linear-gradient(180deg,rgba(3,8,24,.985),rgba(3,8,24,.90),transparent)!important;
+  backdrop-filter:blur(16px);
+}
+.mixo-studio-window .mixo-brand-logo{width:min(330px,40vw)!important;max-height:94px!important}
+.mixo-studio-window .mixo-hero{margin:6px 0 18px!important}
+.mixo-studio-window > .grid{
+  display:grid!important;
+  grid-template-columns:minmax(320px,380px) minmax(0,1fr)!important;
+  gap:18px!important;
+  align-items:start!important;
+  background:transparent!important;
+}
+.mixo-studio-window aside,
+.mixo-studio-window main section{
+  background:linear-gradient(180deg,rgba(7,16,38,.94),rgba(4,10,27,.96))!important;
+  border:1px solid rgba(102,181,255,.28)!important;
+  box-shadow:0 18px 56px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.025)!important;
+}
+.mixo-studio-window main{
+  min-width:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:14px!important;
+}
+.mixo-main-features{grid-template-columns:repeat(3,minmax(0,1fr))!important;margin:0!important}
+.mixo-promo{min-height:230px!important;background-position:center!important}
+#placeholder{min-height:360px!important;height:auto!important;padding:100px 20px!important}
+.mixo-site-footer.mixo-external-footer{
+  width:min(1460px,96vw)!important;
+  margin:8px auto 0!important;
+  padding:8px 6px 0!important;
+  flex:0 0 auto!important;
+  border:0!important;
+  background:transparent!important;
+  color:#d3dcf2!important;
+  text-shadow:0 2px 12px #000;
+}
+.mixo-external-footer .footer-nav span{color:#d3dcf2!important}
+#lightbox{z-index:100!important}
+
+/* Uploaded/preset skins */
+body[data-mixo-skin="midnight"] .mixo-skin-backdrop{
+  background-image:
+    radial-gradient(circle at 18% 22%,rgba(14,116,144,.35),transparent 28rem),
+    radial-gradient(circle at 82% 28%,rgba(109,40,217,.34),transparent 30rem),
+    linear-gradient(135deg,#01030a,#03091d 48%,#090321)!important;
+}
+body[data-mixo-skin="aurora"] .mixo-skin-backdrop{
+  background-image:
+    radial-gradient(circle at 12% 20%,rgba(0,229,255,.35),transparent 26rem),
+    radial-gradient(circle at 75% 18%,rgba(255,46,209,.28),transparent 30rem),
+    radial-gradient(circle at 60% 84%,rgba(92,57,255,.30),transparent 32rem),
+    linear-gradient(140deg,#020614,#061328,#10051f)!important;
+}
+
+@media(max-width:980px){
+  body{overflow:auto!important}
+  .mixo-page{height:auto;min-height:100vh;padding:10px}
+  .mixo-studio-window{
+    width:100%!important;
+    max-height:none!important;
+    overflow:visible!important;
+    border-radius:20px!important;
+  }
+  .mixo-studio-window > .grid{grid-template-columns:1fr!important}
+  .mixo-studio-window .mixo-topbar{position:relative!important;top:auto!important}
+  .mixo-main-features{grid-template-columns:1fr!important}
+}
+@media(max-width:620px){
+  .mixo-page-toolbar{min-height:40px}
+  .mixo-skin-button{padding:8px 11px!important;font-size:12px!important}
+  .mixo-studio-window{padding:14px!important}
+  .mixo-studio-window .mixo-topbar{margin:-14px -14px 0!important;padding:12px 14px 8px!important}
+  .mixo-studio-window .mixo-brand-logo{width:min(280px,78vw)!important}
+}
+</style>
+
 </head>
 <body class="bg-slate-950 text-white min-h-screen">
-<div class="mixo-side-art left" aria-hidden="true"></div>
-<div class="mixo-side-art right" aria-hidden="true"></div>
-<div class="mixo-shell mixo-solid-layout">
+<div id="skinBackdrop" class="mixo-skin-backdrop" aria-hidden="true"></div>
+<div class="mixo-page">
+  <div class="mixo-page-toolbar">
+    <button id="skinButton" type="button" class="mixo-skin-button" aria-expanded="false">🎨 Appearance</button>
+    <div id="skinPanel" class="mixo-skin-panel hidden">
+      <div class="mixo-skin-panel-head">
+        <strong>Personalise your studio</strong>
+        <button id="skinClose" type="button" aria-label="Close appearance panel">×</button>
+      </div>
+      <p>Choose a MixoLabs skin or upload your own. Your choice is saved on this browser.</p>
+      <div class="mixo-skin-presets">
+        <button type="button" data-skin="default">Default MixoLabs</button>
+        <button type="button" data-skin="midnight">Midnight</button>
+        <button type="button" data-skin="aurora">Aurora</button>
+      </div>
+      <label class="mixo-upload-skin">
+        <span>Upload your own skin</span>
+        <input id="skinUpload" type="file" accept="image/*">
+      </label>
+      <button id="skinReset" type="button" class="mixo-skin-reset">Reset to MixoLabs</button>
+      <div id="skinStatus" class="mixo-skin-status" aria-live="polite"></div>
+    </div>
+  </div>
+  <div class="mixo-shell mixo-solid-layout mixo-studio-window">
 <header class="mixo-topbar">
   <img class="mixo-brand-logo" src="/mixolabs-logo.png" alt="MixoLabs — Imagine • Generate • Create • Without Limits">
   <nav class="mixo-nav" aria-label="Primary"><span>⌂ &nbsp;Generator</span><span>▧ &nbsp;Gallery</span><span>♡ &nbsp;Favorites</span><span>⚙ &nbsp;Settings</span></nav>
@@ -708,6 +931,8 @@ body{
 
 </div>
 
+  </div>
+
 <div id="lightbox" class="hidden fixed inset-0 z-50 bg-black/95 p-4 items-center justify-center">
 <button id="closeLightbox" class="absolute top-4 right-5 text-4xl">&times;</button>
 <img id="lightboxImg" class="max-w-full max-h-full object-contain">
@@ -717,7 +942,7 @@ body{
 
 
 
-<footer class="mixo-site-footer">
+<footer class="mixo-site-footer mixo-external-footer">
   <div class="copyright">© 2026 MixoLabs</div>
   <div class="footer-nav" aria-label="Site information">
     <span>Privacy</span>
@@ -725,6 +950,7 @@ body{
     <span>Support</span>
   </div>
 </footer>
+</div>
 
 <script>
 "use strict";
@@ -900,5 +1126,109 @@ $("resinTotal").oninput=resin;$("resinRatio").onchange=resin;
 
 initSelectors();initColors();updateAngleCount();resin();
 </script>
+
+<script id="mixo-skin-system">
+(() => {
+  const STORAGE_KEY = "mixolabs.skin.v1";
+  const CUSTOM_KEY = "mixolabs.customSkin.v1";
+  const body = document.body;
+  const backdrop = document.getElementById("skinBackdrop");
+  const panel = document.getElementById("skinPanel");
+  const button = document.getElementById("skinButton");
+  const close = document.getElementById("skinClose");
+  const upload = document.getElementById("skinUpload");
+  const reset = document.getElementById("skinReset");
+  const status = document.getElementById("skinStatus");
+
+  if (!backdrop || !panel || !button) return;
+
+  const setStatus = (text) => { if (status) status.textContent = text || ""; };
+
+  function applySkin(kind, customData) {
+    body.dataset.mixoSkin = kind;
+    if (kind === "custom" && customData) {
+      backdrop.style.backgroundImage =
+        `linear-gradient(180deg,rgba(0,4,17,.18),rgba(0,3,14,.34)),url("${customData}")`;
+      backdrop.style.backgroundSize = "cover";
+      backdrop.style.backgroundPosition = "center";
+    } else {
+      backdrop.style.backgroundImage = "";
+      backdrop.style.backgroundSize = "";
+      backdrop.style.backgroundPosition = "";
+    }
+  }
+
+  function savePreset(kind) {
+    try {
+      localStorage.setItem(STORAGE_KEY, kind);
+      if (kind !== "custom") localStorage.removeItem(CUSTOM_KEY);
+    } catch (_) {}
+    applySkin(kind);
+    setStatus(kind === "default" ? "MixoLabs skin restored." : `${kind[0].toUpperCase()+kind.slice(1)} skin saved.`);
+  }
+
+  function loadSaved() {
+    let kind = "default";
+    let custom = "";
+    try {
+      kind = localStorage.getItem(STORAGE_KEY) || "default";
+      if (kind === "custom") custom = localStorage.getItem(CUSTOM_KEY) || "";
+    } catch (_) {}
+    if (kind === "custom" && !custom) kind = "default";
+    applySkin(kind, custom);
+  }
+
+  button.addEventListener("click", () => {
+    const opening = panel.classList.contains("hidden");
+    panel.classList.toggle("hidden", !opening);
+    button.setAttribute("aria-expanded", String(opening));
+  });
+  close?.addEventListener("click", () => {
+    panel.classList.add("hidden");
+    button.setAttribute("aria-expanded", "false");
+  });
+  panel.querySelectorAll("[data-skin]").forEach((btn) => {
+    btn.addEventListener("click", () => savePreset(btn.dataset.skin));
+  });
+  reset?.addEventListener("click", () => savePreset("default"));
+
+  upload?.addEventListener("change", () => {
+    const file = upload.files && upload.files[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setStatus("Please choose an image file.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const maxW = 1920, maxH = 1080;
+        const scale = Math.min(1, maxW / img.width, maxH / img.height);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        let data;
+        try {
+          data = canvas.toDataURL("image/jpeg", 0.82);
+          localStorage.setItem(STORAGE_KEY, "custom");
+          localStorage.setItem(CUSTOM_KEY, data);
+          applySkin("custom", data);
+          setStatus("Your custom skin is saved on this browser.");
+        } catch (_) {
+          setStatus("That image is too large to save. Try a smaller image.");
+        }
+      };
+      img.src = String(reader.result);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  loadSaved();
+})();
+</script>
+
 </body>
 </html>
