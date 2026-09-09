@@ -210,7 +210,7 @@
   <div class="mixo-settings-head"><div><h2 id="mixoSettingsTitle">MixoLabs Settings</h2><p style="margin:4px 0 0;color:#9facc7;font-size:11px">Manage your account, preferences and future subscription settings.</p></div><button id="mixoSettingsClose" class="mixo-settings-close" type="button" aria-label="Close">&times;</button></div>
   <div class="mixo-settings-section"><h3>Account &amp; Profile</h3><p>Prepare your creator profile now. Secure email/password authentication will connect when the production database is activated.</p><div class="mixo-settings-row"><span id="settingsProfileSummary">Local profile not set up</span><div style="display:flex;gap:6px;flex-wrap:wrap"><button id="settingsProfileButton" class="mixo-settings-action" type="button">Manage Profile</button><button id="settingsLoginButton" class="mixo-settings-action" type="button">Log In / Create Account</button></div></div></div>
   <div class="mixo-settings-section"><h3>Appearance</h3><p>Your MixoLabs skin controls are already available from Appearance in the main navigation.</p><div class="mixo-settings-row"><span>Background &amp; skin</span><button id="settingsAppearanceButton" class="mixo-settings-action" type="button">Open Appearance</button></div></div>
-  <div class="mixo-settings-section"><h3>Subscription &amp; Credits</h3><p>Preview the future plan and credit experience. Live billing is still disabled.</p><div class="mixo-settings-row"><span id="settingsPlanSummary">Current plan: Not activated</span><button class="mixo-settings-action" data-open-billing type="button">View Plans &amp; Credits</button></div></div>
+  <div class="mixo-settings-section"><h3>Subscription &amp; Credits</h3><p>View plans, buy credit packs, or manage billing securely through Stripe.</p><div class="mixo-settings-row"><span id="settingsPlanSummary">Current plan: None</span><button class="mixo-settings-action" data-open-billing type="button">View Plans &amp; Credits</button></div></div>
   <div class="mixo-settings-section"><h3>Privacy &amp; Legal</h3><p>Review the MixoLabs legal information at any time.</p><div class="mixo-settings-row"><span>Policies</span><div style="display:flex;gap:6px"><button class="mixo-settings-action" type="button" data-settings-legal="privacy">Privacy</button><button class="mixo-settings-action" type="button" data-settings-legal="terms">Terms</button></div></div></div>
   <div class="mixo-settings-section"><h3>Support</h3><p>Product help, billing guidance and the future AI support assistant will be accessible through MixoLabs Support.</p><div class="mixo-settings-row"><span>Need help?</span><button class="mixo-settings-action" type="button" data-settings-legal="support">Open Support</button></div></div>
  </div>
@@ -220,44 +220,42 @@
 <div id="mixoBillingOverlay" class="mixo-billing-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="mixoBillingTitle">
  <div class="mixo-billing-card">
   <div class="mixo-billing-head">
-   <div><h2 id="mixoBillingTitle">Plans &amp; Credits</h2><p>Preview the MixoLabs subscription experience before Stripe and secure account billing are connected.</p></div>
+  <div><h2 id="mixoBillingTitle">Plans &amp; Credits</h2><p>Secure Stripe Checkout. Test mode is used until MixoLabs is ready for paid launch.</p></div>
    <button id="mixoBillingClose" class="mixo-billing-close" type="button" aria-label="Close">&times;</button>
   </div>
   <div class="mixo-billing-summary">
-   <div class="mixo-billing-stat"><span>Preview plan</span><b id="mixoPreviewPlan">Not selected</b></div>
+   <div class="mixo-billing-stat"><span>Current plan</span><b id="mixoPreviewPlan">None</b></div>
    <div class="mixo-billing-stat"><span>Credits</span><b id="mixoPreviewCredits">Not active</b><div class="mixo-credit-bar"><div id="mixoCreditFill" class="mixo-credit-fill"></div></div></div>
-   <div class="mixo-billing-stat"><span>Billing status</span><b>Disabled</b></div>
+   <div class="mixo-billing-stat"><span>Billing status</span><b id="mixoBillingMode">Checking…</b></div>
   </div>
   <div class="mixo-billing-tabs">
    <button class="mixo-billing-tab active" type="button" data-billing-tab="monthly">Monthly</button>
    <button class="mixo-billing-tab" type="button" data-billing-tab="annual">Annual</button>
    <button class="mixo-billing-tab" type="button" data-billing-tab="credits">Buy Credits</button>
   </div>
-  <div class="mixo-rollover"><b>Planned credit rules:</b> subscription credits roll over while the subscription remains active, capped at 2× the monthly allowance. One-off purchased credits do not expire while the account remains open and are used after subscription credits. These are draft commercial rules and will be finalised before paid launch.</div>
+  <div class="mixo-rollover"><b>Credit rules:</b> subscription credits roll over while the subscription remains active, capped at 2× the monthly allowance. One-off purchased credits do not expire while the account remains open and are used after subscription credits.</div>
   <div id="mixoBillingMonthly" class="mixo-billing-panel">
    <div class="mixo-plan-grid">
-    <div class="mixo-plan" data-plan-card="Free"><h3>Free</h3><div class="price">£0</div><div class="muted">Testing preview</div><ul><li>Starter generation allowance</li><li>No payment required</li></ul><button type="button" data-preview-plan="Free">Preview Free</button></div>
-    <div class="mixo-plan" data-plan-card="Creator"><h3>Creator</h3><div class="price">£9.99<span class="muted"> / month</span></div><div class="muted">Draft: 150 credits / month</div><ul><li>Credits roll over up to 300</li><li>Creator profile &amp; library</li></ul><button type="button" data-preview-plan="Creator">Preview Creator</button></div>
-    <div class="mixo-plan" data-plan-card="Pro"><h3>Pro</h3><div class="price">£19.99<span class="muted"> / month</span></div><div class="muted">Credit quantity to be cost-checked</div><ul><li>Higher monthly allowance</li><li>2× rollover cap</li></ul><button type="button" data-preview-plan="Pro">Preview Pro</button></div>
-    <div class="mixo-plan" data-plan-card="Studio"><h3>Studio</h3><div class="price">£34.99<span class="muted"> / month</span></div><div class="muted">Credit quantity to be cost-checked</div><ul><li>Highest monthly allowance</li><li>2× rollover cap</li></ul><button type="button" data-preview-plan="Studio">Preview Studio</button></div>
+    <div class="mixo-plan"><h3>Free</h3><div class="price">£0</div><div class="muted">Account access</div><ul><li>Buy packs whenever needed</li><li>No payment required</li></ul></div>
+    <div class="mixo-plan" data-plan-card="creator"><h3>Creator</h3><div class="price">£9.99<span class="muted"> / month</span></div><div class="muted">100 credits / month</div><ul><li>Rollover cap: 200</li><li>Cancel through Stripe</li></ul><button type="button" data-checkout-item="creator">Choose Creator</button></div>
+    <div class="mixo-plan" data-plan-card="pro"><h3>Pro</h3><div class="price">£19.99<span class="muted"> / month</span></div><div class="muted">230 credits / month</div><ul><li>Rollover cap: 460</li><li>Cancel through Stripe</li></ul><button type="button" data-checkout-item="pro">Choose Pro</button></div>
+    <div class="mixo-plan" data-plan-card="studio"><h3>Studio</h3><div class="price">£34.99<span class="muted"> / month</span></div><div class="muted">450 credits / month</div><ul><li>Rollover cap: 900</li><li>Cancel through Stripe</li></ul><button type="button" data-checkout-item="studio">Choose Studio</button></div>
    </div>
   </div>
   <div id="mixoBillingAnnual" class="mixo-billing-panel hidden">
    <div class="mixo-plan-grid">
-    <div class="mixo-plan"><h3>Creator Annual</h3><div class="price">Draft</div><div class="muted">Target: better value than 12 monthly payments</div><ul><li>Credits delivered monthly</li><li>Same 2× rollover cap</li></ul><button type="button" data-preview-message="Annual pricing will be finalised after cost checks.">Preview Annual</button></div>
-    <div class="mixo-plan"><h3>Pro Annual</h3><div class="price">Draft</div><div class="muted">Annual discount planned</div><ul><li>Credits delivered monthly</li><li>Not a lump-sum yearly credit dump</li></ul><button type="button" data-preview-message="Annual pricing will be finalised after cost checks.">Preview Annual</button></div>
-    <div class="mixo-plan"><h3>Studio Annual</h3><div class="price">Draft</div><div class="muted">Annual discount planned</div><ul><li>Credits delivered monthly</li><li>Same rollover rules</li></ul><button type="button" data-preview-message="Annual pricing will be finalised after cost checks.">Preview Annual</button></div>
+    <div class="mixo-plan"><h3>Annual plans</h3><div class="price">Coming later</div><div class="muted">Monthly plans will be tested first.</div><ul><li>No accidental annual charge</li><li>Launch after renewal testing</li></ul></div>
    </div>
   </div>
   <div id="mixoBillingCredits" class="mixo-billing-panel hidden">
    <div class="mixo-pack-grid">
-    <div class="mixo-pack"><h3>150 Credits</h3><div class="price">£11.99</div><p>Draft one-off pack. No subscription. Purchased credits do not expire while the account remains open.</p><button type="button" data-preview-message="150-credit pack selected for testing only — no charge was created.">Preview Pack</button></div>
-    <div class="mixo-pack"><h3>Credit Pack 2</h3><div class="price">Draft</div><p>Larger one-off pack. Quantity and price will be set after generation-cost checks.</p><button type="button" data-preview-message="Larger credit pack preview — billing is disabled.">Preview Pack</button></div>
-    <div class="mixo-pack"><h3>Credit Pack 3</h3><div class="price">Draft</div><p>For heavier pay-as-you-go use, with no recurring subscription.</p><button type="button" data-preview-message="Larger credit pack preview — billing is disabled.">Preview Pack</button></div>
+    <div class="mixo-pack"><h3>50 Credits</h3><div class="price">£5.99</div><p>One-off purchase. No subscription.</p><button type="button" data-checkout-item="pack50">Buy 50 Credits</button></div>
+    <div class="mixo-pack"><h3>110 Credits</h3><div class="price">£11.99</div><p>One-off purchase. No subscription.</p><button type="button" data-checkout-item="pack110">Buy 110 Credits</button></div>
+    <div class="mixo-pack"><h3>250 Credits</h3><div class="price">£24.99</div><p>One-off purchase. No subscription.</p><button type="button" data-checkout-item="pack250">Buy 250 Credits</button></div>
    </div>
   </div>
   <div id="mixoBillingStatus" class="mixo-billing-status" aria-live="polite"></div>
-  <div class="mixo-billing-note"><b>Testing mode only.</b> Choosing a plan here does not create a subscription, charge a card, grant real credits or unlock paid service. Draft prices and credit allowances can still change before paid launch. Stripe, secure accounts and server-side credit enforcement will replace this preview layer.</div>
+  <div class="mixo-billing-note"><b id="mixoBillingNotice">Stripe test mode:</b> use Stripe's test card details only. Test payments do not move real money. <button id="mixoManageBilling" type="button">Manage Billing</button></div>
  </div>
 </div>
 
@@ -645,33 +643,17 @@ const planOut=document.getElementById("mixoPreviewPlan");
 const creditsOut=document.getElementById("mixoPreviewCredits");
 const fill=document.getElementById("mixoCreditFill");
 const settingsSummary=document.getElementById("settingsPlanSummary");
-const key="mixolabs.previewPlan.v1";
-const drafts={
- Free:{credits:"Starter preview",pct:20},
- Creator:{credits:"150 planned / month • rollover cap 300",pct:45},
- Pro:{credits:"Allowance to be cost-checked",pct:70},
- Studio:{credits:"Allowance to be cost-checked",pct:100}
-};
-function load(){try{return localStorage.getItem(key)||""}catch(_){return""}}
-function paint(plan){
- document.querySelectorAll("[data-plan-card]").forEach(c=>c.classList.toggle("active",c.dataset.planCard===plan));
- if(!plan||!drafts[plan]){planOut.textContent="Not selected";creditsOut.textContent="Not active";fill.style.width="0%";if(settingsSummary)settingsSummary.textContent="Current plan: Not activated";return}
- planOut.textContent=plan+" (preview)";
- creditsOut.textContent=drafts[plan].credits;
- fill.style.width=drafts[plan].pct+"%";
- if(settingsSummary)settingsSummary.textContent="Preview plan: "+plan+" • billing disabled";
-}
-function show(){paint(load());status.textContent="";overlay.classList.remove("hidden")}
+const mode=document.getElementById("mixoBillingMode"),notice=document.getElementById("mixoBillingNotice");
+function paint(user,enabled,testMode){const plan=user?.subscriptionPlan||"none",credits=Number(user?.credits||0);document.querySelectorAll("[data-plan-card]").forEach(c=>c.classList.toggle("active",c.dataset.planCard===plan));planOut.textContent=plan==="none"?"None":plan[0].toUpperCase()+plan.slice(1);creditsOut.textContent=credits+" available";fill.style.width=Math.min(100,credits/4.5)+"%";mode.textContent=!enabled?"Not configured":testMode?"TEST MODE":"Live";notice.textContent=testMode?"Stripe test mode:":"Secure Stripe billing:";if(settingsSummary)settingsSummary.textContent=`Current plan: ${planOut.textContent} • ${credits} credits`}
+async function refresh(){try{const r=await fetch("/api/billing/status");if(r.status===401){paint(null,false,true);status.textContent="Log in before choosing a plan or buying credits.";return}const d=await r.json();paint(d.user,d.enabled,d.testMode)}catch(_){status.textContent="Billing status could not be loaded."}}
+function show(){status.textContent="";overlay.classList.remove("hidden");refresh()}
 function hide(){overlay.classList.add("hidden")}
 document.querySelectorAll("[data-open-billing]").forEach(b=>b.addEventListener("click",()=>{document.getElementById("mixoSettingsOverlay")?.classList.add("hidden");show()}));
 close?.addEventListener("click",hide);
 overlay?.addEventListener("click",e=>{if(e.target===overlay)hide()});
-document.querySelectorAll("[data-preview-plan]").forEach(b=>b.addEventListener("click",()=>{
- const plan=b.dataset.previewPlan;
- try{localStorage.setItem(key,plan)}catch(_){}
- paint(plan);
- status.textContent=plan+" selected for interface testing only — no subscription or charge was created.";
-}));
+async function openStripe(path,item){status.textContent="Opening secure Stripe Checkout…";try{const r=await fetch(path,{method:"POST",headers:{"Content-Type":"application/json"},body:item?JSON.stringify({item}):"{}"}),d=await r.json();if(!r.ok)throw Error(d.error||"Billing could not be opened.");location.href=d.url}catch(e){status.textContent=e.message}}
+document.querySelectorAll("[data-checkout-item]").forEach(b=>b.addEventListener("click",()=>openStripe("/api/billing/checkout",b.dataset.checkoutItem)));
+document.getElementById("mixoManageBilling")?.addEventListener("click",()=>openStripe("/api/billing/portal"));
 document.querySelectorAll("[data-billing-tab]").forEach(btn=>btn.addEventListener("click",()=>{
  const tab=btn.dataset.billingTab;
  document.querySelectorAll("[data-billing-tab]").forEach(x=>x.classList.toggle("active",x===btn));
@@ -681,10 +663,8 @@ document.querySelectorAll("[data-billing-tab]").forEach(btn=>btn.addEventListene
  });
  status.textContent="";
 }));
-document.querySelectorAll("[data-preview-message]").forEach(btn=>btn.addEventListener("click",()=>{
- status.textContent=btn.dataset.previewMessage+" Testing mode only.";
-}));
-paint(load());
+const q=new URLSearchParams(location.search),result=q.get("billing");if(result){show();status.textContent=result==="success"?"Payment received. Credits can take a few seconds to appear; refreshing now…":result==="cancelled"?"Checkout was cancelled. Nothing was charged.":"Returned from Stripe.";setTimeout(refresh,1800);history.replaceState({},"",location.pathname)}
+window.addEventListener("mixo:auth-changed",()=>refresh());window.addEventListener("mixo:credits-changed",()=>refresh());refresh();
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay&&!overlay.classList.contains("hidden"))hide()});
 })();
 </script>

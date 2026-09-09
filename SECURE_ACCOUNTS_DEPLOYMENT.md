@@ -1,4 +1,4 @@
-# MixoLabs Secure Accounts Deployment
+# MixoLabs Secure Accounts and Stripe Test Deployment
 
 This build replaces browser-only login with real accounts, PostgreSQL sessions, a server-side credit ledger, and server-enforced image-generation charges.
 
@@ -26,8 +26,23 @@ The database schema is created automatically when the service starts. A failed d
 - Failed Gemini requests restore the exact credit buckets that were charged.
 - Community posts and messages are stored in PostgreSQL and require login to create.
 
-## Still deliberately disabled
+## Stripe test-mode setup
 
-Stripe payments and subscriptions are not enabled in this build. Product quantities and margins must be approved first. Do not grant paid credits from browser code or local storage. The next backend milestone should add Stripe Checkout, webhook idempotency, renewal grants, cancellation handling, and the customer portal against this ledger.
+Keep Stripe in test mode. Create six GBP prices and add their IDs to Render:
+
+- `STRIPE_PRICE_CREATOR_MONTHLY`: £9.99 monthly, 100 credits
+- `STRIPE_PRICE_PRO_MONTHLY`: £19.99 monthly, 230 credits
+- `STRIPE_PRICE_STUDIO_MONTHLY`: £34.99 monthly, 450 credits
+- `STRIPE_PRICE_PACK_50`: £5.99 one time
+- `STRIPE_PRICE_PACK_110`: £11.99 one time
+- `STRIPE_PRICE_PACK_250`: £24.99 one time
+
+Also add `STRIPE_SECRET_KEY` using the test secret key. In Stripe Workbench, create a webhook endpoint at `https://stylemaster-ai-pro.onrender.com/api/stripe/webhook`, subscribe to `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `invoice.paid`, `customer.subscription.updated`, and `customer.subscription.deleted`, then add its test signing secret to Render as `STRIPE_WEBHOOK_SECRET`.
+
+Never paste keys into source files, GitHub, screenshots, or chat. Use Render's secret environment-value fields.
+
+Before live mode, repeat the setup with live products, live price IDs, a live secret key, and a separate live webhook signing secret. Complete the published refund/cancellation terms, business identity, support contact, VAT/tax review, end-to-end purchase/refund/cancellation tests, and upgrade the sleeping Render web service.
+
+## Still deliberately deferred
 
 Community image files still use the web service filesystem. Move them to durable object storage before relying on community uploads in production.
