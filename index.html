@@ -304,15 +304,14 @@
 
 <div id="mixoTutorialOverlay" class="mixo-tutorial-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="mixoTutorialTitle"><div class="mixo-tutorial-card"><div class="mixo-tutorial-head"><div><h2 id="mixoTutorialTitle">MixoLabs Complete Tutorial</h2><p class="mixo-tutorial-intro">A complete guided tour of the whole MixoLabs platform. It walks through accounts, plans and credit packs, appearance, every generator control, Gallery, Favorites, publishing and Community Chat.</p></div><button id="mixoTutorialClose" class="mixo-tutorial-close" type="button">×</button></div><button id="mixoWatchLaunch" class="mixo-watch-launch" type="button">▶ Watch Narrated MixoLabs Tutorial</button>
 <div id="mixoWatchPanel" class="mixo-watch-panel hidden">
- <div class="mixo-watch-title"><b>🎬 Visual + Narrated Tutorial Player</b><span class="mixo-watch-badge">VISUAL WALKTHROUGH + VOICE + MUSIC</span></div>
+ <div class="mixo-watch-title"><b>🎬 Visual + Narrated Tutorial Player</b><span class="mixo-watch-badge">VISUAL WALKTHROUGH + NARRATION</span></div>
  <div class="mixo-watch-grid">
-  <div class="mixo-watch-field"><label for="mixoMusicGenre">Tutorial soundtrack</label><select id="mixoMusicGenre"><option value="none">No Music</option><optgroup label="Pop & Modern"><option value="electropop" selected>Electro Pop</option><option value="pop">Pop</option><option value="kpop">K-Pop Inspired</option><option value="rnb">R&B</option><option value="hiphop">Hip-Hop</option><option value="trap">Trap</option><option value="funk">Funk</option><option value="disco">Disco</option></optgroup><optgroup label="Dance & Electronic"><option value="dnb">Drum & Bass</option><option value="jungle">Jungle</option><option value="garage">UK Garage</option><option value="house">House</option><option value="deephouse">Deep House</option><option value="techhouse">Tech House</option><option value="hardhouse">Hard House</option><option value="trance">Trance</option><option value="techno">Techno</option><option value="ambient">Ambient</option><option value="chillout">Chillout</option><option value="lofi">Lo-Fi</option><option value="synthwave">Synthwave</option></optgroup><optgroup label="Rock & Alternative"><option value="rock">Rock</option><option value="indie">Indie Rock</option><option value="punk">Punk</option><option value="metal">Heavy Metal</option><option value="metalcore">Metalcore</option><option value="deathmetal">Death Metal</option><option value="deathcore">Deathcore</option></optgroup><optgroup label="Acoustic & Traditional"><option value="classical">Classical</option><option value="orchestral">Orchestral</option><option value="jazz">Jazz</option><option value="blues">Blues</option><option value="country">Country</option><option value="folk">Folk</option><option value="reggae">Reggae</option></optgroup></select></div>
-  <div class="mixo-watch-field"><label for="mixoVoiceSelect">Narrator voice</label><select id="mixoVoiceSelect"><option>Loading available voices…</option></select></div>
+  <div class="mixo-watch-field"><label for="mixoVoiceSelect">Narrator voice</label><select id="mixoVoiceSelect"><option value="female" selected>Female narrator — natural feminine remix</option><option value="male">Male narrator — creator voice</option></select></div>
  </div>
- <div class="mixo-watch-volumes"><div class="mixo-watch-field"><label>Voice volume <span id="mixoVoiceVolLabel">100%</span></label><input id="mixoVoiceVolume" type="range" min="0" max="1" step=".05" value="1"></div><div class="mixo-watch-field"><label>Music volume <span id="mixoMusicVolLabel">18%</span></label><input id="mixoMusicVolume" type="range" min="0" max=".45" step=".01" value=".18"></div></div>
- <div class="mixo-watch-stage"><div id="mixoWatchStep" class="mixo-watch-step">Ready to begin</div><h3 id="mixoWatchHeading">Welcome to MixoLabs</h3><p id="mixoWatchCaption" class="mixo-watch-caption">Choose a tutorial below, choose your soundtrack and narrator, then press Play. MixoLabs opens the relevant area, highlights the real controls and narrates what to do.</p><div class="mixo-watch-progress"><span id="mixoWatchProgress"></span></div></div>
+ <div class="mixo-watch-volumes"><div class="mixo-watch-field"><label>Voice volume <span id="mixoVoiceVolLabel">100%</span></label><input id="mixoVoiceVolume" type="range" min="0" max="1" step=".05" value="1"></div></div>
+ <div class="mixo-watch-stage"><div id="mixoWatchStep" class="mixo-watch-step">Ready to begin</div><h3 id="mixoWatchHeading">Welcome to MixoLabs</h3><p id="mixoWatchCaption" class="mixo-watch-caption">Choose a tutorial below, choose a female or male narrator, then press Play. MixoLabs opens the relevant area, highlights the real controls and narrates what to do.</p><div class="mixo-watch-progress"><span id="mixoWatchProgress"></span></div></div>
  <div class="mixo-watch-controls"><button id="mixoWatchPrev" type="button">← Previous</button><button id="mixoWatchRestart" type="button">↻ Restart</button><span></span><button id="mixoWatchNext" type="button">Next →</button><button id="mixoWatchPlay" class="primary" type="button">▶ Play</button></div>
- <p class="mixo-watch-note">Instrumental accompaniment is generated locally in the browser and contains no vocals. Narration uses voices available on the viewer's device/browser, so the exact voice can vary. No tutorial action purchases credits or submits passwords.</p>
+ <p class="mixo-watch-note">Choose a Female or Male narrator and adjust the voice volume. MixoLabs uses the connected natural narrator service when available: Male uses the creator voice and Female uses its feminine remix. If the service has not been connected yet, the browser voice is used as a temporary fallback. No tutorial action purchases credits or submits passwords.</p>
 </div>
 <div class="mixo-tutorial-grid"><button class="mixo-tutorial-chapter" data-tour-start="0"><b>1. Account & Profile</b><small>Log in, create an account and set up your creator identity.</small></button><button class="mixo-tutorial-chapter" data-tour-start="4"><b>2. Plans & Credits</b><small>Subscriptions, reusable credit packs and generation costs.</small></button><button class="mixo-tutorial-chapter" data-tour-start="7"><b>3. Appearance</b><small>Change the full-page skin and Creativity banner background.</small></button><button class="mixo-tutorial-chapter" data-tour-start="10"><b>4. Generator</b><small>Prompt, Random Idea, text, quantity, quality, ratio, background, references, category, style, theme, colours and resin calculator.</small></button><button class="mixo-tutorial-chapter" data-tour-start="25"><b>5. Results & Angle Sheets</b><small>Select, download, fullscreen, save, favourite and create angle sheets.</small></button><button class="mixo-tutorial-chapter" data-tour-start="31"><b>6. Gallery & Publishing</b><small>Open, remove and publish saved creations.</small></button><button class="mixo-tutorial-chapter" data-tour-start="35"><b>7. Favorites</b><small>Open and remove favourite creations.</small></button><button class="mixo-tutorial-chapter" data-tour-start="37"><b>8. Community Chat</b><small>Choose a display name, send messages and upload images.</small></button></div><button id="mixoTutorialStart" class="mixo-tour-start" type="button">▶ Start Complete MixoLabs Tour</button><p class="mixo-tutorial-intro" style="margin-bottom:0">The tour demonstrates controls without making purchases or generating images automatically. Features that are still in testing mode are clearly identified.</p></div></div>
 <div id="mixoTourCoach" class="hidden"><div id="mixoTourCount" class="mixo-tour-count"></div><div id="mixoTourTitle" class="mixo-tour-title"></div><div id="mixoTourText" class="mixo-tour-text"></div><div id="mixoTourDemo" class="mixo-tour-demo"></div><div class="mixo-tour-actions"><button id="mixoTourBack" type="button">Back</button><button id="mixoTourExit" type="button">Exit</button><button id="mixoTourNext" class="next" type="button">Next</button></div></div>
@@ -1074,7 +1073,7 @@ const chapterStarts=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19];
 const chapterGrid=document.querySelector('.mixo-tutorial-grid');
 if(chapterGrid){chapterGrid.innerHTML=sceneData.map((s,i)=>`<button class="mixo-tutorial-chapter${i===19?' mixo-selected-tutorial':''}" data-narrated-scene="${i}" type="button"><b>${i===19?'▶ ':''}${s[0]}</b><small>${s[1]}</small></button>`).join('');}
 let selected=19, idx=0, playing=false, utter=null, nextTimer=null, ctx=null, musicGain=null, musicTimer=null, scheduled=[];
-const $=id=>document.getElementById(id), panel=$('mixoWatchPanel'), play=$('mixoWatchPlay'), genre=$('mixoMusicGenre'), musicVol=$('mixoMusicVolume'), voiceVol=$('mixoVoiceVolume'), voiceSel=$('mixoVoiceSelect');
+const $=id=>document.getElementById(id), panel=$('mixoWatchPanel'), play=$('mixoWatchPlay'), genre=null, musicVol=null, voiceVol=$('mixoVoiceVolume'), voiceSel=$('mixoVoiceSelect');
 function closeDemoOverlays(except){['mixoAccountOverlay','mixoProfileOverlay','mixoSettingsOverlay','mixoGalleryOverlay','mixoFavoritesOverlay','mixoCommunityOverlay','skinBackdrop'].forEach(id=>{if(id===except)return;const e=$(id);if(e)e.classList.add('hidden')})}
 function reveal(sel){
  closeDemoOverlays();
@@ -1090,8 +1089,12 @@ function reveal(sel){
 }
 function render(){const s=sceneData[idx];$('mixoWatchStep').textContent=`Tutorial ${idx+1} of ${sceneData.length}`;$('mixoWatchHeading').textContent=s[0];$('mixoWatchCaption').textContent=s[1];$('mixoWatchProgress').style.width=((idx+1)/sceneData.length*100)+'%';reveal(s[2])}
 function voices(){return speechSynthesis.getVoices()}
+function narratorVoice(kind){const vs=voices(), english=vs.filter(v=>/^en/i.test(v.lang)), pool=english.length?english:vs;if(!pool.length)return null;const female=/female|samantha|serena|ava|aria|sonia|victoria|karen|moira|tessa|zira|hazel|susan|fiona|veena|allison|siri female/i;const male=/male|daniel|alex|fred|jorge|tom|aaron|arthur|gordon|oliver|rishi|lee|david|mark|george|google uk english male/i;return pool.find(v=>(kind==='male'?male:female).test(v.name))||pool.find(v=>!(kind==='male'?female:male).test(v.name))||pool[0]}
 function stopSpeech(){speechSynthesis.cancel();if(nextTimer){clearTimeout(nextTimer);nextTimer=null}}
-function speak(){stopSpeech();if(!playing)return;utter=new SpeechSynthesisUtterance(sceneData[idx][1]);let vs=voices(),vi=Number(voiceSel?.value);if(vs[vi])utter.voice=vs[vi];utter.volume=Number(voiceVol?.value||1);utter.rate=.92;utter.pitch=1;utter.onend=()=>{if(!playing)return;if(selected===19&&idx<sceneData.length-2){nextTimer=setTimeout(()=>{idx++;render();speak()},900)}else{playing=false;play.textContent='▶ Replay';stopMusic()}};speechSynthesis.speak(utter)}
+let naturalAudio=null;
+function afterNarration(){if(!playing)return;if(selected===19&&idx<sceneData.length-2){nextTimer=setTimeout(()=>{idx++;render();speak()},900)}else{playing=false;play.textContent='▶ Replay';stopMusic()}}
+function browserFallback(text,kind){utter=new SpeechSynthesisUtterance(text);const chosen=narratorVoice(kind);if(chosen)utter.voice=chosen;utter.volume=Number(voiceVol?.value||1);utter.rate=.92;utter.pitch=1;utter.onend=afterNarration;utter.onerror=afterNarration;speechSynthesis.speak(utter)}
+async function speak(){stopSpeech();if(naturalAudio){try{naturalAudio.pause();naturalAudio.src=''}catch(_){}naturalAudio=null}if(!playing)return;const text=sceneData[idx][1],kind=document.getElementById('mixoVoiceSelect')?.value||'female';try{const r=await fetch('/api/narration',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:kind})});if(!r.ok)throw new Error('Natural narrator unavailable');const blob=await r.blob();if(!blob.type.startsWith('audio/'))throw new Error('Invalid narrator audio');naturalAudio=new Audio(URL.createObjectURL(blob));naturalAudio.volume=Number(voiceVol?.value||1);naturalAudio.onended=()=>{URL.revokeObjectURL(naturalAudio.src);naturalAudio=null;afterNarration()};naturalAudio.onerror=()=>{naturalAudio=null;browserFallback(text,kind)};await naturalAudio.play()}catch(_){browserFallback(text,kind)}}
 function osc(freq,t,dur,amp,type='sine',detune=0){if(!ctx||!musicGain)return;const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);o.detune.value=detune;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.001,amp),t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g).connect(musicGain);o.start(t);o.stop(t+dur+.03);scheduled.push(o)}
 function noise(t,dur,amp,high=700){if(!ctx||!musicGain)return;const n=Math.ceil(ctx.sampleRate*dur),b=ctx.createBuffer(1,n,ctx.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*(1-i/n);const src=ctx.createBufferSource(),f=ctx.createBiquadFilter(),g=ctx.createGain();src.buffer=b;f.type='highpass';f.frequency.value=high;g.gain.value=amp;src.connect(f).connect(g).connect(musicGain);src.start(t);scheduled.push(src)}
 function kick(t,amp=.55){if(!ctx)return;const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.setValueAtTime(130,t);o.frequency.exponentialRampToValueAtTime(48,t+.12);g.gain.setValueAtTime(amp,t);g.gain.exponentialRampToValueAtTime(.001,t+.18);o.connect(g).connect(musicGain);o.start(t);o.stop(t+.2);scheduled.push(o)}
@@ -1099,7 +1102,7 @@ const cfg={electropop:[116,'dance'],pop:[108,'pop'],kpop:[120,'kpop'],rnb:[82,'r
 function scheduleBar(start,g){const [bpm,style]=cfg[g]||cfg.electropop,q=60/bpm,e=q/2,roots=[130.81,110,146.83,98],root=roots[Math.floor(start/(q*4))%roots.length];for(let i=0;i<8;i++){let t=start+i*e;const four=/dance|pop|kpop|disco|house|deep|techhouse|hard|trance|techno/.test(style);if(four&&i%2===0)kick(t,.45);if(/dnb|jungle/.test(style)){if(i===0||i===5)kick(t,.55);if(i===2||i===6)noise(t,.09,.18,1200);if(style==='jungle'&&(i===3||i===7))noise(t,.05,.12,1800)}else if(/hiphop|trap|rnb|lofi/.test(style)){if(i===0||i===4)kick(t,.48);if(i===2||i===6)noise(t,.08,.13,1000);if(style==='trap')noise(t+.25*e,.025,.055,3500)}else if(/rock|indie|punk|metal/.test(style)||style.includes('death')){if(i%2===0)kick(t,.5);if(i===2||i===6)noise(t,.1,.18,900);osc(root*(i%2?1:2),t,e*.7,.22,style.includes('metal')||style.includes('death')?'sawtooth':'square',i%2?5:-5)}else if(style==='reggae'){if(i%2===1){osc(root*2,t,e*.28,.18,'triangle');osc(root*2.5,t,e*.28,.12,'triangle')}}else if(/classical|orchestral|ambient|chill/.test(style)){if(i%2===0){osc(root,t,q*1.8,.18,'sine');osc(root*1.5,t,q*1.8,.1,'triangle');osc(root*2,t,q*1.8,.07,'sine')}}else if(/jazz|blues|country|folk|funk/.test(style)){if(i%2===0)osc(root*(i%4===0?1:1.5),t,e*.7,.2,style==='country'||style==='folk'?'triangle':'sine');if(style==='funk'&&i%2)noise(t,.035,.06,2500)}else{if(i%2===0)kick(t,.4)}if(/trance|synthwave|electropop|kpop/.test(g)||style==='dance'){osc(root*(i%4===0?2:3),t,e*.55,.12,'sawtooth',i%2?7:-7)}if(style==='garage'&&(i===1||i===4||i===6))kick(t,.38)}return q*4}
 async function startMusic(){stopMusic();if(!genre||genre.value==='none')return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;ctx=new AC();if(ctx.state==='suspended')await ctx.resume();musicGain=ctx.createGain();musicGain.gain.value=Math.max(0,Number(musicVol.value||.18));const comp=ctx.createDynamicsCompressor();comp.threshold.value=-18;comp.ratio.value=4;musicGain.connect(comp).connect(ctx.destination);let cursor=ctx.currentTime+.05;const pump=()=>{if(!playing||!ctx)return;while(cursor<ctx.currentTime+1.5)cursor+=scheduleBar(cursor,genre.value);musicTimer=setTimeout(pump,500)};pump()}
 function stopMusic(){if(musicTimer){clearTimeout(musicTimer);musicTimer=null}scheduled.forEach(n=>{try{n.stop()}catch{}});scheduled=[];if(ctx){try{ctx.close()}catch{}}ctx=null;musicGain=null}
-async function start(){playing=true;play.textContent='⏸ Pause';render();await startMusic();speak()}
+async function start(){playing=true;play.textContent='⏸ Pause';render();stopMusic();speak()}
 function pause(){playing=false;play.textContent='▶ Play';stopSpeech();stopMusic();document.querySelectorAll('.mixo-tour-highlight').forEach(x=>x.classList.remove('mixo-tour-highlight'))}
 // Replace controls to remove old v1 listeners.
 function replace(id){const old=$(id);if(!old)return null;const n=old.cloneNode(true);old.replaceWith(n);return n}
@@ -1107,6 +1110,58 @@ const p2=replace('mixoWatchPlay'),nx=replace('mixoWatchNext'),pv=replace('mixoWa
 if(ln)ln.onclick=()=>{panel.classList.toggle('hidden');if(!panel.classList.contains('hidden')){idx=selected===19?0:selected;render()}};
 if(p2)p2.onclick=()=>playing?pause():start();if(nx)nx.onclick=()=>{pause();idx=Math.min(sceneData.length-1,idx+1);render()};if(pv)pv.onclick=()=>{pause();idx=Math.max(0,idx-1);render()};if(rs)rs.onclick=()=>{pause();idx=selected===19?0:selected;render()};
 chapterGrid?.querySelectorAll('[data-narrated-scene]').forEach(b=>b.onclick=()=>{pause();selected=Number(b.dataset.narratedScene);idx=selected===19?0:selected;chapterGrid.querySelectorAll('.mixo-tutorial-chapter').forEach(x=>x.classList.remove('mixo-selected-tutorial'));b.classList.add('mixo-selected-tutorial');panel.classList.remove('hidden');render();panel.scrollIntoView({behavior:'smooth',block:'center'})});
-if(genre)genre.onchange=()=>{if(playing)startMusic()};if(musicVol)musicVol.oninput=()=>{const lab=$('mixoMusicVolLabel');if(lab)lab.textContent=Math.round(musicVol.value*100)+'%';if(musicGain)musicGain.gain.value=Number(musicVol.value)};
+if(voiceSel)voiceSel.onchange=()=>{if(playing)speak()};
 })();
-</script>\n</body></html>
+</script>\n
+<style id="mixo-contextual-help-styles">
+.mixo-help-btn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin-left:7px;border:1px solid rgba(93,221,255,.58);border-radius:50%;background:rgba(20,121,180,.14);color:#7de8ff;font-size:12px;font-weight:900;line-height:1;cursor:pointer;vertical-align:middle;box-shadow:0 0 12px rgba(57,196,255,.08);transition:.15s}.mixo-help-btn:hover,.mixo-help-btn:focus{background:#123b63;border-color:#7de8ff;color:#fff;transform:translateY(-1px);outline:none}.mixo-help-btn:focus-visible{box-shadow:0 0 0 3px rgba(82,218,255,.2)}
+.mixo-context-help-note{font-size:10px;color:#89a6c7;margin-top:6px}.mixo-context-help-note .mixo-help-btn{margin-left:3px}
+</style>
+<script id="mixo-contextual-help-system">
+(()=>{
+ const overlay=document.getElementById('mixoTutorialOverlay');
+ const map=[
+  ['#prompt',3,'Prompt tutorial'],['#randomBtn',3,'Random Idea tutorial'],['#clearBtn',3,'Prompt controls tutorial'],
+  ['#exactTextInput',4,'Exact Text tutorial'],['#variationCountSelect',5,'Variations tutorial'],['#imageSizeSelect',5,'Image Quality tutorial'],
+  ['#aspectRatioSelect',6,'Aspect Ratio tutorial'],['#backgroundSelect',6,'Background tutorial'],['#addPhotos',7,'Reference Images tutorial'],
+  ['#categorySelect',8,'Category tutorial'],['#styleSelect',8,'Style tutorial'],['#themeSelect',8,'Theme tutorial'],['#families',9,'Colours tutorial'],
+  ['.resin-box',10,'Resin Calculator tutorial'],['#generateBtn',11,'Generate tutorial'],['#activeArea',12,'Results tutorial'],
+  ['#galleryButton',13,'Gallery tutorial'],['#favoritesButton',14,'Favorites tutorial'],['#mixoGalleryPublishedTab',15,'Publishing tutorial'],
+  ['#generateChosenAnglesBtn',16,'Angle Sheets tutorial'],['#mixoCommunityButton',17,'Community Chat tutorial'],['#settingsButton',18,'Settings tutorial'],
+  ['#accountButton',0,'Account tutorial'],['#skinButton',2,'Appearance tutorial'],['#mixoPreviewPlan',1,'Plans and Credits tutorial']
+ ];
+ function launch(scene){
+   overlay?.classList.remove('hidden');
+   const b=document.querySelector(`[data-narrated-scene="${scene}"]`);
+   if(b){b.click();setTimeout(()=>document.getElementById('mixoWatchPanel')?.scrollIntoView({behavior:'smooth',block:'center'}),80)}
+ }
+ function button(scene,label){const b=document.createElement('button');b.type='button';b.className='mixo-help-btn';b.textContent='?';b.title=label;b.setAttribute('aria-label',label);b.dataset.helpScene=scene;b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();launch(scene)});return b}
+ function bestAnchor(el){
+   if(el.matches('input,select,textarea')){const lab=document.querySelector(`label[for="${el.id}"]`);if(lab)return lab}
+   if(el.id==='addPhotos'){return el.closest('.ref-row')?.querySelector('.subhead')||el}
+   if(el.id==='families'){return el.closest('.color-box')?.querySelector('.subhead')||el}
+   if(el.matches('.resin-box'))return el.querySelector('.subhead')||el;
+   if(el.id==='activeArea')return el.querySelector('h2,h3,.subhead')||el;
+   return el;
+ }
+ map.forEach(([sel,scene,label])=>{const el=document.querySelector(sel);if(!el)return;const a=bestAnchor(el);if(a.querySelector?.(`.mixo-help-btn[data-help-scene="${scene}"]`))return;const b=button(scene,label);if(a.matches('button')||a.tagName==='SELECT'||a.tagName==='INPUT'||a.tagName==='TEXTAREA')a.insertAdjacentElement('afterend',b);else a.appendChild(b)});
+ // Settings gets contextual help on every visible section/row, while keeping one clean icon per item.
+ const settings=document.getElementById('mixoSettingsOverlay');
+ if(settings){
+   settings.querySelectorAll('.mixo-settings-section').forEach(sec=>{
+     const h=sec.querySelector('h3'); if(h&&!h.querySelector('.mixo-help-btn')) h.appendChild(button(18,(h.textContent||'Settings')+' tutorial'));
+   });
+   settings.querySelectorAll('.mixo-settings-row').forEach(row=>{
+     const label=row.querySelector('span,strong,label');if(!label||label.querySelector('.mixo-help-btn'))return;
+     let scene=18,txt=(label.textContent||'').toLowerCase();
+     if(/profile|creator/.test(txt))scene=0;else if(/appearance|background|skin/.test(txt))scene=2;else if(/plan|credit|subscription/.test(txt))scene=1;
+     label.appendChild(button(scene,(label.textContent||'Setting')+' tutorial'));
+   });
+ }
+ // Advanced Options summary: help is available before users open the section.
+ const adv=document.querySelector('.mixo-advanced > summary');if(adv&&!adv.querySelector('.mixo-help-btn'))adv.appendChild(button(7,'Advanced generator options tutorial'));
+ // Persistent contextual-help hint near generator title without cluttering every control with the word Tutorial.
+ const genTitle=document.querySelector('.mixo-settings > h2');if(genTitle&&!genTitle.querySelector('.mixo-help-btn'))genTitle.appendChild(button(3,'Generator tutorials'));
+})();
+</script>
+</body></html>
