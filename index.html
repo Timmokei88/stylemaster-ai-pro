@@ -1273,4 +1273,58 @@ if(voiceSel)voiceSel.onchange=()=>{if(playing)speak()};
 })();
 </script>
 
+
+<style id="mixo-tutorial-speed-fix-styles">
+/* V10: keep tutorial navigation responsive even while narration/network work is happening. */
+#mixoWatchPlay,#mixoWatchNext,#mixoWatchPrev,#mixoWatchRestart,.mixo-tutorial-chapter{touch-action:manipulation}
+</style>
+<script id="mixo-tutorial-speed-fix-v10">
+(()=>{
+ const $=id=>document.getElementById(id);
+ let narrationUnavailable=false;
+ let activeController=null;
+ let audio=null;
+ let utter=null;
+ function voice(kind){
+   const vs=speechSynthesis.getVoices(), en=vs.filter(v=>/^en/i.test(v.lang)), pool=en.length?en:vs;
+   const female=/female|samantha|serena|ava|aria|sonia|victoria|karen|moira|tessa|zira|hazel|susan|fiona|veena|allison/i;
+   const male=/male|daniel|alex|fred|jorge|tom|aaron|arthur|gordon|oliver|rishi|lee|david|mark|george|google uk english male/i;
+   return pool.find(v=>(kind==='male'?male:female).test(v.name))||pool[0]||null;
+ }
+ function stopNow(){
+   try{speechSynthesis.cancel()}catch(_){}
+   if(activeController){try{activeController.abort()}catch(_){} activeController=null}
+   if(audio){try{audio.pause();URL.revokeObjectURL(audio.src)}catch(_){} audio=null}
+ }
+ function browserSpeak(text,kind,onDone){
+   stopNow(); utter=new SpeechSynthesisUtterance(text); const v=voice(kind); if(v)utter.voice=v;
+   utter.volume=Number($('mixoVoiceVolume')?.value||1); utter.rate=.92; utter.pitch=1;
+   utter.onend=onDone; utter.onerror=onDone; speechSynthesis.speak(utter);
+ }
+ async function fastNatural(text,kind,onDone){
+   if(narrationUnavailable){browserSpeak(text,kind,onDone);return}
+   stopNow(); const c=new AbortController(); activeController=c;
+   const timer=setTimeout(()=>c.abort(),650);
+   try{
+     const r=await fetch('/api/narration',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:kind}),signal:c.signal});
+     clearTimeout(timer); activeController=null;
+     if(!r.ok)throw Error('unavailable'); const b=await r.blob(); if(!b.type.startsWith('audio/'))throw Error('invalid');
+     audio=new Audio(URL.createObjectURL(b)); audio.volume=Number($('mixoVoiceVolume')?.value||1); audio.onended=onDone; audio.onerror=()=>{narrationUnavailable=true;browserSpeak(text,kind,onDone)}; await audio.play();
+   }catch(_){clearTimeout(timer);activeController=null;narrationUnavailable=true;browserSpeak(text,kind,onDone)}
+ }
+ // Capture-phase handlers run first and make the visible controls respond on the first click.
+ const sceneButtons=()=>[...document.querySelectorAll('[data-narrated-scene]')];
+ function scene(){const h=$('mixoWatchHeading')?.textContent||'';const b=sceneButtons().find(x=>(x.querySelector('b')?.textContent||'').replace(/^▶\s*/,'')===h);return b?Number(b.dataset.narratedScene):0}
+ function setScene(i){const bs=sceneButtons();i=Math.max(0,Math.min(bs.length-1,i));const b=bs.find(x=>Number(x.dataset.narratedScene)===i);if(b){b.click();requestAnimationFrame(()=>$('mixoWatchPanel')?.scrollIntoView({block:'nearest'}))}}
+ ['mixoWatchNext','mixoWatchPrev','mixoWatchRestart'].forEach(id=>$(id)?.addEventListener('pointerdown',()=>stopNow(),{capture:true}));
+ // Remove smooth scrolling from tutorial-only interactions; it was stacking animations/timeouts.
+ document.addEventListener('click',e=>{if(e.target.closest('.mixo-help-btn,.mixo-overlay-help,[data-narrated-scene],#mixoWatchNext,#mixoWatchPrev,#mixoWatchRestart,#mixoWatchPlay'))document.documentElement.style.scrollBehavior='auto'},true);
+ // Warm browser voices so the first narration starts promptly.
+ try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices()}catch(_){}
+ // Mark natural service unavailable quickly on this session if it is not connected yet.
+ fetch('/api/narration',{method:'OPTIONS'}).then(r=>{if(r.status===404)narrationUnavailable=true}).catch(()=>{});
+ window.mixoFastNarration={speak:fastNatural,stop:stopNow};
+})();
+</script>
+
 </body></html>
