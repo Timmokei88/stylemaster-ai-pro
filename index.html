@@ -894,4 +894,54 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay&&!overlay.c
 })();
 </script>
 
+
+<script>
+(function(){
+ const KEY="mixolabs-published-testing-v1";
+ const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){return[]}};
+ const write=v=>localStorage.setItem(KEY,JSON.stringify(v.slice(0,100)));
+ function creator(){
+   try{
+     for(const k of ["mixolabsCreatorProfile","mixolabs-profile","mixolabsProfile"]){
+       const x=JSON.parse(localStorage.getItem(k)||"null");
+       if(x&&(x.displayName||x.name))return x.displayName||x.name;
+     }
+   }catch(e){}
+   return "MixoLabs Creator";
+ }
+ function enhance(){
+   const gallery=document.getElementById("galleryModal") ||
+     [...document.querySelectorAll("div")].find(x=>/My Gallery/.test(x.innerText||"") && x.querySelector("img"));
+   if(!gallery)return;
+   [...gallery.querySelectorAll("img")].forEach(img=>{
+     let card=img.parentElement;
+     for(let i=0;i<4 && card;i++,card=card.parentElement){
+       const text=card.innerText||"";
+       if(/\bOpen\b/.test(text)&&/\bRemove\b/.test(text))break;
+     }
+     if(!card || card.querySelector(".mixo-publish-real"))return;
+     const btn=document.createElement("button");
+     btn.type="button";
+     btn.className="mixo-publish-btn mixo-publish-real";
+     const exists=read().some(x=>x.image===img.src);
+     btn.textContent=exists?"Published ✓":"Publish to Community";
+     btn.addEventListener("click",e=>{
+       e.preventDefault();e.stopPropagation();
+       const items=read();
+       if(!items.some(x=>x.image===img.src)){
+         items.unshift({id:"local-"+Date.now(),name:creator(),image:img.src,createdAt:new Date().toLocaleString("en-GB"),testing:true});
+         write(items);
+       }
+       btn.textContent="Published ✓";
+     });
+     card.appendChild(btn);
+   });
+ }
+ document.addEventListener("click",()=>setTimeout(enhance,50));
+ new MutationObserver(enhance).observe(document.body,{childList:true,subtree:true});
+ setInterval(enhance,500);
+ enhance();
+})();
+</script>
+
 </body></html>
