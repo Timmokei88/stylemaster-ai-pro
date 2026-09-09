@@ -183,7 +183,7 @@
 <div id="mixoGalleryOverlay" class="mixo-gallery-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="mixoGalleryTitle">
  <div class="mixo-gallery-card">
   <div class="mixo-gallery-head"><div><h2 id="mixoGalleryTitle">My Gallery</h2><p style="margin:4px 0 0;color:#9facc7;font-size:11px">Your MixoLabs creations will live here.</p></div><button id="mixoGalleryClose" class="mixo-gallery-close" type="button" aria-label="Close">&times;</button></div>
-  <div class="mixo-gallery-tabs"><button class="active" type="button">My Creations</button><button type="button" disabled title="Available after account storage is connected">Saved</button><button type="button" disabled title="Available after account storage is connected">Published</button></div>
+  <div class="mixo-gallery-tabs"><button class="active" type="button">My Creations</button><button type="button" disabled title="Available after account storage is connected">Saved</button><button id="mixoGalleryPublishedTab" type="button" title="Available after account storage is connected">Published</button></div>
   <div id="mixoGalleryLibrary" class="mixo-library-grid"></div><button id="galleryCreateButton" class="mixo-gallery-action" type="button">Create an Image</button><p style="margin:10px 0 0;color:#74839f;font-size:10px">Testing mode: saved only in this browser. Account cloud storage will replace this before paid launch.</p>
  </div>
 </div>
@@ -831,6 +831,66 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay&&!overlay.c
  const obs=new MutationObserver(()=>decorateGallery());
  obs.observe(document.body,{childList:true,subtree:true});
  setTimeout(()=>{decorateGallery();renderPublished()},500);
+})();
+</script>
+
+
+<script>
+(function(){
+ function publishedItems(){
+   try{return JSON.parse(localStorage.getItem("mixolabs-published-testing-v1")||"[]")}catch(e){return[]}
+ }
+ function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+ function getGallery(){
+   return document.getElementById("galleryModal") ||
+          [...document.querySelectorAll("div")].find(x=>x.querySelector && x.querySelector("button") && /My Gallery/.test(x.innerText||""));
+ }
+ function showPublished(){
+   const modal=getGallery(); if(!modal)return;
+   const tab=document.getElementById("mixoGalleryPublishedTab"); if(tab)tab.disabled=false;
+   const createTab=[...modal.querySelectorAll("button")].find(b=>/My Creations/.test(b.textContent||""));
+   const savedTab=[...modal.querySelectorAll("button")].find(b=>/^\s*Saved\s*$/.test(b.textContent||""));
+   [createTab,savedTab,tab].forEach(b=>{if(b)b.classList.remove("active")});
+   if(tab)tab.classList.add("active");
+
+   let host=document.getElementById("mixoPublishedView");
+   if(!host){
+     host=document.createElement("div");
+     host.id="mixoPublishedView";
+     host.style.cssText="min-height:190px;border:1px dashed #25517b;border-radius:12px;padding:10px;margin-top:10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px";
+     const tabs=tab && tab.parentElement;
+     if(tabs)tabs.insertAdjacentElement("afterend",host);
+   }
+   // Hide the normal gallery content area(s) while Published is selected.
+   [...modal.querySelectorAll("img")].forEach(img=>{
+     if(!host.contains(img)){
+       const card=img.closest("div");
+       if(card)card.dataset.mixoHiddenByPublished="1",card.style.display="none";
+     }
+   });
+   const items=publishedItems();
+   host.style.display="grid";
+   host.innerHTML=items.length ? items.map(x =>
+     '<div class="mixo-community-post"><div class="mixo-community-post-head"><span class="mixo-community-post-name">'+esc(x.name||"MixoLabs Creator")+'</span></div><img src="'+esc(x.image)+'" alt="Published creation"><div class="mixo-published-badge">Published locally • testing mode</div></div>'
+   ).join("") : '<div style="grid-column:1/-1;color:#9fb0c7;font-size:12px;text-align:center;padding:55px 10px">No published creations yet. Return to My Creations and publish an image.</div>';
+ }
+ function restoreNormal(){
+   const modal=getGallery(); if(!modal)return;
+   const host=document.getElementById("mixoPublishedView"); if(host)host.style.display="none";
+   modal.querySelectorAll('[data-mixo-hidden-by-published="1"]').forEach(el=>{el.style.display="";delete el.dataset.mixoHiddenByPublished});
+ }
+ document.addEventListener("click",function(e){
+   const b=e.target.closest && e.target.closest("button"); if(!b)return;
+   if(b.id==="mixoGalleryPublishedTab" || /^\s*Published\s*$/.test(b.textContent||"")){
+     e.preventDefault(); e.stopImmediatePropagation(); showPublished();
+   } else if(/My Creations/.test(b.textContent||"") || /^\s*Saved\s*$/.test(b.textContent||"")){
+     restoreNormal();
+   }
+ },true);
+ setInterval(()=>{
+   const b=[...document.querySelectorAll("button")].find(x=>/^\s*Published\s*$/.test(x.textContent||""));
+   if(b){b.disabled=false;if(!b.id)b.id="mixoGalleryPublishedTab";}
+ },500);
 })();
 </script>
 
