@@ -1,83 +1,55 @@
 require("dotenv").config();
-const express=require("express"), cors=require("cors"), path=require("path"), fs=require("fs"), crypto=require("crypto"), multer=require("multer"), http=require("http");
-const {Server}=require("socket.io");
-const app=express(), server=http.createServer(app), PORT=Number(process.env.PORT||3000), MESHY_API_KEY=process.env.MESHY_API_KEY;const GEMINI_API_KEY=process.env.GEMINI_API_KEY;
-
-app.use(cors({origin:true}));
-app.use(express.json({limit:"50mb"}));
-app.use("/uploads",express.static(path.join(__dirname,"uploads")));
-app.use(express.static(__dirname));
-
-const io=new Server(server,{cors:{origin:"*"}});
-
-const dataDir=path.join(__dirname,"data");
-const uploadsDir=path.join(__dirname,"uploads");
-fs.mkdirSync(dataDir,{recursive:true});
-fs.mkdirSync(uploadsDir,{recursive:true});
-
-const db=path.join(dataDir,"community-posts.json");
-const read=()=>{try{return JSON.parse(fs.readFileSync(db,"utf8"))}catch{return[]}};
-const write=p=>fs.writeFileSync(db,JSON.stringify(p.slice(0,500),null,2));
-const chatDb=path.join(dataDir,"community-chat.json");
-const readChat=()=>{try{return JSON.parse(fs.readFileSync(chatDb,"utf8"))}catch{return[]}};
-const writeChat=m=>fs.writeFileSync(chatDb,JSON.stringify(m.slice(-1000),null,2));
-
+const express=require("express"),cors=require("cors"),path=require("path"),fs=require("fs"),crypto=require("crypto"),multer=require("multer"),http=require("http"),bcrypt=require("bcryptjs"),session=require("express-session"),rateLimit=require("express-rate-limit"),helmet=require("helmet");
+const PgStore=require("connect-pg-simple")(session),{Pool}=require("pg"),{Server}=require("socket.io");
+const app=express(),server=http.createServer(app),PORT=Number(process.env.PORT||3000),PROD=process.env.NODE_ENV==="production";
+const DATABASE_URL=process.env.DATABASE_URL,SESSION_SECRET=process.env.SESSION_SECRET,APP_ORIGIN=String(process.env.APP_ORIGIN||"").replace(/\/$/,""),GEMINI_API_KEY=process.env.GEMINI_API_KEY,MESHY_API_KEY=process.env.MESHY_API_KEY;
+if(!DATABASE_URL)throw Error("DATABASE_URL is required.");
+if(!SESSION_SECRET||SESSION_SECRET.length<32)throw Error("SESSION_SECRET must be at least 32 characters.");
+const pool=new Pool({connectionString:DATABASE_URL,ssl:PROD?{rejectUnauthorized:false}:undefined,max:Number(process.env.DB_POOL_SIZE||10)});
+app.set("trust proxy",1);app.disable("x-powered-by");app.use(helmet({contentSecurityPolicy:false,crossOriginResourcePolicy:false}));app.use(cors({origin:APP_ORIGIN||true,credentials:true}));app.use(express.json({limit:"50mb"}));
+const sessionMiddleware=session({store:new PgStore({pool,tableName:"user_sessions",createTableIfMissing:true}),name:"mixolabs.sid",secret:SESSION_SECRET,resave:false,saveUninitialized:false,rolling:true,cookie:{httpOnly:true,secure:PROD,sameSite:"lax",maxAge:2592000000}});
+app.use(sessionMiddleware);
+app.use("/api",(req,res,next)=>{if(!["POST","PUT","PATCH","DELETE"].includes(req.method)||!APP_ORIGIN||req.get("origin")===APP_ORIGIN)return next();res.status(403).json({error:"Request origin is not allowed."})});
+const authLimit=rateLimit({windowMs:900000,limit:20,standardHeaders:true,legacyHeaders:false}),genLimit=rateLimit({windowMs:60000,limit:12,standardHeaders:true,legacyHeaders:false}),communityLimit=rateLimit({windowMs:60000,limit:20,standardHeaders:true,legacyHeaders:false});
+const uploadsDir=path.join(__dirname,"uploads");fs.mkdirSync(uploadsDir,{recursive:true});app.use("/uploads",express.static(uploadsDir));app.use(express.static(__dirname));
+const io=new Server(server,{cors:{origin:APP_ORIGIN||true,credentials:true}});io.engine.use(sessionMiddleware);
 const storage=multer.diskStorage({destination:(_,__,cb)=>cb(null,uploadsDir),filename:(_,f,cb)=>cb(null,Date.now()+"-"+crypto.randomBytes(5).toString("hex")+path.extname(f.originalname||".jpg"))});
-const upload=multer({storage,limits:{fileSize:10*1024*1024},fileFilter:(_,f,cb)=>/^image\//.test(f.mimetype)?cb(null,true):cb(new Error("Images only"))});
-
-app.post("/api/gemini/generate",async(req,res)=>{
- if(!GEMINI_API_KEY)return res.status(500).json({error:"Gemini API key is not configured."});
- try{
-  const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key="+encodeURIComponent(GEMINI_API_KEY),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(req.body)});
-  const data=await r.json();
-  return res.status(r.status).json(data);
- }catch(e){return res.status(500).json({error:e.message||"Gemini request failed."});}
-});
-
-app.get("/api/community/posts",(_,res)=>res.json({posts:read().sort((a,b)=>b.ts-a.ts)}));
-app.post("/api/community/posts",upload.single("image"),(req,res)=>{
- const name=String(req.body.name||"").trim().slice(0,40), prompt=String(req.body.prompt||"").trim().slice(0,1200);
- if(!name)return res.status(400).json({error:"Display name required."});
- if(!prompt&&!req.file)return res.status(400).json({error:"Add an image or prompt."});
- const p={id:crypto.randomUUID(),name,prompt,imageUrl:req.file?"/uploads/"+req.file.filename:null,likes:0,ts:Date.now(),createdAt:new Date().toLocaleString("en-GB")};
- const posts=read(); posts.unshift(p); write(posts); io.emit("community:new-post",p); res.json({post:p});
-});
-app.post("/api/community/posts/:id/like",(req,res)=>{const posts=read(),p=posts.find(x=>x.id===req.params.id);if(!p)return res.status(404).json({error:"Not found"});p.likes=(p.likes||0)+1;write(posts);io.emit("community:updated",p);res.json({post:p})});
-app.get("/api/community/chat",(_,res)=>res.json({messages:readChat().slice(-200)}));
-
-io.on("connection",(socket)=>{
- io.emit("community:online",io.engine.clientsCount);
- socket.on("community:chat-send",(payload={})=>{
-  const name=String(payload.name||"").trim().slice(0,40);
-  const message=String(payload.message||"").trim().slice(0,800);
-  if(!name||!message)return;
-  const item={id:crypto.randomUUID(),name,message,ts:Date.now(),createdAt:new Date().toLocaleString("en-GB")};
-  const history=readChat(); history.push(item); writeChat(history);
-  io.emit("community:chat-message",item);
- });
- socket.on("disconnect",()=>setTimeout(()=>io.emit("community:online",io.engine.clientsCount),50));
-});
-
-function key(req,res,next){if(!MESHY_API_KEY)return res.status(500).json({error:"MESHY_API_KEY is not configured."});next()}
-async function meshy(p,o={}){const r=await fetch("https://api.meshy.ai"+p,{...o,headers:{Authorization:"Bearer "+MESHY_API_KEY,"Content-Type":"application/json",...(o.headers||{})}});const d=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(d.message||d.error?.message||d.error||"Meshy error"),{status:r.status});return d}
+const upload=multer({storage,limits:{fileSize:10485760},fileFilter:(_,f,cb)=>/^image\//.test(f.mimetype)?cb(null,true):cb(Error("Images only"))});
+async function migrate(){await pool.query(`
+CREATE TABLE IF NOT EXISTS users(id UUID PRIMARY KEY,email TEXT NOT NULL UNIQUE,display_name VARCHAR(40) NOT NULL,password_hash TEXT NOT NULL,purchased_credits INTEGER NOT NULL DEFAULT 0 CHECK(purchased_credits>=0),subscription_credits INTEGER NOT NULL DEFAULT 0 CHECK(subscription_credits>=0),subscription_status TEXT NOT NULL DEFAULT 'none',created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE TABLE IF NOT EXISTS credit_ledger(id UUID PRIMARY KEY,user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,delta INTEGER NOT NULL,bucket TEXT NOT NULL CHECK(bucket IN('purchased','subscription')),reason TEXT NOT NULL,idempotency_key TEXT NOT NULL,metadata JSONB NOT NULL DEFAULT '{}'::jsonb,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),UNIQUE(user_id,idempotency_key));
+CREATE TABLE IF NOT EXISTS community_posts(id UUID PRIMARY KEY,user_id UUID REFERENCES users(id) ON DELETE SET NULL,display_name VARCHAR(40) NOT NULL,prompt VARCHAR(1200) NOT NULL DEFAULT '',image_url TEXT,likes INTEGER NOT NULL DEFAULT 0,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE TABLE IF NOT EXISTS community_messages(id UUID PRIMARY KEY,user_id UUID REFERENCES users(id) ON DELETE SET NULL,display_name VARCHAR(40) NOT NULL,message VARCHAR(800) NOT NULL,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE INDEX IF NOT EXISTS ledger_user_created_idx ON credit_ledger(user_id,created_at DESC);CREATE INDEX IF NOT EXISTS posts_created_idx ON community_posts(created_at DESC);CREATE INDEX IF NOT EXISTS messages_created_idx ON community_messages(created_at DESC);`)}
+const cleanEmail=v=>String(v||"").trim().toLowerCase(),validEmail=v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)&&v.length<=254;
+const expose=u=>({id:u.id,email:u.email,displayName:u.display_name,credits:Number(u.purchased_credits)+Number(u.subscription_credits),purchasedCredits:Number(u.purchased_credits),subscriptionCredits:Number(u.subscription_credits),subscriptionStatus:u.subscription_status});
+async function getUser(id){return(await pool.query("SELECT * FROM users WHERE id=$1",[id])).rows[0]||null}
+function requireAuth(req,res,next){if(!req.session.userId)return res.status(401).json({error:"Please log in to continue."});next()}
+app.post("/api/auth/register",authLimit,async(req,res,next)=>{try{const displayName=String(req.body.displayName||"").trim().slice(0,40),email=cleanEmail(req.body.email),password=String(req.body.password||"");if(displayName.length<2)return res.status(400).json({error:"Display name must be at least 2 characters."});if(!validEmail(email))return res.status(400).json({error:"Enter a valid email address."});if(password.length<10||password.length>128)return res.status(400).json({error:"Password must be 10 to 128 characters."});const id=crypto.randomUUID(),hash=await bcrypt.hash(password,12),starter=Math.max(0,Math.min(25,Number(process.env.STARTER_CREDITS||0))),c=await pool.connect();try{await c.query("BEGIN");const u=(await c.query("INSERT INTO users(id,email,display_name,password_hash,purchased_credits) VALUES($1,$2,$3,$4,$5) RETURNING *",[id,email,displayName,hash,starter])).rows[0];if(starter)await c.query("INSERT INTO credit_ledger(id,user_id,delta,bucket,reason,idempotency_key) VALUES($1,$2,$3,'purchased','starter_credit',$4)",[crypto.randomUUID(),id,starter,`starter:${id}`]);await c.query("COMMIT");req.session.userId=id;req.session.save(e=>e?next(e):res.status(201).json({user:expose(u)}))}catch(e){await c.query("ROLLBACK");if(e.code==="23505")return res.status(409).json({error:"An account with that email already exists."});throw e}finally{c.release()}}catch(e){next(e)}});
+app.post("/api/auth/login",authLimit,async(req,res,next)=>{try{const u=(await pool.query("SELECT * FROM users WHERE email=$1",[cleanEmail(req.body.email)])).rows[0];if(!u||!await bcrypt.compare(String(req.body.password||""),u.password_hash))return res.status(401).json({error:"Email or password is incorrect."});req.session.regenerate(e=>{if(e)return next(e);req.session.userId=u.id;req.session.save(x=>x?next(x):res.json({user:expose(u)}))})}catch(e){next(e)}});
+app.post("/api/auth/logout",(req,res,next)=>req.session.destroy(e=>e?next(e):res.status(204).end()));
+app.get("/api/auth/me",async(req,res,next)=>{try{if(!req.session.userId)return res.json({user:null});const u=await getUser(req.session.userId);if(!u)return req.session.destroy(()=>res.json({user:null}));res.json({user:expose(u)})}catch(e){next(e)}});
+const COSTS={"512":1,"1K":1,"2K":2,"4K":3};
+async function debit(userId,amount,key,metadata){const c=await pool.connect();try{await c.query("BEGIN");if((await c.query("SELECT 1 FROM credit_ledger WHERE user_id=$1 AND idempotency_key=$2",[userId,key])).rowCount){await c.query("COMMIT");return{duplicate:true}}const u=(await c.query("SELECT * FROM users WHERE id=$1 FOR UPDATE",[userId])).rows[0];if(!u)throw Object.assign(Error("Account not found."),{status:401});if(Number(u.purchased_credits)+Number(u.subscription_credits)<amount)throw Object.assign(Error("Not enough credits."),{status:402});const sub=Math.min(Number(u.subscription_credits),amount),purchased=amount-sub,meta={...metadata,fromSubscription:sub,fromPurchased:purchased};await c.query("UPDATE users SET subscription_credits=subscription_credits-$1,purchased_credits=purchased_credits-$2,updated_at=NOW() WHERE id=$3",[sub,purchased,userId]);await c.query("INSERT INTO credit_ledger(id,user_id,delta,bucket,reason,idempotency_key,metadata) VALUES($1,$2,$3,$4,'generation',$5,$6)",[crypto.randomUUID(),userId,-amount,purchased?"purchased":"subscription",key,meta]);await c.query("COMMIT");return{metadata:meta}}catch(e){await c.query("ROLLBACK");throw e}finally{c.release()}}
+async function refund(userId,amount,key,meta){const c=await pool.connect();try{await c.query("BEGIN");const x=await c.query("INSERT INTO credit_ledger(id,user_id,delta,bucket,reason,idempotency_key,metadata) VALUES($1,$2,$3,$4,'generation_refund',$5,$6) ON CONFLICT(user_id,idempotency_key) DO NOTHING RETURNING id",[crypto.randomUUID(),userId,amount,meta.fromPurchased?"purchased":"subscription",`refund:${key}`,meta]);if(x.rowCount)await c.query("UPDATE users SET subscription_credits=subscription_credits+$1,purchased_credits=purchased_credits+$2,updated_at=NOW() WHERE id=$3",[meta.fromSubscription||0,meta.fromPurchased||0,userId]);await c.query("COMMIT")}catch(e){await c.query("ROLLBACK");throw e}finally{c.release()}}
+app.post("/api/gemini/generate",requireAuth,genLimit,async(req,res,next)=>{if(!GEMINI_API_KEY)return res.status(503).json({error:"Image generation is temporarily unavailable."});const size=req.body?.generationConfig?.imageConfig?.imageSize,operation=req.get("X-MixoLabs-Operation")==="angle-sheet"?"angle-sheet":"image",cost=operation==="angle-sheet"?2:COSTS[size],key=String(req.get("Idempotency-Key")||"");if(!cost)return res.status(400).json({error:"Invalid image quality."});if(!/^[A-Za-z0-9_-]{16,80}$/.test(key))return res.status(400).json({error:"A valid generation request ID is required."});let charge;try{charge=await debit(req.session.userId,cost,key,{imageSize:size,operation});if(charge.duplicate)return res.status(409).json({error:"This generation request was already processed."});const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key="+encodeURIComponent(GEMINI_API_KEY),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(req.body),signal:AbortSignal.timeout(120000)}),data=await r.json().catch(()=>({}));if(!r.ok){await refund(req.session.userId,cost,key,charge.metadata);return res.status(r.status>=500?502:r.status).json({error:data?.error?.message||"Image generation failed. Your credits were returned."})}const u=await getUser(req.session.userId);res.set("X-MixoLabs-Credits",String(expose(u).credits)).json(data)}catch(e){if(charge&&!charge.duplicate)await refund(req.session.userId,cost,key,charge.metadata).catch(console.error);next(e)}});
+app.get("/api/community/posts",async(_,res,next)=>{try{const rows=(await pool.query("SELECT id,display_name AS name,prompt,image_url AS \"imageUrl\",likes,EXTRACT(EPOCH FROM created_at)*1000 AS ts FROM community_posts ORDER BY created_at DESC LIMIT 500")).rows;res.json({posts:rows})}catch(e){next(e)}});
+app.post("/api/community/posts",requireAuth,communityLimit,upload.single("image"),async(req,res,next)=>{try{const u=await getUser(req.session.userId),prompt=String(req.body.prompt||"").trim().slice(0,1200);if(!prompt&&!req.file)return res.status(400).json({error:"Add an image or prompt."});const rows=(await pool.query("INSERT INTO community_posts(id,user_id,display_name,prompt,image_url) VALUES($1,$2,$3,$4,$5) RETURNING id,display_name AS name,prompt,image_url AS \"imageUrl\",likes,EXTRACT(EPOCH FROM created_at)*1000 AS ts",[crypto.randomUUID(),u.id,u.display_name,prompt,req.file?"/uploads/"+req.file.filename:null])).rows;io.emit("community:new-post",rows[0]);res.json({post:rows[0]})}catch(e){next(e)}});
+app.post("/api/community/posts/:id/like",requireAuth,communityLimit,async(req,res,next)=>{try{const rows=(await pool.query("UPDATE community_posts SET likes=likes+1 WHERE id=$1 RETURNING id,display_name AS name,prompt,image_url AS \"imageUrl\",likes,EXTRACT(EPOCH FROM created_at)*1000 AS ts",[req.params.id])).rows;if(!rows[0])return res.status(404).json({error:"Not found"});io.emit("community:updated",rows[0]);res.json({post:rows[0]})}catch(e){next(e)}});
+app.get("/api/community/chat",async(_,res,next)=>{try{const rows=(await pool.query("SELECT id,display_name AS name,message,EXTRACT(EPOCH FROM created_at)*1000 AS ts FROM community_messages ORDER BY created_at DESC LIMIT 200")).rows;res.json({messages:rows.reverse()})}catch(e){next(e)}});
+io.on("connection",socket=>{io.emit("community:online",io.engine.clientsCount);socket.on("community:chat-send",async(payload={})=>{try{const id=socket.request.session?.userId,u=id&&await getUser(id),message=String(payload.message||"").trim().slice(0,800);if(!u)return socket.emit("community:error",{error:"Please log in to chat."});if(!message)return;const item=(await pool.query("INSERT INTO community_messages(id,user_id,display_name,message) VALUES($1,$2,$3,$4) RETURNING id,display_name AS name,message,EXTRACT(EPOCH FROM created_at)*1000 AS ts",[crypto.randomUUID(),u.id,u.display_name,message])).rows[0];io.emit("community:chat-message",item)}catch(e){console.error("chat_send_failed",e);socket.emit("community:error",{error:"Message could not be sent."})}});socket.on("disconnect",()=>setTimeout(()=>io.emit("community:online",io.engine.clientsCount),50))});
+function key(req,res,next){if(!MESHY_API_KEY)return res.status(503).json({error:"3D generation is temporarily unavailable."});next()}
+async function meshy(p,o={}){const r=await fetch("https://api.meshy.ai"+p,{...o,headers:{Authorization:"Bearer "+MESHY_API_KEY,"Content-Type":"application/json",...(o.headers||{})}}),d=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(Error(d.message||d.error?.message||d.error||"Meshy error"),{status:r.status});return d}
 const fail=(res,e)=>res.status(e.status||500).json({error:e.message});
-
-app.post("/api/3d/from-image",key,async(req,res)=>{try{const image_url=req.body.image_url;if(!image_url)return res.status(400).json({error:"image_url is required."});const d=await meshy("/openapi/v1/image-to-3d",{method:"POST",body:JSON.stringify({image_url,ai_model:"latest",ultra_mode:req.body.ultra_mode !== false,should_texture:true,enable_pbr:req.body.enable_pbr !== false,texture_resolution:"4k",should_remesh:false,image_enhancement:true,moderation:true,target_formats:["glb","obj","fbx","stl","usdz","3mf"],auto_size:true,multi_view_thumbnails:true,origin_at:"bottom"})});res.json({id:d.result})}catch(e){fail(res,e)}});
-app.get("/api/3d/from-image/status/:id",key,async(req,res)=>{try{res.json(await meshy("/openapi/v1/image-to-3d/"+encodeURIComponent(req.params.id)))}catch(e){fail(res,e)}});
-app.post("/api/3d/create",key,async(req,res)=>{try{const images=(req.body.images||[]).slice(0,4);const d=await meshy("/openapi/v1/multi-image-to-3d",{method:"POST",body:JSON.stringify({image_urls:images,ai_model:"latest",ultra_mode:!!req.body.ultra_mode,should_texture:true,enable_pbr:!!req.body.enable_pbr,should_remesh:true,target_formats:["glb","obj","fbx","stl","usdz","3mf"],origin_at:"bottom"})});res.json({id:d.result})}catch(e){fail(res,e)}});
-app.get("/api/3d/status/:id",key,async(req,res)=>{try{res.json(await meshy("/openapi/v1/multi-image-to-3d/"+encodeURIComponent(req.params.id)))}catch(e){fail(res,e)}});
-app.post("/api/3d/resize",key,async(req,res)=>{try{const d=await meshy("/openapi/v1/resize",{method:"POST",body:JSON.stringify({input_task_id:req.body.input_task_id,resize_height:Number(req.body.height_mm)/1000,origin_at:"bottom"})});res.json({id:d.result})}catch(e){fail(res,e)}});
-app.get("/api/3d/resize-status/:id",key,async(req,res)=>{try{res.json(await meshy("/openapi/v1/resize/"+encodeURIComponent(req.params.id)))}catch(e){fail(res,e)}});
-app.post("/api/3d/convert",key,async(req,res)=>{try{const d=await meshy("/openapi/v1/convert",{method:"POST",body:JSON.stringify({model_url:req.body.model_url,target_formats:["glb","obj","fbx","stl","usdz","3mf"]})});res.json({id:d.result})}catch(e){fail(res,e)}});
-app.get("/api/3d/convert-status/:id",key,async(req,res)=>{try{res.json(await meshy("/openapi/v1/convert/"+encodeURIComponent(req.params.id)))}catch(e){fail(res,e)}});
-
-app.get("/api/health",(_,res)=>res.json({ok:true,community:true,meshy_key_configured:!!MESHY_API_KEY}));
-
-// IMPORTANT: page routes come AFTER all /api routes.
-app.get("/",(req,res)=>{
- const h=fs.readFileSync(path.join(__dirname,"index.html"),"utf8");
- res.type("html").send(h.replace("</body>",'<script src="/random-infinite.js"></script></body>'));
-});
-app.get("*",(_,res)=>res.sendFile(path.join(__dirname,"index.html")));
-
-server.listen(PORT,()=>console.log(`MixoLabs running at http://localhost:${PORT}`));
+app.post("/api/3d/from-image",requireAuth,key,async(req,res)=>{try{const image_url=req.body.image_url;if(!image_url)return res.status(400).json({error:"image_url is required."});const d=await meshy("/openapi/v1/image-to-3d",{method:"POST",body:JSON.stringify({image_url,ai_model:"latest",ultra_mode:req.body.ultra_mode!==false,should_texture:true,enable_pbr:req.body.enable_pbr!==false,texture_resolution:"4k",should_remesh:false,image_enhancement:true,moderation:true,target_formats:["glb","obj","fbx","stl","usdz","3mf"],auto_size:true,multi_view_thumbnails:true,origin_at:"bottom"})});res.json({id:d.result})}catch(e){fail(res,e)}});
+app.get("/api/3d/from-image/status/:id",requireAuth,key,async(req,res)=>{try{res.json(await meshy("/openapi/v1/image-to-3d/"+encodeURIComponent(req.params.id)))}catch(e){fail(res,e)}});
+app.post("/api/3d/create",requireAuth,key,async(req,res)=>{try{const d=await meshy("/openapi/v1/multi-image-to-3d",{method:"POST",body:JSON.stringify({image_urls:(req.body.images||[]).slice(0,4),ai_model:"latest",ultra_mode:!!req.body.ultra_mode,should_texture:true,enable_pbr:!!req.body.enable_pbr,should_remesh:true,target_formats:["glb","obj","fbx","stl","usdz","3mf"],origin_at:"bottom"})});res.json({id:d.result})}catch(e){fail(res,e)}});
+app.get("/api/3d/status/:id",requireAuth,key,async(req,res)=>{try{res.json(await meshy("/openapi/v1/multi-image-to-3d/"+encodeURIComponent(req.params.id)))}catch(e){fail(res,e)}});
+app.post("/api/3d/resize",requireAuth,key,async(req,res)=>{try{res.json({id:(await meshy("/openapi/v1/resize",{method:"POST",body:JSON.stringify({input_task_id:req.body.input_task_id,resize_height:Number(req.body.height_mm)/1000,origin_at:"bottom"})})).result})}catch(e){fail(res,e)}});
+app.get("/api/3d/resize-status/:id",requireAuth,key,async(req,res)=>{try{res.json(await meshy("/openapi/v1/resize/"+encodeURIComponent(req.params.id)))}catch(e){fail(res,e)}});
+app.post("/api/3d/convert",requireAuth,key,async(req,res)=>{try{res.json({id:(await meshy("/openapi/v1/convert",{method:"POST",body:JSON.stringify({model_url:req.body.model_url,target_formats:["glb","obj","fbx","stl","usdz","3mf"]})})).result})}catch(e){fail(res,e)}});
+app.get("/api/3d/convert-status/:id",requireAuth,key,async(req,res)=>{try{res.json(await meshy("/openapi/v1/convert/"+encodeURIComponent(req.params.id)))}catch(e){fail(res,e)}});
+app.get("/api/health",async(_,res)=>{try{await pool.query("SELECT 1");res.json({ok:true,database:true,community:true,gemini_key_configured:!!GEMINI_API_KEY,meshy_key_configured:!!MESHY_API_KEY})}catch(_){res.status(503).json({ok:false,database:false})}});
+app.get("/",(_,res)=>{const h=fs.readFileSync(path.join(__dirname,"index.html"),"utf8");res.type("html").send(h.replace("</body>",'<script src="/random-infinite.js"></script></body>'))});app.get("*",(_,res)=>res.sendFile(path.join(__dirname,"index.html")));
+app.use((e,req,res,next)=>{console.error("request_failed",{path:req.path,message:e.message});if(res.headersSent)return next(e);res.status(e.status||500).json({error:e.status?e.message:"Something went wrong. Please try again."})});
+migrate().then(()=>server.listen(PORT,()=>console.log(`MixoLabs running on port ${PORT}`))).catch(e=>{console.error("startup_failed",e);process.exit(1)});

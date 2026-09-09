@@ -287,12 +287,12 @@
   <form id="mixoSignupForm" class="mixo-account-form hidden">
    <label for="mixoSignupName">Display name</label><input id="mixoSignupName" type="text" autocomplete="name" maxlength="40" required placeholder="Your name">
    <label for="mixoSignupEmail">Email</label><input id="mixoSignupEmail" type="email" autocomplete="email" required placeholder="you@example.com">
-   <label for="mixoSignupPassword">Password</label><input id="mixoSignupPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters">
+   <label for="mixoSignupPassword">Password</label><input id="mixoSignupPassword" type="password" autocomplete="new-password" minlength="10" maxlength="128" required placeholder="At least 10 characters">
    <label style="display:flex;gap:8px;align-items:flex-start;font-weight:500"><input id="mixoSignupAgree" type="checkbox" required style="width:auto;margin-top:3px"> <span>I agree to the MixoLabs Terms &amp; Conditions and acknowledge the Privacy Policy.</span></label>
    <button class="mixo-account-submit" type="submit">Create Account</button>
   </form>
   <div id="mixoAccountStatus" class="mixo-account-status" aria-live="polite"></div>
-  <p class="mixo-account-copy" style="margin-bottom:0">Account screens are ready. Secure registration/login will be activated when the production database is connected. No password is stored in this browser-only foundation.</p>
+  <p class="mixo-account-copy" style="margin-bottom:0">Passwords are securely hashed and sessions use protected cookies. MixoLabs never displays or stores your plain-text password.</p>
  </div>
 </div>
 <div id="mixoLegalOverlay" class="mixo-legal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="mixoLegalTitle">
@@ -397,12 +397,14 @@ $("imageCount").textContent=uploadedImages.length;
 }
 
 function dataPart(url){const m=String(url).match(/^data:([^;]+);base64,(.+)$/);return m?{inlineData:{mimeType:m[1],data:m[2]}}:null;}
-async function callGemini(promptText, refs=[], ratio=null, size=null){
+async function callGemini(promptText, refs=[], ratio=null, size=null, operation="image"){
 const parts=[{text:promptText}];refs.forEach(r=>{const p=dataPart(r);if(p)parts.push(p);});
 const payload={contents:[{role:"user",parts}],generationConfig:{responseModalities:["IMAGE"],imageConfig:{aspectRatio:ratio||$("aspectRatioSelect").value,imageSize:size||$("imageSizeSelect").value}}};
-const response=await fetch("/api/gemini/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+const requestId=(crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random().toString(36).slice(2)).replace(/-/g,"");
+const response=await fetch("/api/gemini/generate",{method:"POST",headers:{"Content-Type":"application/json","Idempotency-Key":requestId,"X-MixoLabs-Operation":operation},body:JSON.stringify(payload)});
 let result={};try{result=await response.json();}catch{}
 if(!response.ok)throw new Error(result?.error?.message||result?.error||`Request failed (${response.status})`);
+const remaining=response.headers.get("X-MixoLabs-Credits");if(remaining!==null)window.dispatchEvent(new CustomEvent("mixo:credits-changed",{detail:Number(remaining)}));
 const image=result?.candidates?.[0]?.content?.parts?.find(p=>p.inlineData)?.inlineData;
 if(!image)throw new Error("Gemini did not return an image.");
 return `data:${image.mimeType};base64,${image.data}`;
@@ -481,7 +483,7 @@ TOP = camera directly overhead, looking vertically down.
 BOTTOM = camera directly underneath, looking vertically up.
 LEFT and RIGHT must be opposite sides of the SAME subject. Do not mirror one panel to fake the other side. Do not use three-quarter, 45-degree, turned, oblique or perspective profile views. Keep the camera height, subject scale and pose consistent across the horizontal views.
 Keep the subject fully visible. Preserve photorealism and fine surface detail. Neutral studio background. No extra or duplicate views.`;
-const url=await callGemini(prompt,[activeSelectedImage],"16:9");
+const url=await callGemini(prompt,[activeSelectedImage],"16:9",null,"angle-sheet");
 $("angleArea").innerHTML=`<div class="border-t border-slate-800 pt-5"><div class="flex justify-between items-center"><h3 class="font-bold text-indigo-300">Angle Sheet</h3><button id="backFromAngles" class="bg-slate-700 px-3 py-1.5 rounded text-xs">Back to Masterpiece</button></div><p class="text-xs text-slate-400 my-2">${requested.join(" • ")}</p><div class="checker rounded-xl p-3 flex justify-center"><img id="angleSheetImage" src="${url}" class="max-w-full max-h-[75vh] object-contain rounded-lg cursor-zoom-in"></div><button id="downloadAngleSheet" class="mt-3 bg-emerald-700 px-4 py-2 rounded-lg font-bold">Download Angle Sheet</button></div>`;
 $("activeArea").classList.add("hidden");$("angleArea").classList.remove("hidden");
 $("downloadAngleSheet").onclick=()=>download(url,"mixolabs-angle-sheet.png");$("backFromAngles").onclick=()=>{$("angleArea").classList.add("hidden");$("activeArea").classList.remove("hidden");};$("angleSheetImage").onclick=()=>openLightbox(url);
@@ -580,11 +582,16 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.classList.
 (()=>{
 const overlay=document.getElementById("mixoAccountOverlay"),open=document.getElementById("accountButton"),close=document.getElementById("mixoAccountClose"),loginTab=document.getElementById("mixoLoginTab"),signupTab=document.getElementById("mixoSignupTab"),login=document.getElementById("mixoLoginForm"),signup=document.getElementById("mixoSignupForm"),status=document.getElementById("mixoAccountStatus");
 if(!overlay||!open)return;
+let user=null;
 function mode(which){const isLogin=which==="login";login.classList.toggle("hidden",!isLogin);signup.classList.toggle("hidden",isLogin);loginTab.classList.toggle("active",isLogin);signupTab.classList.toggle("active",!isLogin);status.textContent=""}
-open.addEventListener("click",()=>overlay.classList.remove("hidden"));close.addEventListener("click",()=>overlay.classList.add("hidden"));overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.classList.add("hidden")});
+function paint(next){user=next||null;open.textContent=user?`♙  ${user.displayName} • ${user.credits} credits`:"♙   Log In";window.mixoUser=user;window.dispatchEvent(new CustomEvent("mixo:auth-changed",{detail:user}))}
+async function api(url,body){const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});let d={};try{d=await r.json()}catch(_){}if(!r.ok)throw Error(d.error||"Request failed.");return d}
+open.addEventListener("click",()=>{if(user){if(confirm("Log out of MixoLabs?"))api("/api/auth/logout",{}).then(()=>paint(null)).catch(e=>alert(e.message));return}overlay.classList.remove("hidden")});close.addEventListener("click",()=>overlay.classList.add("hidden"));overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.classList.add("hidden")});
 loginTab.addEventListener("click",()=>mode("login"));signupTab.addEventListener("click",()=>mode("signup"));
-login.addEventListener("submit",e=>{e.preventDefault();status.textContent="Secure login will activate when the MixoLabs production database is connected."});
-signup.addEventListener("submit",e=>{e.preventDefault();status.textContent="Account creation is ready for the secure backend. No account or password has been stored yet."});
+login.addEventListener("submit",async e=>{e.preventDefault();status.textContent="Logging in…";try{const d=await api("/api/auth/login",{email:document.getElementById("mixoLoginEmail").value,password:document.getElementById("mixoLoginPassword").value});paint(d.user);status.textContent="✓ Logged in securely.";setTimeout(()=>overlay.classList.add("hidden"),500)}catch(x){status.textContent=x.message}});
+signup.addEventListener("submit",async e=>{e.preventDefault();status.textContent="Creating your account…";try{const d=await api("/api/auth/register",{displayName:document.getElementById("mixoSignupName").value,email:document.getElementById("mixoSignupEmail").value,password:document.getElementById("mixoSignupPassword").value});paint(d.user);status.textContent="✓ Account created and logged in.";setTimeout(()=>overlay.classList.add("hidden"),500)}catch(x){status.textContent=x.message}});
+fetch("/api/auth/me").then(r=>r.json()).then(d=>paint(d.user)).catch(()=>paint(null));
+window.addEventListener("mixo:credits-changed",e=>{if(user)paint({...user,credits:Number(e.detail)})});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.classList.contains("hidden"))overlay.classList.add("hidden")});
 })();
 </script>
