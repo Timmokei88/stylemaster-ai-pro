@@ -68,6 +68,10 @@
 .mixo-favorites-empty{min-height:300px;border:1px dashed rgba(74,143,217,.32);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:25px;color:#a8b5cd}.mixo-favorites-empty strong{font-size:17px;color:#fff;margin:8px 0 5px}.mixo-favorites-empty p{max-width:500px;margin:0;font-size:11px;line-height:1.55}.mixo-favorites-icon{font-size:40px;color:#62dcff}
 .mixo-favorites-action{margin-top:15px;border:0;border-radius:9px;padding:10px 15px;color:#fff;font-weight:900;background:linear-gradient(90deg,#16bff4,#7a63ff 58%,#d837ef)}
 </style>
+
+<style id="mixo-local-library-styles">
+.mixo-library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;min-height:180px}.mixo-library-item{border:1px solid rgba(91,126,180,.32);border-radius:12px;background:#071126;padding:8px;overflow:hidden}.mixo-library-item img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:8px;display:block}.mixo-library-actions{display:flex;gap:6px;margin-top:7px}.mixo-library-actions button{flex:1;border:1px solid rgba(91,126,180,.35);border-radius:7px;background:#101d38;color:#dbe5f6;padding:7px;font-size:10px;font-weight:800}.mixo-library-empty-note{grid-column:1/-1;min-height:220px;border:1px dashed rgba(74,143,217,.32);border-radius:14px;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;color:#9facc7;font-size:11px;line-height:1.6}
+</style>
 </head><body><div id="skinBackdrop" aria-hidden="true"></div><div class="mixo-page"><header class="mixo-topbar"><img class="mixo-brand-logo" src="/mixolabs-logo.png" alt="MixoLabs — Imagine • Generate • Create • Without Limits"><nav class="mixo-nav" aria-label="Primary navigation"><span class="active">⌂ &nbsp;Generator</span><button id="galleryButton" type="button">▧ &nbsp;Gallery</button><button id="favoritesButton" type="button">♡ &nbsp;Favorites</button><button id="settingsButton" type="button">⚙ &nbsp;Settings</button><button id="accountButton" class="mixo-account-btn" type="button">♙ &nbsp; Log In</button><div class="appearance-wrap"><button id="skinButton" type="button" aria-expanded="false">◉ &nbsp;Appearance</button><div id="skinPanel" class="hidden"><div class="skin-head"><strong>Personalise your MixoLabs skin</strong><button id="skinClose" type="button" aria-label="Close appearance menu">×</button></div><p class="skin-copy">Your chosen background is saved on this browser and automatically restored when you return.</p><button class="skin-default" type="button" data-skin="default">★ Use Default MixoLabs Skin</button><div class="skin-presets"><button type="button" data-skin="midnight">Midnight</button><button type="button" data-skin="aurora">Aurora</button></div><label class="skin-upload">Upload &amp; Save My Own Skin<input id="skinUpload" type="file" accept="image/*"></label><button id="skinReset" class="skin-reset" type="button">Restore Default Skin</button><div id="skinStatus" aria-live="polite"></div></div></div></nav><button class="mixo-cta" type="button">✦ &nbsp; Create Without Limits</button></header>
 <section class="mixo-studio" aria-label="MixoLabs image generator"><div class="mixo-studio-inner"><div class="mixo-hero"><div class="eyebrow">TURN IDEAS INTO</div><h1>EXTRAORDINARY VISUALS</h1><p>AI IMAGES FOR CREATORS, BRANDS &amp; DREAMERS</p></div><div class="mixo-features"><div class="mixo-feature"><div class="mixo-feature-icon">ϟ</div><div><b>Wild Ideas</b><small>Turn simple ideas into stunning, unique visuals.</small></div></div><div class="mixo-feature"><div class="mixo-feature-icon">☷</div><div><b>Total Control</b><small>Fine-tune every detail your way.</small></div></div><div class="mixo-feature"><div class="mixo-feature-icon">∞</div><div><b>Limitless Creativity</b><small>Explore endless possibilities.</small></div></div></div>
 <div class="mixo-workspace"><aside class="mixo-panel mixo-settings"><h2>Generator Settings</h2><div class="field"><label for="prompt">Prompt / Idea</label><textarea id="prompt" placeholder="Describe what you want to create..."></textarea><div class="prompt-actions"><button id="randomBtn" type="button">🎲 &nbsp; Random Idea</button><button id="clearBtn" type="button">Clear</button></div></div><div class="field"><label for="exactTextInput">Exact Text / Lettering (Optional)</label><input id="exactTextInput" type="text" placeholder="Example: SMOKE"></div><div class="two"><div class="field"><label for="variationCountSelect">Variations</label><select id="variationCountSelect"><option value="1">1 Image</option><option value="2">2 Images</option><option value="3">3 Images</option><option value="4">4 Images</option><option value="5">5 Images</option><option value="6" selected>6 Images</option></select></div><div class="field"><label for="imageSizeSelect">Output Quality</label><select id="imageSizeSelect"><option value="512">512 — Economy</option><option value="1K" selected>1K — Standard</option><option value="2K">2K — High Quality</option><option value="4K">4K — Maximum</option></select></div></div><div class="field"><label for="aspectRatioSelect">Aspect Ratio</label><select id="aspectRatioSelect"><option>1:1</option><option>9:16</option><option>16:9</option><option>4:5</option><option>3:4</option><option>2:3</option><option>21:9</option></select></div><div class="field"><label for="backgroundSelect">Background</label><select id="backgroundSelect"><option value="contextual">Contextual Environment</option><option value="transparent">Isolated / clean white</option><option value="solid-black">Solid Black</option><option value="solid-white">Solid White</option><option value="studio-gradient">Studio Gradient</option></select></div>
@@ -85,14 +89,14 @@
 <div id="mixoFavoritesOverlay" class="mixo-favorites-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="mixoFavoritesTitle">
  <div class="mixo-favorites-card">
   <div class="mixo-favorites-head"><div><h2 id="mixoFavoritesTitle">My Favorites</h2><p style="margin:4px 0 0;color:#9facc7;font-size:11px">Keep the MixoLabs creations you love close at hand.</p></div><button id="mixoFavoritesClose" class="mixo-favorites-close" type="button" aria-label="Close">&times;</button></div>
-  <div class="mixo-favorites-empty"><div class="mixo-favorites-icon">♡</div><strong>Your favorites are ready</strong><p>When secure accounts and storage are connected, images you mark as favorites will appear here under your account. Nothing is uploaded or stored by this foundation yet.</p><button id="favoritesCreateButton" class="mixo-favorites-action" type="button">Create an Image</button></div>
+  <div id="mixoFavoritesLibrary" class="mixo-library-grid"></div><button id="favoritesCreateButton" class="mixo-favorites-action" type="button">Create an Image</button><p style="margin:10px 0 0;color:#74839f;font-size:10px">Testing mode: favorites are saved only in this browser. Account cloud storage will replace this before paid launch.</p>
  </div>
 </div>
 <div id="mixoGalleryOverlay" class="mixo-gallery-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="mixoGalleryTitle">
  <div class="mixo-gallery-card">
   <div class="mixo-gallery-head"><div><h2 id="mixoGalleryTitle">My Gallery</h2><p style="margin:4px 0 0;color:#9facc7;font-size:11px">Your MixoLabs creations will live here.</p></div><button id="mixoGalleryClose" class="mixo-gallery-close" type="button" aria-label="Close">&times;</button></div>
   <div class="mixo-gallery-tabs"><button class="active" type="button">My Creations</button><button type="button" disabled title="Available after account storage is connected">Saved</button><button type="button" disabled title="Available after account storage is connected">Published</button></div>
-  <div class="mixo-gallery-empty"><div class="mixo-gallery-icon">▧</div><strong>Your gallery is ready</strong><p>When secure accounts and storage are connected, images you choose to save will appear here under your account. Nothing is uploaded or stored by this foundation yet.</p><button id="galleryCreateButton" class="mixo-gallery-action" type="button">Create an Image</button></div>
+  <div id="mixoGalleryLibrary" class="mixo-library-grid"></div><button id="galleryCreateButton" class="mixo-gallery-action" type="button">Create an Image</button><p style="margin:10px 0 0;color:#74839f;font-size:10px">Testing mode: saved only in this browser. Account cloud storage will replace this before paid launch.</p>
  </div>
 </div>
 <div id="mixoSettingsOverlay" class="mixo-settings-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="mixoSettingsTitle">
@@ -256,16 +260,20 @@ $("backBtn").onclick=()=>{$("activeArea").classList.add("hidden");$("angleArea")
 $("downloadBtn").onclick=()=>activeSelectedImage&&download(activeSelectedImage,"mixolabs-masterpiece.png");
 function download(url,name){const a=document.createElement("a");a.href=url;a.download=name;a.click();}
 
-// Save-image foundation: UI is live now; secure persistence is connected later.
+// Local testing library. Browser-only until secure account storage is connected.
 const saveImageStatus=$("saveImageStatus");
-function showSaveFoundation(kind){
+const MIXO_GALLERY_KEY="mixolabs.localGallery.v1", MIXO_FAVORITES_KEY="mixolabs.localFavorites.v1";
+function readLocalLibrary(key){try{return JSON.parse(localStorage.getItem(key)||"[]")}catch(_){return[]}}
+function saveLocalImage(kind){
   if(!activeSelectedImage)return;
-  saveImageStatus.textContent=kind==="gallery"
-    ? "Gallery saving is ready to connect. Secure account storage is not active yet, so this image has not been uploaded or stored."
-    : "Favorites saving is ready to connect. Secure account storage is not active yet, so this image has not been uploaded or stored.";
+  const key=kind==="gallery"?MIXO_GALLERY_KEY:MIXO_FAVORITES_KEY, items=readLocalLibrary(key);
+  if(items.some(x=>x.url===activeSelectedImage)){saveImageStatus.textContent=kind==="gallery"?"Already saved to My Gallery on this browser.":"Already in My Favorites on this browser.";return}
+  items.unshift({id:Date.now()+"-"+Math.random().toString(36).slice(2),url:activeSelectedImage,ts:Date.now()});
+  try{localStorage.setItem(key,JSON.stringify(items.slice(0,12)));saveImageStatus.textContent=kind==="gallery"?"✓ Saved to My Gallery on this browser.":"♥ Added to My Favorites on this browser.";window.dispatchEvent(new Event("mixo:library-changed"))}
+  catch(_){saveImageStatus.textContent="Browser storage is full. Remove an older saved image and try again."}
 }
-$("saveToGalleryBtn").onclick=()=>showSaveFoundation("gallery");
-$("saveToFavoritesBtn").onclick=()=>showSaveFoundation("favorites");
+$("saveToGalleryBtn").onclick=()=>saveLocalImage("gallery");
+$("saveToFavoritesBtn").onclick=()=>saveLocalImage("favorites");
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
 
 function selectedAngles(){return [...document.querySelectorAll(".pre-angle-choice:checked")].map(x=>x.value);}
@@ -401,28 +409,23 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.classList.
 
 <script id="mixo-gallery-foundation-system">
 (()=>{
-const overlay=document.getElementById("mixoGalleryOverlay"),open=document.getElementById("galleryButton"),close=document.getElementById("mixoGalleryClose"),create=document.getElementById("galleryCreateButton");
+const overlay=document.getElementById("mixoGalleryOverlay"),open=document.getElementById("galleryButton"),close=document.getElementById("mixoGalleryClose"),create=document.getElementById("galleryCreateButton"),host=document.getElementById("mixoGalleryLibrary"),key="mixolabs.localGallery.v1";
 if(!overlay||!open)return;
+const read=()=>{try{return JSON.parse(localStorage.getItem(key)||"[]")}catch(_){return[]}};
+function render(){const items=read();if(!host)return;if(!items.length){host.innerHTML='<div class="mixo-library-empty-note">No saved creations yet.<br>Choose an image and press <b>Save to Gallery</b>.</div>';return}host.innerHTML=items.map(x=>`<div class="mixo-library-item" data-id="${x.id}"><img src="${x.url}" alt="Saved MixoLabs creation"><div class="mixo-library-actions"><button data-open="${x.id}" type="button">Open</button><button data-remove="${x.id}" type="button">Remove</button></div></div>`).join("");host.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{const x=read().find(i=>i.id===b.dataset.open);if(x&&typeof selectImage==="function"){hide();selectImage(x.url)}});host.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{localStorage.setItem(key,JSON.stringify(read().filter(i=>i.id!==b.dataset.remove)));render()})}
 const hide=()=>overlay.classList.add("hidden");
-open.addEventListener("click",()=>overlay.classList.remove("hidden"));
-close.addEventListener("click",hide);
-overlay.addEventListener("click",e=>{if(e.target===overlay)hide()});
-create?.addEventListener("click",()=>{hide();document.querySelector(".mixo-studio")?.scrollTo({top:0,behavior:"smooth"});document.getElementById("prompt")?.focus()});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.classList.contains("hidden"))hide()});
+open.addEventListener("click",()=>{render();overlay.classList.remove("hidden")});close.addEventListener("click",hide);overlay.addEventListener("click",e=>{if(e.target===overlay)hide()});create?.addEventListener("click",()=>{hide();document.querySelector(".mixo-studio")?.scrollTo({top:0,behavior:"smooth"});document.getElementById("prompt")?.focus()});window.addEventListener("mixo:library-changed",render);document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.classList.contains("hidden"))hide()});
 })();
 </script>
 
 
 <script id="mixo-favorites-foundation-system">
 (()=>{
-const overlay=document.getElementById("mixoFavoritesOverlay"),open=document.getElementById("favoritesButton"),close=document.getElementById("mixoFavoritesClose"),create=document.getElementById("favoritesCreateButton");
+const overlay=document.getElementById("mixoFavoritesOverlay"),open=document.getElementById("favoritesButton"),close=document.getElementById("mixoFavoritesClose"),create=document.getElementById("favoritesCreateButton"),host=document.getElementById("mixoFavoritesLibrary"),key="mixolabs.localFavorites.v1";
 if(!overlay||!open)return;
-const hide=()=>overlay.classList.add("hidden");
-open.addEventListener("click",()=>overlay.classList.remove("hidden"));
-close?.addEventListener("click",hide);
-overlay.addEventListener("click",e=>{if(e.target===overlay)hide()});
-create?.addEventListener("click",()=>{hide();document.querySelector(".mixo-studio")?.scrollTo({top:0,behavior:"smooth"});document.getElementById("prompt")?.focus()});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.classList.contains("hidden"))hide()});
+const read=()=>{try{return JSON.parse(localStorage.getItem(key)||"[]")}catch(_){return[]}};
+function render(){const items=read();if(!host)return;if(!items.length){host.innerHTML='<div class="mixo-library-empty-note">No favorites yet.<br>Choose an image and press <b>Add to Favorites</b>.</div>';return}host.innerHTML=items.map(x=>`<div class="mixo-library-item" data-id="${x.id}"><img src="${x.url}" alt="Favorite MixoLabs creation"><div class="mixo-library-actions"><button data-open="${x.id}" type="button">Open</button><button data-remove="${x.id}" type="button">Remove</button></div></div>`).join("");host.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{const x=read().find(i=>i.id===b.dataset.open);if(x&&typeof selectImage==="function"){hide();selectImage(x.url)}});host.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{localStorage.setItem(key,JSON.stringify(read().filter(i=>i.id!==b.dataset.remove)));render()})}
+const hide=()=>overlay.classList.add("hidden");open.addEventListener("click",()=>{render();overlay.classList.remove("hidden")});close?.addEventListener("click",hide);overlay.addEventListener("click",e=>{if(e.target===overlay)hide()});create?.addEventListener("click",()=>{hide();document.querySelector(".mixo-studio")?.scrollTo({top:0,behavior:"smooth"});document.getElementById("prompt")?.focus()});window.addEventListener("mixo:library-changed",render);document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.classList.contains("hidden"))hide()});
 })();
 </script>
 
