@@ -1,5 +1,12 @@
 StyleMaster AI Pro V4
 
+PRIVATE MODEL COMPARISON TEST:
+- Set MODEL_TESTER_EMAILS to the email address used by your MixoLabs owner account. Separate multiple addresses with commas.
+- After deployment, log in with that account and use the Private Model Test button at the lower-left of the generator.
+- Each comparison creates two billable 1K images but deducts no MixoLabs credits.
+- Results are randomly placed as A/B. Model names appear only after voting.
+- Aggregate votes are stored in PostgreSQL. The comparison prompt is represented only by a one-way hash and is not stored as readable text.
+
 NEW:
 - Select exactly which of Front / Left / Right / Back / Top / Bottom you want.
 - Only selected angles generate, reducing unnecessary image-generation usage.
