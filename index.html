@@ -935,6 +935,8 @@ const steps=[
 ["#settingsButton","Settings","Settings is the central place for account/profile, appearance, plans, legal information and support."],
 ["#settingsProfileButton","Creator profile","Set your display name, creator handle, bio, creator type and profile visibility."],
 ["[data-open-billing]","Plans & Credits","Open Plans & Credits to compare monthly subscriptions, annual options and reusable one-off credit packs."],
+[".mixo-custom-offer[data-custom-offer='payment']","Choose an exact payment amount","Build a one-time credit pack by dragging the scale or typing the exact amount you are comfortable paying. The estimated credits update immediately before checkout."],
+[".mixo-custom-offer[data-custom-offer='subscription']","Build a custom monthly plan","For a recurring plan, drag the scale or type an exact monthly amount. MixoLabs shows the estimated monthly credits before you choose Start Monthly."],
 ["#mixoBillingTabs","Subscriptions and packs","Monthly plans and Buy Credits are separate: users can subscribe or simply purchase credit packs when needed."],
 ["#mixoBillingCredits","Reusable credit packs","Credit packs are one-off purchases, not subscriptions. Users can choose a pack whenever they need more credits."],
 ["#skinButton","Appearance","Appearance controls personalisation of the MixoLabs workspace."],
@@ -990,6 +992,7 @@ document.getElementById("tutorialButton")?.addEventListener("click",()=>overlay.
 const scenes=[
 ["Account & Profile","Start with the Log In button. New creators can switch to Create Account, choose a display name, enter their email and create a secure password. Your creator profile is where your public name, handle and bio will live.","#accountButton"],
 ["Plans & Credits","Plans and Credits lets you compare subscriptions with reusable one-off credit packs. Before paid billing goes live, testing screens are clearly marked so nobody is misled into thinking a payment has been taken.","[data-open-billing]"],
+["Choose Your Own Amount","Inside Plans and Credits, customers can build a one-time credit pack or a monthly plan. Drag the scale for a quick adjustment, or click the amount box and type the exact pound-and-pence value you are happy with, such as two pounds and forty-nine pence. The estimated credits update immediately, so you can review the value before continuing to Stripe. Nothing is purchased until you deliberately press the purchase button and complete checkout.",".mixo-custom-offer[data-custom-offer='payment']"],
 ["Appearance","Open Appearance to personalise MixoLabs. You can upload and save your own full-page background skin, restore the default skin, and separately customise the Creativity Has No Limits banner.","#skinButton"],
 ["Prompt & Random Idea","In Prompt or Idea, describe the image you want. Random Idea can give you inspiration or expand a concept when you are not sure where to start. Clear removes the current prompt.","#prompt"],
 ["Exact Text","Use Exact Text when your image needs specific visible lettering. Enter the wording you want the image model to render.","#exactTextInput"],
@@ -1032,6 +1035,7 @@ const sceneData=[
 ["Log In","The Log In page is for existing creators. Enter your registered email address and password, then select Log In. The tutorial never enters, records or stores your password.","#mixoLoginTab"],
 ["Create Account","New creators select Create Account, choose a display name, enter an email address, create a secure password, and agree to the Terms and Privacy Policy before registering.","#mixoSignupTab"],
 ["Plans & Credits","Open Plans & Credits to compare monthly plans, reusable credit packs and the credits needed for each generation quality.","#mixoPreviewPlan"],
+["Choose Your Own Amount","In Plans and Credits, build either a one-time credit pack or a custom monthly plan. Move the scale for a quick choice, or select the amount box and type the exact pound-and-pence amount you are comfortable paying, such as two pounds and forty-nine pence. The credit estimate changes immediately. Review whether the payment is one-time or monthly before pressing the purchase button; the tutorial never makes a purchase for you.",".mixo-custom-offer[data-custom-offer='payment']"],
 ["Appearance","Open Appearance to upload and save a full-page MixoLabs skin. You can also customise the Creativity banner separately and restore either default whenever you want.","#skinButton"],
 ["Prompt & Random Idea","Type what you want to create in Prompt or Idea. Random Idea can inspire a new concept or build on what you have already typed.","#prompt"],
 ["Exact Text","Use Exact Text when the generated image must contain specific visible words, labels or lettering.","#exactTextInput"],
@@ -1051,10 +1055,10 @@ const sceneData=[
 ["Settings, Privacy & Support","Open Settings for account, profile, appearance and plan shortcuts. Privacy, Terms and Support are also available from the footer.","#settingsButton"],
 ["Complete Platform Tour","This complete tour moves through the whole MixoLabs workflow from account setup and personalisation to generating, saving, publishing, angle sheets, Community Chat and support.","#tutorialButton"]
 ];
-const chapterStarts=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19];
+const completeTourIndex=sceneData.length-1;
 const chapterGrid=document.querySelector('.mixo-tutorial-grid');
-if(chapterGrid){chapterGrid.innerHTML=sceneData.map((s,i)=>`<button class="mixo-tutorial-chapter${i===20?' mixo-selected-tutorial':''}" data-narrated-scene="${i}" type="button"><b>${i===20?'▶ ':''}${s[0]}</b><small>${s[1]}</small></button>`).join('');}
-let selected=20, idx=0, playing=false, contextualScene=null, utter=null, nextTimer=null, ctx=null, musicGain=null, musicTimer=null, scheduled=[];
+if(chapterGrid){chapterGrid.innerHTML=sceneData.map((s,i)=>`<button class="mixo-tutorial-chapter${i===completeTourIndex?' mixo-selected-tutorial':''}" data-narrated-scene="${i}" type="button"><b>${i===completeTourIndex?'▶ ':''}${s[0]}</b><small>${s[1]}</small></button>`).join('');}
+let selected=completeTourIndex, idx=0, playing=false, contextualScene=null, utter=null, nextTimer=null, ctx=null, musicGain=null, musicTimer=null, scheduled=[];
 const $=id=>document.getElementById(id), panel=$('mixoWatchPanel'), play=$('mixoWatchPlay'), genre=null, musicVol=null, voiceVol=$('mixoVoiceVolume'), voiceSel=$('mixoVoiceSelect');
 const tutorialOverlay=$('mixoTutorialOverlay'),panelHome=panel?.parentNode,panelAnchor=panel?.nextSibling;
 function guidedMode(){if(!panel)return;document.body.appendChild(panel);panel.classList.add('mixo-guided-active');panel.classList.remove('hidden');tutorialOverlay?.classList.add('hidden')}
@@ -1084,7 +1088,7 @@ function narratorVoice(kind){const vs=voices(), english=vs.filter(v=>/^en/i.test
 function stopSpeech(){speechSynthesis.cancel();if(nextTimer){clearTimeout(nextTimer);nextTimer=null}}
 function setPlayLabel(text,busy=false){const b=$('mixoWatchPlay');if(!b)return;b.textContent=text;if(busy)b.setAttribute('aria-busy','true');else b.removeAttribute('aria-busy')}
 let naturalAudio=null;
-function afterNarration(){if(!playing)return;if(!contextualScene&&selected===20&&idx<sceneData.length-2){nextTimer=setTimeout(()=>{idx++;render();speak()},900)}else{playing=false;setPlayLabel('▶ Replay');stopMusic()}}
+function afterNarration(){if(!playing)return;if(!contextualScene&&selected===completeTourIndex&&idx<sceneData.length-2){nextTimer=setTimeout(()=>{idx++;render();speak()},900)}else{playing=false;setPlayLabel('▶ Replay');stopMusic()}}
 function browserFallback(text,kind){utter=new SpeechSynthesisUtterance(text);const chosen=narratorVoice(kind);if(chosen)utter.voice=chosen;utter.volume=Number(voiceVol?.value||1);utter.rate=.92;utter.pitch=1;utter.onend=afterNarration;utter.onerror=afterNarration;speechSynthesis.speak(utter)}
 let narrationRequest=0;
 async function speak(){stopSpeech();const request=++narrationRequest;if(naturalAudio){try{naturalAudio.pause();naturalAudio.src=''}catch(_){}naturalAudio=null}if(!playing)return;const text=currentScene()[1],kind=document.getElementById('mixoVoiceSelect')?.value||'female';setPlayLabel('⌛ Loading narrator…',true);try{const r=await fetch('/api/narration',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:kind})});if(request!==narrationRequest||!playing)return;if(!r.ok)throw new Error('Natural narrator unavailable');const blob=await r.blob();if(!blob.type.startsWith('audio/'))throw new Error('Invalid narrator audio');naturalAudio=new Audio(URL.createObjectURL(blob));naturalAudio.volume=Number(voiceVol?.value||1);naturalAudio.onended=()=>{URL.revokeObjectURL(naturalAudio.src);naturalAudio=null;afterNarration()};naturalAudio.onerror=()=>{naturalAudio=null;browserFallback(text,kind)};setPlayLabel('⏸ Pause Narration');await naturalAudio.play()}catch(_){if(request!==narrationRequest||!playing)return;setPlayLabel('⏸ Pause Narration');browserFallback(text,kind)}}
@@ -1101,9 +1105,9 @@ function exitTutorial(){pause();closeDemoOverlays();document.querySelector('#ski
 // Replace controls to remove old v1 listeners.
 function replace(id){const old=$(id);if(!old)return null;const n=old.cloneNode(true);old.replaceWith(n);return n}
 const p2=replace('mixoWatchPlay'),nx=replace('mixoWatchNext'),pv=replace('mixoWatchPrev'),rs=replace('mixoWatchRestart'),ln=replace('mixoWatchLaunch');
-if(ln)ln.onclick=()=>{panel.classList.toggle('hidden');if(!panel.classList.contains('hidden')){idx=selected===20?0:selected;render()}};
-if(p2)p2.onclick=()=>playing?pause():start();if(nx)nx.onclick=()=>{contextualScene=null;guidedMode();pause();idx=Math.min(sceneData.length-1,idx+1);render()};if(pv)pv.onclick=()=>{contextualScene=null;guidedMode();pause();idx=Math.max(0,idx-1);render()};if(rs)rs.onclick=()=>{contextualScene=null;guidedMode();pause();idx=selected===20?0:selected;render()};
-chapterGrid?.querySelectorAll('[data-narrated-scene]').forEach(b=>b.onclick=()=>{pause();contextualScene=null;selected=Number(b.dataset.narratedScene);idx=selected===20?0:selected;chapterGrid.querySelectorAll('.mixo-tutorial-chapter').forEach(x=>x.classList.remove('mixo-selected-tutorial'));b.classList.add('mixo-selected-tutorial');panel.classList.remove('hidden');render();panel.scrollIntoView({behavior:'smooth',block:'center'})});
+if(ln)ln.onclick=()=>{panel.classList.toggle('hidden');if(!panel.classList.contains('hidden')){idx=selected===completeTourIndex?0:selected;render()}};
+if(p2)p2.onclick=()=>playing?pause():start();if(nx)nx.onclick=()=>{contextualScene=null;guidedMode();pause();idx=Math.min(sceneData.length-1,idx+1);render()};if(pv)pv.onclick=()=>{contextualScene=null;guidedMode();pause();idx=Math.max(0,idx-1);render()};if(rs)rs.onclick=()=>{contextualScene=null;guidedMode();pause();idx=selected===completeTourIndex?0:selected;render()};
+chapterGrid?.querySelectorAll('[data-narrated-scene]').forEach(b=>b.onclick=()=>{pause();contextualScene=null;selected=Number(b.dataset.narratedScene);idx=selected===completeTourIndex?0:selected;chapterGrid.querySelectorAll('.mixo-tutorial-chapter').forEach(x=>x.classList.remove('mixo-selected-tutorial'));b.classList.add('mixo-selected-tutorial');panel.classList.remove('hidden');render();panel.scrollIntoView({behavior:'smooth',block:'center'})});
 if(voiceSel)voiceSel.onchange=()=>{if(playing)speak()};
 window.mixoTutorialExit=exitTutorial;
 window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[title,text,target];guidedMode();playing=true;render();speak()};
