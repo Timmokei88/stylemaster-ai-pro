@@ -175,7 +175,8 @@
 .mixo-watch-title{display:flex;justify-content:space-between;gap:10px;align-items:center}.mixo-watch-title b{font-size:15px}.mixo-watch-badge{font-size:9px;color:#72e4ff;border:1px solid rgba(70,210,255,.3);padding:4px 7px;border-radius:999px}
 .mixo-watch-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:10px;margin-top:10px}.mixo-watch-field label{display:block;font-size:10px;font-weight:850;color:#b9c6dc;margin-bottom:5px}.mixo-watch-field select,.mixo-watch-field input[type=range]{width:100%}.mixo-watch-field select{border:1px solid rgba(82,117,173,.45);border-radius:8px;background:#030c20;color:#fff;padding:9px}
 .mixo-watch-volumes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:9px}.mixo-watch-stage{margin-top:12px;min-height:170px;border:1px solid rgba(92,113,255,.26);border-radius:12px;background:radial-gradient(circle at 50% 0,rgba(94,65,190,.22),transparent 55%),#030a1b;padding:18px;display:flex;flex-direction:column;justify-content:center;text-align:center}.mixo-watch-step{font-size:10px;color:#72e4ff;font-weight:850;letter-spacing:.08em;text-transform:uppercase}.mixo-watch-stage h3{margin:8px 0 7px;font-size:22px}.mixo-watch-caption{font-size:13px;line-height:1.55;color:#d8e2f2;max-width:680px;margin:0 auto}.mixo-watch-progress{height:4px;background:#111d38;border-radius:99px;margin-top:13px;overflow:hidden}.mixo-watch-progress>span{display:block;height:100%;width:0;background:linear-gradient(90deg,#1dd9ff,#e347ff);transition:width .25s ease}.mixo-watch-controls{display:grid;grid-template-columns:auto auto 1fr auto auto;gap:7px;margin-top:10px}.mixo-watch-controls button{border:1px solid rgba(93,124,181,.35);border-radius:8px;background:#10203e;color:#fff;padding:9px 11px;font-size:11px;font-weight:850}.mixo-watch-controls .primary{border:0;background:linear-gradient(90deg,#18bff2,#7a63ff,#d837ef)}.mixo-watch-note{font-size:9px;color:#8190ac;line-height:1.45;margin:8px 0 0}
-.mixo-watch-panel.mixo-guided-active{position:fixed;left:18px;bottom:18px;z-index:100200;width:min(620px,calc(100vw - 36px));max-height:48vh;overflow:auto;margin:0;box-shadow:0 22px 70px rgba(0,0,0,.72),0 0 0 2px rgba(65,218,255,.2)}
+.mixo-watch-panel.mixo-guided-active{position:fixed;left:18px;bottom:18px;z-index:100200;width:min(620px,calc(100vw - 36px));height:auto;min-width:300px;min-height:210px;max-width:calc(100vw - 20px);max-height:calc(100vh - 20px);overflow:auto;resize:both;margin:0;box-shadow:0 22px 70px rgba(0,0,0,.72),0 0 0 2px rgba(65,218,255,.2)}
+.mixo-guided-active .mixo-watch-title{cursor:move;user-select:none;touch-action:none}.mixo-guided-active .mixo-watch-title:after{content:'Drag to move • resize from corner';font-size:9px;color:#72e4ff;font-weight:700}
 @media(max-width:650px){.mixo-watch-grid,.mixo-watch-volumes{grid-template-columns:1fr}.mixo-watch-controls{grid-template-columns:1fr 1fr 1fr}.mixo-watch-controls .primary{grid-column:span 3}}
 
 /* Visual narrated tutorial v2 */
@@ -210,12 +211,12 @@
 </div>
 <div id="mixoSettingsOverlay" class="mixo-settings-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="mixoSettingsTitle">
  <div class="mixo-settings-card">
-  <div class="mixo-settings-head"><div><h2 id="mixoSettingsTitle">MixoLabs Settings</h2><p style="margin:4px 0 0;color:#9facc7;font-size:11px">Manage your account, preferences and future subscription settings.</p></div><button id="mixoSettingsClose" class="mixo-settings-close" type="button" aria-label="Close">&times;</button></div>
-  <div class="mixo-settings-section"><h3>Account &amp; Profile</h3><p>Prepare your creator profile now. Secure email/password authentication will connect when the production database is activated.</p><div class="mixo-settings-row"><span id="settingsProfileSummary">Local profile not set up</span><div style="display:flex;gap:6px;flex-wrap:wrap"><button id="settingsProfileButton" class="mixo-settings-action" type="button">Manage Profile</button><button id="settingsLoginButton" class="mixo-settings-action" type="button">Log In / Create Account</button></div></div></div>
+  <div class="mixo-settings-head"><div><h2 id="mixoSettingsTitle">MixoLabs Settings</h2><p style="margin:4px 0 0;color:#9facc7;font-size:11px">Manage your account, preferences, billing and support.</p></div><button id="mixoSettingsClose" class="mixo-settings-close" type="button" aria-label="Close">&times;</button></div>
+  <div class="mixo-settings-section"><h3>Account &amp; Profile</h3><p>Manage secure sign-in and the creator profile shown within MixoLabs.</p><div class="mixo-settings-row"><span id="settingsProfileSummary">Local profile not set up</span><div style="display:flex;gap:6px;flex-wrap:wrap"><button id="settingsProfileButton" class="mixo-settings-action" type="button">Manage Profile</button><button id="settingsLoginButton" class="mixo-settings-action" type="button">Log In / Create Account</button></div></div></div>
   <div class="mixo-settings-section"><h3>Appearance</h3><p>Your MixoLabs skin controls are already available from Appearance in the main navigation.</p><div class="mixo-settings-row"><span>Background &amp; skin</span><button id="settingsAppearanceButton" class="mixo-settings-action" type="button">Open Appearance</button></div></div>
   <div class="mixo-settings-section"><h3>Subscription &amp; Credits</h3><p>View plans, buy credit packs, or manage billing securely through Stripe.</p><div class="mixo-settings-row"><span id="settingsPlanSummary">Current plan: None</span><button class="mixo-settings-action" data-open-billing type="button">View Plans &amp; Credits</button></div></div>
   <div class="mixo-settings-section"><h3>Privacy &amp; Legal</h3><p>Review the MixoLabs legal information at any time.</p><div class="mixo-settings-row"><span>Policies</span><div style="display:flex;gap:6px"><button class="mixo-settings-action" type="button" data-settings-legal="privacy">Privacy</button><button class="mixo-settings-action" type="button" data-settings-legal="terms">Terms</button></div></div></div>
-  <div class="mixo-settings-section"><h3>Support</h3><p>Product help, billing guidance and the future AI support assistant will be accessible through MixoLabs Support.</p><div class="mixo-settings-row"><span>Need help?</span><button class="mixo-settings-action" type="button" data-settings-legal="support">Open Support</button></div></div>
+  <div class="mixo-settings-section"><h3>Support</h3><p>Get help with product, billing, account, privacy and safety questions.</p><div class="mixo-settings-row"><span>Need help?</span><button class="mixo-settings-action" type="button" data-settings-legal="support">Open Support</button></div></div>
  </div>
 </div>
 
@@ -237,11 +238,12 @@
   </div>
   <div class="mixo-rollover"><b>Choose exactly what suits you:</b> enter any amount from £1.99 to £1,000. One-time packs can be purchased repeatedly. Monthly plans renew at your chosen amount and receive a larger credit allowance while protecting the business margin.</div>
   <div id="mixoBillingCredits" class="mixo-billing-panel">
-   <div class="mixo-custom-offer" data-custom-offer="payment"><h3>Build a one-time credit pack</h3><p>Pay once. Buy this pack again whenever you want—there is no purchase limit.</p><div class="mixo-custom-amount"><label>Amount <input type="number" min="1.99" max="1000" step="0.01" value="1.99" data-custom-number></label><input type="range" min="199" max="100000" step="1" value="199" data-custom-range aria-label="One-time pack amount"></div><div class="mixo-quick-amounts"><button type="button" data-quick-pence="199">£1.99</button><button type="button" data-quick-pence="350">£3.50</button><button type="button" data-quick-pence="500">£5</button><button type="button" data-quick-pence="700">£7</button><button type="button" data-quick-pence="1000">£10</button><button type="button" data-quick-pence="10000">£100</button></div><div class="mixo-custom-result"><div><b data-custom-credits>20 credits</b><span data-custom-price>One payment of £1.99</span></div><button class="mixo-custom-buy" type="button" data-custom-buy>Buy Pack</button></div></div>
+   <div class="mixo-custom-offer" data-custom-offer="payment"><h3>Build a one-time credit pack</h3><p>Pay once. Buy this pack again whenever you want—there is no purchase limit.</p><div class="mixo-custom-amount"><label>Amount <input type="number" min="1.99" max="1000" step="0.01" value="1.99" inputmode="decimal" data-custom-number></label><input type="range" min="199" max="100000" step="1" value="199" data-custom-range aria-label="One-time pack amount"></div><div class="mixo-quick-amounts"><button type="button" data-quick-pence="199">£1.99</button><button type="button" data-quick-pence="350">£3.50</button><button type="button" data-quick-pence="500">£5</button><button type="button" data-quick-pence="700">£7</button><button type="button" data-quick-pence="1000">£10</button><button type="button" data-quick-pence="10000">£100</button></div><div class="mixo-custom-result"><div><b data-custom-credits>30 estimated credits</b><span data-custom-price>One payment of £1.99</span></div><button class="mixo-custom-buy" type="button" data-custom-buy>Buy Pack</button></div></div>
   </div>
   <div id="mixoBillingMonthly" class="mixo-billing-panel hidden">
-   <div class="mixo-custom-offer" data-custom-offer="subscription"><h3>Build your monthly plan</h3><p>Choose your own monthly payment. Monthly customers receive <span class="mixo-monthly-bonus">more credits than the same-value one-time pack</span>, calculated for that amount.</p><div class="mixo-custom-amount"><label>Monthly amount <input type="number" min="1.99" max="1000" step="0.01" value="1.99" data-custom-number></label><input type="range" min="199" max="100000" step="1" value="199" data-custom-range aria-label="Monthly subscription amount"></div><div class="mixo-quick-amounts"><button type="button" data-quick-pence="199">£1.99</button><button type="button" data-quick-pence="350">£3.50</button><button type="button" data-quick-pence="500">£5</button><button type="button" data-quick-pence="700">£7</button><button type="button" data-quick-pence="1000">£10</button><button type="button" data-quick-pence="10000">£100</button></div><div class="mixo-custom-result"><div><b data-custom-credits>22 credits</b><span data-custom-price>£1.99 each month</span></div><button class="mixo-custom-buy" type="button" data-custom-buy>Start Monthly</button></div></div>
+   <div class="mixo-custom-offer" data-custom-offer="subscription"><h3>Build your monthly plan</h3><p>Choose your own monthly payment. Monthly customers receive <span class="mixo-monthly-bonus">more credits than the same-value one-time pack</span>, calculated for that amount.</p><div class="mixo-custom-amount"><label>Monthly amount <input type="number" min="1.99" max="1000" step="0.01" value="1.99" inputmode="decimal" data-custom-number></label><input type="range" min="199" max="100000" step="1" value="199" data-custom-range aria-label="Monthly subscription amount"></div><div class="mixo-quick-amounts"><button type="button" data-quick-pence="199">£1.99</button><button type="button" data-quick-pence="350">£3.50</button><button type="button" data-quick-pence="500">£5</button><button type="button" data-quick-pence="700">£7</button><button type="button" data-quick-pence="1000">£10</button><button type="button" data-quick-pence="10000">£100</button></div><div class="mixo-custom-result"><div><b data-custom-credits>32 estimated credits</b><span data-custom-price>£1.99 each month</span></div><button class="mixo-custom-buy" type="button" data-custom-buy>Start Monthly</button></div></div>
   </div>
+  <label class="mixo-billing-note" style="display:flex;gap:9px;align-items:flex-start"><input id="mixoDigitalConsent" type="checkbox" style="margin-top:3px"><span>I request immediate supply of the digital service. I understand that credits used for a successfully delivered AI generation are non-refundable for change of mind, without affecting my statutory rights.</span></label>
   <div id="mixoBillingStatus" class="mixo-billing-status" aria-live="polite"></div>
   <div class="mixo-billing-note"><b id="mixoBillingNotice">Stripe test mode:</b> use Stripe's test card details only. Test payments do not move real money. <button id="mixoManageBilling" type="button">Manage Billing</button></div>
  </div>
@@ -502,41 +504,42 @@ const overlay=document.getElementById("mixoLegalOverlay"), body=document.getElem
 if(!overlay||!body||!title||!close)return;
 const updated="10 September 2026";
 const pages={
-privacy:`<div class="mixo-legal-note"><strong>Privacy Policy</strong><br>Last updated: ${updated}. This launch draft should be reviewed against the final MixoLabs business details and production services before accepting paid customers.</div>
+privacy:`<div class="mixo-legal-note"><strong>Privacy Policy</strong><br>Last updated: ${updated}. MixoLabs is operated by {{LEGAL_NAME}}. Contact: <a href="mailto:{{SUPPORT_EMAIL}}">{{SUPPORT_EMAIL}}</a>.</div>
 <h3>1. Who this policy covers</h3><p>This policy explains how MixoLabs handles personal information when you use the MixoLabs website, AI image-generation tools, accounts, subscriptions, community features and support services.</p>
 <h3>2. Information we may collect</h3><ul><li>Account information such as name, email address and authentication data.</li><li>Prompts, reference images, generated images, saved creations, favourites and settings that you choose to provide or save.</li><li>Subscription and transaction information. Payment-card details should be processed by our payment provider rather than stored directly by MixoLabs.</li><li>Support messages and communications.</li><li>Technical and usage information such as device/browser information, IP address, security logs, feature usage and error information.</li></ul>
 <h3>3. Why we use information</h3><p>We may use information to provide and secure the service, process requested AI generations, operate accounts and subscriptions, enforce usage limits, provide support, prevent abuse, improve MixoLabs, comply with legal obligations and establish or defend legal claims.</p>
 <h3>4. AI processing and service providers</h3><p>Content submitted for image generation is sent to Google's Gemini API to perform the requested generation. Tutorial narration may be processed by ElevenLabs when natural narration is enabled. MixoLabs also uses service providers for hosting, databases, payments, security and storage, including Render and Stripe where those services are enabled. These providers may process data in other countries under their applicable safeguards. We do not send payment-card details directly to the image-generation provider.</p>
 <h3>5. Public and private content</h3><p>Content should remain private unless you deliberately choose to publish or share it through a public MixoLabs feature. If you publish content, other people may be able to view, copy or share it.</p>
 <h3>6. Legal bases</h3><p>Where UK data-protection law applies, processing may rely on performance of a contract, legitimate interests, consent where required, and compliance with legal obligations, depending on the activity.</p>
-<h3>7. Retention</h3><p>We aim to keep personal information only for as long as needed for the purposes described above, including account operation, security, legal, tax and dispute-resolution requirements. Final retention periods will be documented as production systems are connected.</p>
+<h3>7. Retention</h3><p>Account information is normally retained while an account remains open and for up to six years afterwards where needed for tax, accounting, fraud prevention or legal claims. Support and transaction records may also be retained for up to six years. Security logs are kept only as long as reasonably needed for security and troubleshooting. Published content remains available until removed by the user or MixoLabs, subject to backups and legal requirements.</p>
 <h3>8. Your rights</h3><p>Depending on applicable law, you may have rights to request access, correction, deletion, restriction, portability or objection, and to withdraw consent where processing relies on consent. UK users may also have the right to complain to the Information Commissioner's Office.</p>
-<h3>9. Children</h3><p>MixoLabs is not intended for children to create paid accounts independently. The final age requirements will be stated before public paid launch.</p>
+<h3>9. Children</h3><p>MixoLabs paid accounts are intended for people aged 18 or over. A person under 18 may use the service only with the permission and supervision of a parent or legal guardian who accepts responsibility for that use.</p>
 <h3>10. Security</h3><p>We use reasonable technical and organisational safeguards, but no online service can guarantee absolute security.</p>
 <h3>11. Changes</h3><p>We may update this policy as MixoLabs develops. Material changes will be reflected by a new “last updated” date and, where appropriate, additional notice.</p>
-<h3>12. Contact</h3><p>Privacy questions can be raised through the MixoLabs Support section. A dedicated support/privacy contact address and the final legal operator details must be added before paid public launch.</p>`,
-terms:`<div class="mixo-legal-note"><strong>Terms &amp; Conditions</strong><br>Last updated: ${updated}. This launch draft should be reviewed against the final MixoLabs business details, pricing and refund policy before accepting paid customers.</div>
+<h3>12. Contact</h3><p>For privacy requests, contact <a href="mailto:{{SUPPORT_EMAIL}}">{{SUPPORT_EMAIL}}</a>. Operator: {{LEGAL_NAME}}, {{LEGAL_ADDRESS}}. UK users may complain to the Information Commissioner's Office if they remain dissatisfied.</p>`,
+terms:`<div class="mixo-legal-note"><strong>Terms &amp; Conditions</strong><br>Last updated: ${updated}. These terms are between you and {{LEGAL_NAME}}, trading as MixoLabs, at {{LEGAL_ADDRESS}}. Contact: <a href="mailto:{{SUPPORT_EMAIL}}">{{SUPPORT_EMAIL}}</a>.</div>
 <h3>1. Agreement</h3><p>These terms govern use of MixoLabs. By creating an account, purchasing a subscription or using the service, you agree to these terms and any policies expressly incorporated into them.</p>
 <h3>2. The service</h3><p>MixoLabs provides tools for creating and working with AI-generated visual content. AI outputs are probabilistic: results can be inaccurate, unexpected, similar to other outputs, or fail to follow a prompt exactly. Availability and features may change.</p>
 <h3>3. Accounts</h3><p>You are responsible for information submitted through your account and for keeping access credentials secure. You must provide accurate information where required and promptly report suspected unauthorised access.</p>
 <h3>4. Acceptable use</h3><p>You must not use MixoLabs unlawfully; infringe another person's rights; impersonate others deceptively; distribute malware; attempt to bypass security, billing or usage controls; overload or reverse-engineer protected parts of the service; or submit content you have no right to use.</p>
 <h3>5. Your content</h3><p>You retain whatever rights you already hold in prompts, uploads and other content you provide. You grant MixoLabs the permissions reasonably necessary to host, transmit, process and display that content to provide features you request. You are responsible for having the rights and permissions needed for uploaded material.</p>
 <h3>6. AI-generated outputs</h3><p>Rights in AI-generated material can vary by jurisdiction and circumstances. MixoLabs does not guarantee that an output is unique, non-infringing, registrable as intellectual property, or suitable for a particular commercial use. You are responsible for reviewing outputs before relying on or publishing them.</p>
-<h3>7. Subscriptions, credits and billing</h3><p>Paid plans, included credits, renewal frequency and prices are shown before purchase. Unless stated otherwise at checkout, subscriptions renew automatically until cancelled. Credits have no cash value. Purchased pack credits and subscription credits may have different validity or rollover rules, as disclosed at checkout. A credit is normally consumed when a generation request is successfully completed; where MixoLabs detects a failed generation, the system may automatically restore the affected credit. Any statutory consumer rights remain unaffected.</p>
+<h3>7. Subscriptions, credits and billing</h3><p>Prices, included credits and renewal frequency are shown before purchase. Subscriptions renew automatically until cancelled through the billing portal. Cancellation stops future renewals and access continues for the paid period, unless stated otherwise. Credits are a limited licence to request digital generation services, have no cash value, cannot be transferred, and may have validity or rollover rules disclosed before purchase. A credit is consumed only when a generation request is recorded as successfully completed. Credits are automatically restored where MixoLabs detects a failed generation.</p>
 <h3>8. Availability and changes</h3><p>We may maintain, update, suspend or change parts of MixoLabs. We do not promise uninterrupted or error-free operation. Where appropriate, material changes affecting paid users will be communicated.</p>
 <h3>9. Enforcement</h3><p>We may restrict or suspend access where reasonably necessary for security, abuse prevention, legal compliance, non-payment or serious/repeated breach of these terms.</p>
 <h3>10. Liability</h3><p>Nothing in these terms excludes liability that cannot lawfully be excluded. Any additional limitations applicable to paid services must be finalised for the legal entity and customer markets before public paid launch.</p>
-<h3>11. Consumer rights</h3><p>Nothing in these terms is intended to remove mandatory consumer rights that apply to you. Specific statutory cancellation/refund wording will be finalised before paid subscriptions are activated.</p>
-<h3>12. Contact</h3><p>Questions about these terms can be raised through MixoLabs Support. Final legal operator name, geographic address and contact details must be inserted before public paid launch.</p>`,
-support:`<p>MixoLabs Support is being prepared for launch. You can already use this page for common product guidance; direct support messaging and the future AI help assistant will be connected before they are advertised as available.</p>
+<h3>11. Cancellations and refunds</h3><p>Because each AI generation is created on demand and incurs processing costs, credits used for a successfully delivered generation are non-refundable for change of mind, dissatisfaction with an artistic result, or failure of an output to match subjective expectations. Unused credit purchases and subscription cancellations are handled in accordance with the cancellation information shown at checkout and applicable law. Subscription cancellation prevents future renewal but does not normally refund a completed billing period. If MixoLabs charges credits for a generation that fails to deliver, the affected credits will normally be restored. If digital content or the service is faulty, unavailable, or not as described, contact Support so that MixoLabs can investigate and provide any remedy required by law. Nothing in these terms limits mandatory statutory rights.</p>
+<h3>12. Governing law</h3><p>These terms are governed by the laws of England and Wales. Consumers retain any mandatory protections and rights to bring proceedings available in the part of the United Kingdom or other country where they live.</p>
+<h3>13. Contact</h3><p>Questions about these terms can be sent to <a href="mailto:{{SUPPORT_EMAIL}}">{{SUPPORT_EMAIL}}</a>. Operator: {{LEGAL_NAME}}, {{LEGAL_ADDRESS}}.</p>`,
+support:`<p>For account access, billing, generation failures, privacy requests, safety reports or intellectual-property concerns, email <a href="mailto:{{SUPPORT_EMAIL}}">{{SUPPORT_EMAIL}}</a>. Include your account email and relevant transaction or generation details, but never send passwords or complete payment-card information.</p>
 <div class="mixo-support-grid">
 <div class="mixo-support-box"><b>Image generation</b><span>Help with prompts, reference images, output quality, variations and angle sheets.</span></div>
-<div class="mixo-support-box"><b>Accounts &amp; access</b><span>Account creation, sign-in and security help will appear here when accounts are enabled.</span></div>
-<div class="mixo-support-box"><b>Billing &amp; credits</b><span>Subscription, cancellation, payment and credit guidance will be added before live billing is switched on.</span></div>
-<div class="mixo-support-box"><b>Safety &amp; reporting</b><span>Reporting routes for problematic content, abuse and intellectual-property concerns will be added before public community features launch.</span></div>
+<div class="mixo-support-box"><b>Accounts &amp; access</b><span>Get help with account creation, sign-in, account security and profile settings.</span></div>
+<div class="mixo-support-box"><b>Billing &amp; credits</b><span>Get help with payments, subscription cancellation, missing credits and failed generations. Successfully delivered generations are not refunded for change of mind, subject to statutory rights.</span></div>
+<div class="mixo-support-box"><b>Safety &amp; reporting</b><span>Report harmful content, abuse, privacy concerns or suspected intellectual-property infringement.</span></div>
 </div>
-<h3>AI support assistant</h3><p>The support interface is ready to be extended with an AI assistant later. It does not need to create an additional paid service before MixoLabs launches.</p>
-<h3>Direct contact</h3><p>A working support email/contact route still needs to be connected before paid public launch. No email address is shown here until an actual MixoLabs support mailbox exists.</p>`
+<h3>Refund and failed-generation requests</h3><p>Explain what happened and provide the approximate date, your account email and any transaction or generation reference available. Do not resend sensitive source images unless Support specifically requests them through an approved route.</p>
+<h3>Business contact</h3><p>{{LEGAL_NAME}}, {{LEGAL_ADDRESS}}.<br>Email: <a href="mailto:{{SUPPORT_EMAIL}}">{{SUPPORT_EMAIL}}</a>.</p>`
 };
 function openPage(which){title.textContent=which==="privacy"?"Privacy Policy":which==="terms"?"Terms & Conditions":"MixoLabs Support";body.innerHTML=pages[which]||"";overlay.classList.remove("hidden");body.parentElement.scrollTop=0}
 document.querySelectorAll("[data-legal-open]").forEach(b=>b.addEventListener("click",()=>openPage(b.dataset.legalOpen)));
@@ -641,10 +644,10 @@ function hide(){overlay.classList.add("hidden")}
 document.querySelectorAll("[data-open-billing]").forEach(b=>b.addEventListener("click",()=>{document.getElementById("mixoSettingsOverlay")?.classList.add("hidden");show()}));
 close?.addEventListener("click",hide);
 overlay?.addEventListener("click",e=>{if(e.target===overlay)hide()});
-async function openStripe(path,body={}){status.textContent="Opening secure Stripe Checkout…";try{const r=await fetch(path,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}),d=await r.json();if(!r.ok)throw Error(d.error||"Billing could not be opened.");location.href=d.url}catch(e){status.textContent=e.message}}
-function calculateCustomCredits(pence,monthly){const pounds=pence/100,oneTime=Math.max(1,Math.floor((pounds-(pounds*.015+.20)-pounds*.28)/.06));if(!monthly)return oneTime;return Math.max(oneTime+2,Math.floor((pounds-(pounds*.022+.20)-pounds*.22)/.06))}
-document.querySelectorAll("[data-custom-offer]").forEach(box=>{const monthly=box.dataset.customOffer==="subscription",number=box.querySelector("[data-custom-number]"),range=box.querySelector("[data-custom-range]"),credits=box.querySelector("[data-custom-credits]"),price=box.querySelector("[data-custom-price]"),buy=box.querySelector("[data-custom-buy]");function render(pence){pence=Math.max(199,Math.min(100000,Math.round(Number(pence)||199)));number.value=(pence/100).toFixed(2);range.value=String(pence);credits.textContent=calculateCustomCredits(pence,monthly)+" credits";price.textContent=monthly?`£${(pence/100).toFixed(2)} each month`:`One payment of £${(pence/100).toFixed(2)}`}number.addEventListener("input",()=>render(Number(number.value)*100));range.addEventListener("input",()=>render(range.value));box.querySelectorAll("[data-quick-pence]").forEach(b=>b.addEventListener("click",()=>render(b.dataset.quickPence)));buy.addEventListener("click",()=>openStripe("/api/billing/custom-checkout",{amountPence:Math.round(Number(number.value)*100),billingKind:monthly?"subscription":"payment"}));render(199)});
-document.getElementById("mixoManageBilling")?.addEventListener("click",()=>openStripe("/api/billing/portal"));
+async function openStripe(path,body={},needsConsent=true){if(needsConsent&&!document.getElementById('mixoDigitalConsent')?.checked){status.textContent='Please confirm the immediate digital-supply and refund acknowledgement before continuing.';document.getElementById('mixoDigitalConsent')?.focus();return}if(needsConsent)body={...body,digitalConsent:true};status.textContent="Opening secure Stripe Checkout…";try{const r=await fetch(path,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}),d=await r.json();if(!r.ok)throw Error(d.error||"Billing could not be opened.");location.href=d.url}catch(e){status.textContent=e.message}}
+function calculateCustomCredits(pence,monthly){const pounds=pence/100,creditCost=.04,oneTime=Math.max(1,Math.floor((pounds-(pounds*.015+.20)-pounds*.28)/creditCost));if(!monthly)return oneTime;return Math.max(oneTime+2,Math.floor((pounds-(pounds*.022+.20)-pounds*.22)/creditCost))}
+document.querySelectorAll("[data-custom-offer]").forEach(box=>{const monthly=box.dataset.customOffer==="subscription",number=box.querySelector("[data-custom-number]"),range=box.querySelector("[data-custom-range]"),credits=box.querySelector("[data-custom-credits]"),price=box.querySelector("[data-custom-price]"),buy=box.querySelector("[data-custom-buy]");function preview(pence){pence=Math.max(199,Math.min(100000,Math.round(Number(pence)||199)));range.value=String(pence);credits.textContent=calculateCustomCredits(pence,monthly)+" estimated credits";price.textContent=monthly?`£${(pence/100).toFixed(2)} each month`:`One payment of £${(pence/100).toFixed(2)}`}function render(pence){pence=Math.max(199,Math.min(100000,Math.round(Number(pence)||199)));number.value=(pence/100).toFixed(2);preview(pence)}number.addEventListener("input",()=>{const pounds=Number(number.value);if(Number.isFinite(pounds)&&pounds>0)preview(pounds*100)});number.addEventListener("change",()=>render(Number(number.value)*100));number.addEventListener("blur",()=>render(Number(number.value)*100));range.addEventListener("input",()=>render(range.value));box.querySelectorAll("[data-quick-pence]").forEach(b=>b.addEventListener("click",()=>render(b.dataset.quickPence)));buy.addEventListener("click",()=>{render(Number(number.value)*100);openStripe("/api/billing/custom-checkout",{amountPence:Math.round(Number(number.value)*100),billingKind:monthly?"subscription":"payment"})});render(199)});
+document.getElementById("mixoManageBilling")?.addEventListener("click",()=>openStripe("/api/billing/portal",{},false));
 document.querySelectorAll("[data-billing-tab]").forEach(btn=>btn.addEventListener("click",()=>{
  const tab=btn.dataset.billingTab;
  document.querySelectorAll("[data-billing-tab]").forEach(x=>x.classList.toggle("active",x===btn));
@@ -927,10 +930,10 @@ reset?.addEventListener("click",()=>{try{localStorage.removeItem(BK)}catch(_){}a
 (()=>{
 const overlay=document.getElementById("mixoTutorialOverlay"),coach=document.getElementById("mixoTourCoach");let i=0,current=null;
 const steps=[
-["#accountButton","Account access","Use Log In to access the account area. New users can switch to Create Account.","Secure account creation is still testing until the production database is connected."],
+["#accountButton","Account access","Use Log In to access the account area. New users can switch to Create Account.","The tutorial never enters or stores your password."],
 ["#mixoSignupTab","Create an account","Enter a display name, email and password, then agree to the Terms and Privacy Policy.","The tutorial never enters or stores your password."],
 ["#settingsButton","Settings","Settings is the central place for account/profile, appearance, plans, legal information and support."],
-["#settingsProfileButton","Creator profile","Set your display name, creator handle, bio, creator type and future profile visibility."],
+["#settingsProfileButton","Creator profile","Set your display name, creator handle, bio, creator type and profile visibility."],
 ["[data-open-billing]","Plans & Credits","Open Plans & Credits to compare monthly subscriptions, annual options and reusable one-off credit packs."],
 ["#mixoBillingTabs","Subscriptions and packs","Monthly plans and Buy Credits are separate: users can subscribe or simply purchase credit packs when needed."],
 ["#mixoBillingCredits","Reusable credit packs","Credit packs are one-off purchases, not subscriptions. Users can choose a pack whenever they need more credits."],
@@ -1051,14 +1054,20 @@ const sceneData=[
 const chapterStarts=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19];
 const chapterGrid=document.querySelector('.mixo-tutorial-grid');
 if(chapterGrid){chapterGrid.innerHTML=sceneData.map((s,i)=>`<button class="mixo-tutorial-chapter${i===20?' mixo-selected-tutorial':''}" data-narrated-scene="${i}" type="button"><b>${i===20?'▶ ':''}${s[0]}</b><small>${s[1]}</small></button>`).join('');}
-let selected=20, idx=0, playing=false, utter=null, nextTimer=null, ctx=null, musicGain=null, musicTimer=null, scheduled=[];
+let selected=20, idx=0, playing=false, contextualScene=null, utter=null, nextTimer=null, ctx=null, musicGain=null, musicTimer=null, scheduled=[];
 const $=id=>document.getElementById(id), panel=$('mixoWatchPanel'), play=$('mixoWatchPlay'), genre=null, musicVol=null, voiceVol=$('mixoVoiceVolume'), voiceSel=$('mixoVoiceSelect');
 const tutorialOverlay=$('mixoTutorialOverlay'),panelHome=panel?.parentNode,panelAnchor=panel?.nextSibling;
 function guidedMode(){if(!panel)return;document.body.appendChild(panel);panel.classList.add('mixo-guided-active');panel.classList.remove('hidden');tutorialOverlay?.classList.add('hidden')}
 function restorePanel(){if(!panel||!panelHome)return;panel.classList.remove('mixo-guided-active');panel.classList.add('hidden');panelHome.insertBefore(panel,panelAnchor)}
+const dragHandle=panel?.querySelector('.mixo-watch-title');let drag=null;
+dragHandle?.addEventListener('pointerdown',e=>{if(!panel.classList.contains('mixo-guided-active')||e.button!==0)return;const r=panel.getBoundingClientRect();panel.style.left=r.left+'px';panel.style.top=r.top+'px';panel.style.bottom='auto';drag={x:e.clientX,y:e.clientY,left:r.left,top:r.top};dragHandle.setPointerCapture(e.pointerId);e.preventDefault()});
+dragHandle?.addEventListener('pointermove',e=>{if(!drag)return;const maxX=Math.max(0,innerWidth-panel.offsetWidth),maxY=Math.max(0,innerHeight-panel.offsetHeight);panel.style.left=Math.max(0,Math.min(maxX,drag.left+e.clientX-drag.x))+'px';panel.style.top=Math.max(0,Math.min(maxY,drag.top+e.clientY-drag.y))+'px'});
+function endDrag(){drag=null}dragHandle?.addEventListener('pointerup',endDrag);dragHandle?.addEventListener('pointercancel',endDrag);
 function closeDemoOverlays(except){['mixoAccountOverlay','mixoProfileOverlay','mixoSettingsOverlay','mixoBillingOverlay','mixoGalleryOverlay','mixoFavoritesOverlay','mixoCommunityOverlay','skinPanel'].forEach(id=>{if(id===except)return;const e=$(id);if(e)e.classList.add('hidden')})}
 function reveal(sel){
- closeDemoOverlays();
+ const existing=document.querySelector(sel),owner=existing?.closest('#mixoAccountOverlay,#mixoProfileOverlay,#mixoSettingsOverlay,#mixoBillingOverlay,#mixoGalleryOverlay,#mixoFavoritesOverlay,#mixoCommunityOverlay,#skinPanel');
+ closeDemoOverlays(owner?.id);
+ if(owner)owner.classList.remove('hidden');
  if(sel==='#mixoLoginTab'||sel==='#mixoSignupTab'){document.querySelector('#mixoAccountOverlay')?.classList.remove('hidden');document.querySelector(sel)?.click()}
  else if(sel==='#mixoPreviewPlan'){document.querySelector('#mixoSettingsOverlay')?.classList.remove('hidden')}
  else if(sel==='#skinButton'){document.querySelector('#skinPanel')?.classList.remove('hidden')}
@@ -1068,16 +1077,17 @@ function reveal(sel){
  else if(sel==='#settingsButton'){document.querySelector('#mixoSettingsOverlay')?.classList.remove('hidden')}
  const go=()=>{let e=document.querySelector(sel);if(!e)return;let d=e.closest('details');if(d)d.open=true;document.querySelectorAll('.mixo-tour-highlight').forEach(x=>x.classList.remove('mixo-tour-highlight'));try{e.scrollIntoView({behavior:'auto',block:'center'})}catch{};if(e.getClientRects().length)e.classList.add('mixo-tour-highlight')};requestAnimationFrame(go);
 }
-function render(){const s=sceneData[idx];$('mixoWatchStep').textContent=`Tutorial ${idx+1} of ${sceneData.length}`;$('mixoWatchHeading').textContent=s[0];$('mixoWatchCaption').textContent=s[1];$('mixoWatchProgress').style.width=((idx+1)/sceneData.length*100)+'%';reveal(s[2])}
+function currentScene(){return contextualScene||sceneData[idx]}
+function render(){const s=currentScene();$('mixoWatchStep').textContent=contextualScene?'Context help':`Tutorial ${idx+1} of ${sceneData.length}`;$('mixoWatchHeading').textContent=s[0];$('mixoWatchCaption').textContent=s[1];$('mixoWatchProgress').style.width=contextualScene?'100%':((idx+1)/sceneData.length*100)+'%';reveal(s[2])}
 function voices(){return speechSynthesis.getVoices()}
 function narratorVoice(kind){const vs=voices(), english=vs.filter(v=>/^en/i.test(v.lang)), pool=english.length?english:vs;if(!pool.length)return null;const female=/female|samantha|serena|ava|aria|sonia|victoria|karen|moira|tessa|zira|hazel|susan|fiona|veena|allison|siri female/i;const male=/male|daniel|alex|fred|jorge|tom|aaron|arthur|gordon|oliver|rishi|lee|david|mark|george|google uk english male/i;return pool.find(v=>(kind==='male'?male:female).test(v.name))||pool.find(v=>!(kind==='male'?female:male).test(v.name))||pool[0]}
 function stopSpeech(){speechSynthesis.cancel();if(nextTimer){clearTimeout(nextTimer);nextTimer=null}}
 function setPlayLabel(text,busy=false){const b=$('mixoWatchPlay');if(!b)return;b.textContent=text;if(busy)b.setAttribute('aria-busy','true');else b.removeAttribute('aria-busy')}
 let naturalAudio=null;
-function afterNarration(){if(!playing)return;if(selected===20&&idx<sceneData.length-2){nextTimer=setTimeout(()=>{idx++;render();speak()},900)}else{playing=false;setPlayLabel('▶ Replay');stopMusic()}}
+function afterNarration(){if(!playing)return;if(!contextualScene&&selected===20&&idx<sceneData.length-2){nextTimer=setTimeout(()=>{idx++;render();speak()},900)}else{playing=false;setPlayLabel('▶ Replay');stopMusic()}}
 function browserFallback(text,kind){utter=new SpeechSynthesisUtterance(text);const chosen=narratorVoice(kind);if(chosen)utter.voice=chosen;utter.volume=Number(voiceVol?.value||1);utter.rate=.92;utter.pitch=1;utter.onend=afterNarration;utter.onerror=afterNarration;speechSynthesis.speak(utter)}
 let narrationRequest=0;
-async function speak(){stopSpeech();const request=++narrationRequest;if(naturalAudio){try{naturalAudio.pause();naturalAudio.src=''}catch(_){}naturalAudio=null}if(!playing)return;const text=sceneData[idx][1],kind=document.getElementById('mixoVoiceSelect')?.value||'female';setPlayLabel('⌛ Loading narrator…',true);try{const r=await fetch('/api/narration',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:kind})});if(request!==narrationRequest||!playing)return;if(!r.ok)throw new Error('Natural narrator unavailable');const blob=await r.blob();if(!blob.type.startsWith('audio/'))throw new Error('Invalid narrator audio');naturalAudio=new Audio(URL.createObjectURL(blob));naturalAudio.volume=Number(voiceVol?.value||1);naturalAudio.onended=()=>{URL.revokeObjectURL(naturalAudio.src);naturalAudio=null;afterNarration()};naturalAudio.onerror=()=>{naturalAudio=null;browserFallback(text,kind)};setPlayLabel('⏸ Pause Narration');await naturalAudio.play()}catch(_){if(request!==narrationRequest||!playing)return;setPlayLabel('⏸ Pause Narration');browserFallback(text,kind)}}
+async function speak(){stopSpeech();const request=++narrationRequest;if(naturalAudio){try{naturalAudio.pause();naturalAudio.src=''}catch(_){}naturalAudio=null}if(!playing)return;const text=currentScene()[1],kind=document.getElementById('mixoVoiceSelect')?.value||'female';setPlayLabel('⌛ Loading narrator…',true);try{const r=await fetch('/api/narration',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:kind})});if(request!==narrationRequest||!playing)return;if(!r.ok)throw new Error('Natural narrator unavailable');const blob=await r.blob();if(!blob.type.startsWith('audio/'))throw new Error('Invalid narrator audio');naturalAudio=new Audio(URL.createObjectURL(blob));naturalAudio.volume=Number(voiceVol?.value||1);naturalAudio.onended=()=>{URL.revokeObjectURL(naturalAudio.src);naturalAudio=null;afterNarration()};naturalAudio.onerror=()=>{naturalAudio=null;browserFallback(text,kind)};setPlayLabel('⏸ Pause Narration');await naturalAudio.play()}catch(_){if(request!==narrationRequest||!playing)return;setPlayLabel('⏸ Pause Narration');browserFallback(text,kind)}}
 function osc(freq,t,dur,amp,type='sine',detune=0){if(!ctx||!musicGain)return;const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);o.detune.value=detune;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.001,amp),t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g).connect(musicGain);o.start(t);o.stop(t+dur+.03);scheduled.push(o)}
 function noise(t,dur,amp,high=700){if(!ctx||!musicGain)return;const n=Math.ceil(ctx.sampleRate*dur),b=ctx.createBuffer(1,n,ctx.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*(1-i/n);const src=ctx.createBufferSource(),f=ctx.createBiquadFilter(),g=ctx.createGain();src.buffer=b;f.type='highpass';f.frequency.value=high;g.gain.value=amp;src.connect(f).connect(g).connect(musicGain);src.start(t);scheduled.push(src)}
 function kick(t,amp=.55){if(!ctx)return;const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.setValueAtTime(130,t);o.frequency.exponentialRampToValueAtTime(48,t+.12);g.gain.setValueAtTime(amp,t);g.gain.exponentialRampToValueAtTime(.001,t+.18);o.connect(g).connect(musicGain);o.start(t);o.stop(t+.2);scheduled.push(o)}
@@ -1092,10 +1102,11 @@ function exitTutorial(){pause();closeDemoOverlays();document.querySelector('#ski
 function replace(id){const old=$(id);if(!old)return null;const n=old.cloneNode(true);old.replaceWith(n);return n}
 const p2=replace('mixoWatchPlay'),nx=replace('mixoWatchNext'),pv=replace('mixoWatchPrev'),rs=replace('mixoWatchRestart'),ln=replace('mixoWatchLaunch');
 if(ln)ln.onclick=()=>{panel.classList.toggle('hidden');if(!panel.classList.contains('hidden')){idx=selected===20?0:selected;render()}};
-if(p2)p2.onclick=()=>playing?pause():start();if(nx)nx.onclick=()=>{guidedMode();pause();idx=Math.min(sceneData.length-1,idx+1);render()};if(pv)pv.onclick=()=>{guidedMode();pause();idx=Math.max(0,idx-1);render()};if(rs)rs.onclick=()=>{guidedMode();pause();idx=selected===20?0:selected;render()};
-chapterGrid?.querySelectorAll('[data-narrated-scene]').forEach(b=>b.onclick=()=>{pause();selected=Number(b.dataset.narratedScene);idx=selected===20?0:selected;chapterGrid.querySelectorAll('.mixo-tutorial-chapter').forEach(x=>x.classList.remove('mixo-selected-tutorial'));b.classList.add('mixo-selected-tutorial');panel.classList.remove('hidden');render();panel.scrollIntoView({behavior:'smooth',block:'center'})});
+if(p2)p2.onclick=()=>playing?pause():start();if(nx)nx.onclick=()=>{contextualScene=null;guidedMode();pause();idx=Math.min(sceneData.length-1,idx+1);render()};if(pv)pv.onclick=()=>{contextualScene=null;guidedMode();pause();idx=Math.max(0,idx-1);render()};if(rs)rs.onclick=()=>{contextualScene=null;guidedMode();pause();idx=selected===20?0:selected;render()};
+chapterGrid?.querySelectorAll('[data-narrated-scene]').forEach(b=>b.onclick=()=>{pause();contextualScene=null;selected=Number(b.dataset.narratedScene);idx=selected===20?0:selected;chapterGrid.querySelectorAll('.mixo-tutorial-chapter').forEach(x=>x.classList.remove('mixo-selected-tutorial'));b.classList.add('mixo-selected-tutorial');panel.classList.remove('hidden');render();panel.scrollIntoView({behavior:'smooth',block:'center'})});
 if(voiceSel)voiceSel.onchange=()=>{if(playing)speak()};
 window.mixoTutorialExit=exitTutorial;
+window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[title,text,target];guidedMode();playing=true;render();speak()};
 })();
 </script>\n
 <style id="mixo-contextual-help-styles">
@@ -1107,22 +1118,39 @@ window.mixoTutorialExit=exitTutorial;
 (()=>{
  const overlay=document.getElementById('mixoTutorialOverlay');
  const map=[
-  ['.mixo-nav .active',3,'Generator tutorial'],
-  ['#prompt',3,'Prompt tutorial'],['#randomBtn',3,'Random Idea tutorial'],['#clearBtn',3,'Prompt controls tutorial'],
-  ['#exactTextInput',4,'Exact Text tutorial'],['#variationCountSelect',5,'Variations tutorial'],['#imageSizeSelect',5,'Image Quality tutorial'],
-  ['#aspectRatioSelect',6,'Aspect Ratio tutorial'],['#backgroundSelect',6,'Background tutorial'],['#addPhotos',7,'Reference Images tutorial'],
-  ['#categorySelect',8,'Category tutorial'],['#styleSelect',8,'Style tutorial'],['#themeSelect',8,'Theme tutorial'],['#families',9,'Colours tutorial'],
-  ['.resin-box',10,'Resin Calculator tutorial'],['#generateBtn',11,'Generate tutorial'],['#activeArea',12,'Results tutorial'],
-  ['#galleryButton',13,'Gallery tutorial'],['#favoritesButton',14,'Favorites tutorial'],['#tutorialButton',0,'Tutorial guide'],['#mixoGalleryPublishedTab',15,'Publishing tutorial'],
-  ['#generateChosenAnglesBtn',16,'Angle Sheets tutorial'],['#mixoCommunityButton',17,'Community Chat tutorial'],['#settingsButton',18,'Settings tutorial'],
-  ['#accountButton',0,'Account tutorial'],['#skinButton',2,'Appearance tutorial'],['.mixo-cta',11,'Create tutorial'],['#mixoPreviewPlan',1,'Plans and Credits tutorial']
+  ['.mixo-nav .active','Generator','This is the main image generator workspace. Work from the prompt through the visual settings, review the displayed credit cost, and generate only when the setup is ready.'],
+  ['#prompt','Prompt or Idea','Describe the subject, setting, composition, lighting and important details you want. Clear, specific instructions generally give the model stronger direction.'],
+  ['#randomBtn','Random Idea','Random Idea supplies a fresh creative starting point. If text is already present, it may help develop that idea rather than replacing the overall direction.'],
+  ['#clearBtn','Clear Prompt','Clear removes the current prompt text so you can begin a new concept. It does not spend credits or delete saved creations.'],
+  ['#exactTextInput','Exact Text','Enter visible wording that must appear in the generated image. Check spelling carefully; AI image models can still make lettering mistakes, so always inspect the result.'],
+  ['#variationCountSelect','Image Variations','Choose how many alternatives to generate in one request. More variations use more credits, and the Generate button shows the total before purchase.'],
+  ['#imageSizeSelect','Image Quality','Choose the output resolution and quality level. Higher settings can cost more credits, so check the displayed total before generating.'],
+  ['#aspectRatioSelect','Aspect Ratio','Choose the shape of the final image, such as square, portrait or landscape, to suit where it will be used.'],
+  ['#backgroundSelect','Background','Choose how the subject background should be treated, including contextual scenes, studio treatments, solid colours or isolation where available.'],
+  ['#addPhotos','Reference Images','Upload reference images to guide identity, materials, composition or design. Only upload images you have permission to use.'],
+  ['#categorySelect','Category','Category sets the broad type of creation and changes the related style choices available below it.'],
+  ['#styleSelect','Style','Style controls the visual treatment within the selected category, such as photographic, illustrated or design-led approaches.'],
+  ['#themeSelect','Theme or Atmosphere','Theme controls mood and environmental direction, including lighting, energy and overall emotional character.'],
+  ['#families','Colour System','Choose a colour family and then a precise shade. The selected colour is added to the generation direction.'],
+  ['.resin-box','Resin Mixing Calculator','Enter the required total quantity and mixing ratio. The calculator works out each component amount for planning a physical resin project.'],
+  ['#generateBtn','Generate Images','This button displays the number of images and total credit cost. Selecting it submits the configured request and uses credits only under the generation rules shown in the Terms.'],
+  ['#activeArea','Active Masterpiece','Select a generated result to make it the active image. From here you can inspect, download, save, favourite or use compatible follow-on tools.'],
+  ['#galleryButton','Gallery','Gallery contains creations you deliberately save. You can reopen or remove them and access publishing features where available.'],
+  ['#favoritesButton','Favorites','Favorites is a separate shortlist for images you especially like, making them easier to revisit later.'],
+  ['#tutorialButton','Tutorial','Open the complete guided walkthrough or choose an individual subject. The narration panel can be moved and resized, and Exit stops the tour completely.'],
+  ['#mixoGalleryPublishedTab','Published','Published shows work deliberately shared through the current community publishing feature. Do not publish private or unauthorised material.'],
+  ['#generateChosenAnglesBtn','Angle Sheets','Select the required views, such as front, back, sides, top or bottom, then generate them together as an angle sheet.'],
+  ['#mixoCommunityButton','Community Chat','Community Chat lets signed-in users send messages and share permitted images. Messages are public to other participants, so do not post private information.'],
+  ['#settingsButton','Settings','Settings brings together account, profile, appearance, billing, legal information and support.'],
+  ['#accountButton','Account','Existing users can log in here. New users can switch to Create Account and accept the Terms and Privacy Policy.'],
+  ['#skinButton','Appearance','Appearance changes the page skin and creativity banner. Saved appearance choices are restored on this browser.'],
+  ['.mixo-cta','Create Without Limits','This shortcut returns attention to the main creation workflow. It does not itself submit a paid generation.'],
+  ['#mixoPreviewPlan','Plans and Credits','This area shows the current plan and credits. Open billing to buy a one-time pack, start or manage a monthly plan, and review the refund acknowledgement.']
  ];
- function launch(scene){
-   overlay?.classList.remove('hidden');
-   const b=document.querySelector(`[data-narrated-scene="${scene}"]`);
-   if(b){b.click();setTimeout(()=>document.getElementById('mixoWatchPanel')?.scrollIntoView({behavior:'smooth',block:'center'}),80)}
- }
- function button(scene,label){const b=document.createElement('button');b.type='button';b.className='mixo-help-btn';b.textContent='?';b.title=label;b.setAttribute('aria-label',label);b.dataset.helpScene=scene;b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();launch(scene)});return b}
+ function launch(title,text,target){if(typeof window.mixoTutorialLaunchContext==='function')window.mixoTutorialLaunchContext(title,text,target)}
+ let contextualAnchorNumber=0;
+ function contextualTarget(el){if(el.id)return '#'+el.id;const key='context-'+(++contextualAnchorNumber);el.dataset.mixoContextAnchor=key;return `[data-mixo-context-anchor="${key}"]`}
+ function button(title,text,target){const b=document.createElement('button');b.type='button';b.className='mixo-help-btn';b.textContent='?';b.title=title;b.setAttribute('aria-label',title+' help');b.dataset.helpTarget=target;b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();launch(title,text,target)});return b}
  function bestAnchor(el){
    if(el.matches('input,select,textarea')){const lab=document.querySelector(`label[for="${el.id}"]`);if(lab)return lab}
    if(el.id==='addPhotos'){return el.closest('.ref-row')?.querySelector('.subhead')||el}
@@ -1131,24 +1159,24 @@ window.mixoTutorialExit=exitTutorial;
    if(el.id==='activeArea')return el.querySelector('h2,h3,.subhead')||el;
    return el;
  }
- map.forEach(([sel,scene,label])=>{const el=document.querySelector(sel);if(!el)return;const a=bestAnchor(el);if(a.querySelector?.(`.mixo-help-btn[data-help-scene="${scene}"]`)||a.parentElement?.querySelector?.(`.mixo-help-btn[data-help-scene="${scene}"]`))return;const b=button(scene,label);if(a.closest('.mixo-nav')){const wrap=document.createElement('span');wrap.className='mixo-nav-item';a.parentNode.insertBefore(wrap,a);wrap.append(a,b)}else if(a.matches('button')||a.tagName==='SELECT'||a.tagName==='INPUT'||a.tagName==='TEXTAREA')a.insertAdjacentElement('afterend',b);else a.appendChild(b)});
+ map.forEach(([sel,title,text])=>{const el=document.querySelector(sel);if(!el)return;const a=bestAnchor(el);if(a.querySelector?.(`.mixo-help-btn[data-help-target="${sel}"]`)||a.parentElement?.querySelector?.(`.mixo-help-btn[data-help-target="${sel}"]`))return;const b=button(title,text,sel);if(a.closest('.mixo-nav')){const wrap=document.createElement('span');wrap.className='mixo-nav-item';a.parentNode.insertBefore(wrap,a);wrap.append(a,b)}else if(a.matches('button')||a.tagName==='SELECT'||a.tagName==='INPUT'||a.tagName==='TEXTAREA')a.insertAdjacentElement('afterend',b);else a.appendChild(b)});
  // Settings gets contextual help on every visible section/row, while keeping one clean icon per item.
  const settings=document.getElementById('mixoSettingsOverlay');
  if(settings){
    settings.querySelectorAll('.mixo-settings-section').forEach(sec=>{
-     const h=sec.querySelector('h3'); if(h&&!h.querySelector('.mixo-help-btn')) h.appendChild(button(18,(h.textContent||'Settings')+' tutorial'));
+     const h=sec.querySelector('h3');if(!h||h.querySelector('.mixo-help-btn'))return;const name=(h.textContent||'Settings').trim(),copy={"Account & Profile":'Manage login access and the creator profile information associated with the account.',"Appearance":'Open the appearance tools to change or restore the saved page skin and banner.',"Subscription & Credits":'Review the current plan, available credits, one-time packs, monthly options and billing controls.',"Privacy & Legal":'Open the Privacy Policy and Terms and Conditions that govern MixoLabs use and data processing.',"Support":'Open customer support for account, billing, generation, privacy, safety or intellectual-property questions.'}[name]||'Review and manage this group of MixoLabs settings.';h.appendChild(button(name,copy,contextualTarget(sec)));
    });
    settings.querySelectorAll('.mixo-settings-row').forEach(row=>{
      const label=row.querySelector('span,strong,label');if(!label||label.querySelector('.mixo-help-btn'))return;
-     let scene=18,txt=(label.textContent||'').toLowerCase();
-     if(/profile|creator/.test(txt))scene=0;else if(/appearance|background|skin/.test(txt))scene=2;else if(/plan|credit|subscription/.test(txt))scene=1;
-     label.appendChild(button(scene,(label.textContent||'Setting')+' tutorial'));
+     const name=(label.textContent||'Setting').trim(),txt=name.toLowerCase();let copy='This row shows the current setting and the action available to change or review it.';
+     if(/profile|creator/.test(txt))copy='This shows the current creator profile. Use Manage Profile to change the public creator name, handle, bio and visibility.';else if(/appearance|background|skin/.test(txt))copy='Use Open Appearance to upload, restore or change the page skin and creativity banner.';else if(/plan|credit|subscription/.test(txt))copy='This shows the current plan and credit balance. Open Plans and Credits to enter an exact purchase amount, view the estimated credits or manage billing.';else if(/polic/.test(txt))copy='Open Privacy to review data handling or Terms to review account, billing, generation and refund rules.';else if(/need help/.test(txt))copy='Open Support for guidance and the published customer support contact route.';
+     label.appendChild(button(name,copy,contextualTarget(row)));
    });
  }
  // Advanced Options summary: help is available before users open the section.
- const adv=document.querySelector('.mixo-advanced > summary');if(adv&&!adv.querySelector('.mixo-help-btn'))adv.appendChild(button(7,'Advanced generator options tutorial'));
+ const adv=document.querySelector('.mixo-advanced > summary');if(adv&&!adv.querySelector('.mixo-help-btn'))adv.appendChild(button('Advanced Options','Open this section for reference images and additional generation controls. Review each setting before generating because some choices affect the result or credit cost.','.mixo-advanced'));
  // Persistent contextual-help hint near generator title without cluttering every control with the word Tutorial.
- const genTitle=document.querySelector('.mixo-settings > h2');if(genTitle&&!genTitle.querySelector('.mixo-help-btn'))genTitle.appendChild(button(3,'Generator tutorials'));
+ const genTitle=document.querySelector('.mixo-settings > h2');if(genTitle&&!genTitle.querySelector('.mixo-help-btn'))genTitle.appendChild(button('Generator Settings','Work through these controls to describe the image, select its format and appearance, and review the credit cost before generating.','.mixo-settings'));
 })();
 </script>
 \n<style id="mixo-tutorial-exit-fix-styles">
@@ -1196,60 +1224,56 @@ window.mixoTutorialExit=exitTutorial;
 (()=>{
  function ready(fn){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fn);else fn()}
  ready(()=>{
-  const tutorial=document.getElementById('mixoTutorialOverlay');
-  function launch(scene){
-   if(!tutorial)return;
-   tutorial.classList.remove('hidden');
-   const b=tutorial.querySelector(`[data-narrated-scene="${scene}"]`);
-   if(b){b.click();setTimeout(()=>document.getElementById('mixoWatchPanel')?.scrollIntoView({behavior:'smooth',block:'center'}),80)}
-  }
-  function make(scene,label){
+  let anchorNumber=0;
+  function targetFor(el){if(el.id)return '#'+el.id;const key='v22-'+(++anchorNumber);el.dataset.mixoHelpAnchor=key;return `[data-mixo-help-anchor="${key}"]`}
+  function launch(title,text,target){if(typeof window.mixoTutorialLaunchContext==='function')window.mixoTutorialLaunchContext(title,text,target)}
+  function make(title,text,target){
    const b=document.createElement('button');b.type='button';b.className='mixo-help-btn mixo-overlay-help';b.textContent='?';
-   b.title=label;b.setAttribute('aria-label',label);b.dataset.v9Help=scene;
-   b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();launch(scene)});return b;
+   b.title='Explain '+title;b.setAttribute('aria-label','Explain '+title);
+   b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();launch(title,text,target)});return b;
   }
-  function addAfter(sel,scene,label){
+  function addAfter(sel,title,text){
    const el=document.querySelector(sel);if(!el||document.querySelector(`[data-v9-for="${sel.replace(/[^a-z0-9]/gi,'_')}"]`))return;
-   const b=make(scene,label);b.dataset.v9For=sel.replace(/[^a-z0-9]/gi,'_');el.insertAdjacentElement('afterend',b);
+   const b=make(title,text,targetFor(el));b.dataset.v9For=sel.replace(/[^a-z0-9]/gi,'_');el.insertAdjacentElement('afterend',b);
   }
-  function addToHeading(sel,scene,label){const el=document.querySelector(sel);if(!el||el.querySelector('.mixo-overlay-help'))return;el.appendChild(make(scene,label))}
+  function addToHeading(sel,title,text){const el=document.querySelector(sel);if(!el||el.querySelector('.mixo-overlay-help'))return;el.appendChild(make(title,text,targetFor(el)))}
 
   // Top navigation help is owned by the contextual-help system above so each item has exactly one icon.
 
   // Appearance controls.
-  addToHeading('#skinPanel .skin-head strong',2,'Appearance tutorial');
-  addAfter('#skinUpload',2,'Page skin upload tutorial'); addAfter('#skinReset',2,'Restore appearance tutorial');
-  addAfter('#bannerUpload',2,'Banner appearance tutorial'); addAfter('#bannerReset',2,'Restore banner tutorial');
+  addToHeading('#skinPanel .skin-head strong','Appearance','Change the page background, skin and banner to personalise your workspace.');
+  addAfter('#skinUpload','Upload Page Skin','Choose an image from your device to use as the page background.'); addAfter('#skinReset','Reset Page Skin','Remove the uploaded page skin and restore the standard MixoLabs background.');
+  addAfter('#bannerUpload','Upload Banner','Choose an image from your device for the top banner area.'); addAfter('#bannerReset','Reset Banner','Remove the custom banner and restore the standard banner.');
 
   // Gallery / Published.
-  addToHeading('#mixoGalleryTitle',13,'Gallery tutorial');
-  addAfter('#mixoGalleryCreationsTab',13,'My Creations tutorial'); addAfter('#mixoGallerySavedTab',13,'Saved gallery tutorial');
-  addAfter('#mixoGalleryPublishedTab',15,'Published tutorial'); addAfter('#galleryCreateButton',13,'Gallery tutorial');
+  addToHeading('#mixoGalleryTitle','Gallery','Your Gallery collects creations you deliberately save so you can revisit or remove them.');
+  addAfter('#mixoGalleryCreationsTab','My Creations','View images you have generated and retained in this browser.'); addAfter('#mixoGallerySavedTab','Saved Images','View the images you explicitly saved to your Gallery.');
+  addAfter('#mixoGalleryPublishedTab','Published','View the publishing area and the current publication status of your work.'); addAfter('#galleryCreateButton','Create From Gallery','Close the Gallery and return to the generator to make a new image.');
 
   // Favorites.
-  addToHeading('#mixoFavoritesTitle',14,'Favorites tutorial'); addAfter('#favoritesCreateButton',14,'Favorites tutorial');
+  addToHeading('#mixoFavoritesTitle','Favorites','Favorites are your personally marked images for quick access.'); addAfter('#favoritesCreateButton','Create From Favorites','Close Favorites and return to the generator.');
 
   // Community Chat: title and every interactive chat control.
-  addToHeading('#mixoCommunityTitle',17,'Community Chat tutorial');
-  addAfter('#mixoChatUploadButton',17,'Community image upload tutorial');
-  addAfter('#mixoChatName',17,'Community display name tutorial'); addAfter('#mixoChatMessage',17,'Community message tutorial');
-  addAfter('#mixoChatSend',17,'Community send tutorial');
+  addToHeading('#mixoCommunityTitle','Community Chat','Chat with other MixoLabs creators and share appropriate ideas or images.');
+  addAfter('#mixoChatUploadButton','Attach Community Image','Select an image to accompany your community post.');
+  addAfter('#mixoChatName','Community Display Name','Choose the name that other community members will see.'); addAfter('#mixoChatMessage','Community Message','Write the text of your community message here.');
+  addAfter('#mixoChatSend','Send Community Message','Post your message and any selected image to the community.');
 
   // Account / profile.
-  addToHeading('#mixoAccountTitle',0,'Login and account tutorial'); addAfter('#mixoLoginTab',0,'Login tutorial'); addAfter('#mixoSignupTab',0,'Create account tutorial');
-  addToHeading('#mixoProfileTitle',0,'Creator profile tutorial');
+  addToHeading('#mixoAccountTitle','Account Access','Log in to an existing account or create a secure new account.'); addAfter('#mixoLoginTab','Log In','Enter the email address and password belonging to your existing account.'); addAfter('#mixoSignupTab','Create Account','Register a new account with your display name, email address and secure password.');
+  addToHeading('#mixoProfileTitle','Creator Profile','Review or update the creator details associated with your MixoLabs account.');
 
   // Settings and plans.
-  addToHeading('#mixoSettingsTitle',18,'Settings tutorial');
-  addToHeading('#mixoBillingTitle',1,'Plans and credits tutorial');
-  document.querySelectorAll('[data-open-billing]').forEach((el,i)=>{if(!el.nextElementSibling?.matches('.mixo-overlay-help'))el.insertAdjacentElement('afterend',make(1,'Plans and credits tutorial'))});
+  addToHeading('#mixoSettingsTitle','Settings','Manage your account, appearance, credits, legal information and support.');
+  addToHeading('#mixoBillingTitle','Plans and Credits','Buy a one-time pack or choose a monthly plan. You can use the slider or type an exact pound amount and see the estimated credits immediately.');
+  document.querySelectorAll('[data-open-billing]').forEach(el=>{if(!el.nextElementSibling?.matches('.mixo-overlay-help'))el.insertAdjacentElement('afterend',make('Open Plans and Credits','Open the secure billing area to view your balance and purchase options.',targetFor(el)))});
 
   // Result actions that appear after generation.
-  addAfter('#saveToGalleryBtn',13,'Save to Gallery tutorial'); addAfter('#saveToFavoritesBtn',14,'Add to Favorites tutorial'); addAfter('#generateChosenAnglesBtn',16,'Angle Sheet tutorial');
+  addAfter('#saveToGalleryBtn','Save to Gallery','Save the currently selected image to your Gallery.'); addAfter('#saveToFavoritesBtn','Add to Favorites','Mark the currently selected image as a Favorite.'); addAfter('#generateChosenAnglesBtn','Generate Angle Sheet','Generate the selected front, side, rear, top or bottom views from the Active Masterpiece.');
 
   // Explain what the ? does once inside the tutorial.
   const note=document.querySelector('.mixo-watch-note');
-  if(note&&!document.getElementById('mixoV9HelpNote')){const n=document.createElement('p');n.id='mixoV9HelpNote';n.className='mixo-watch-note';n.textContent='Tip: the ? buttons throughout MixoLabs open the matching tutorial section. Press Start Narration to hear the explanation while the relevant controls are highlighted.';note.insertAdjacentElement('afterend',n)}
+  if(note&&!document.getElementById('mixoV9HelpNote')){const n=document.createElement('p');n.id='mixoV9HelpNote';n.className='mixo-watch-note';n.textContent='Tip: every ? button opens and narrates a specific explanation while highlighting its exact control.';note.insertAdjacentElement('afterend',n)}
  });
 })();
 </script>
