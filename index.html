@@ -296,7 +296,7 @@
  <div class="mixo-watch-volumes"><div class="mixo-watch-field"><label>Voice volume <span id="mixoVoiceVolLabel">100%</span></label><input id="mixoVoiceVolume" type="range" min="0" max="1" step=".05" value="1"></div></div>
  <div class="mixo-watch-stage"><div id="mixoWatchStep" class="mixo-watch-step">Ready to begin</div><h3 id="mixoWatchHeading">Welcome to MixoLabs</h3><p id="mixoWatchCaption" class="mixo-watch-caption">Choose a tutorial below, choose a female or male narrator, then press Start Narration. MixoLabs opens the relevant area, highlights the real controls and narrates what to do.</p><div class="mixo-watch-progress"><span id="mixoWatchProgress"></span></div></div>
  <div class="mixo-watch-controls"><button id="mixoWatchPrev" type="button">← Previous</button><button id="mixoWatchRestart" type="button">↻ Restart</button><span></span><button id="mixoWatchNext" type="button">Next →</button><button id="mixoWatchPlay" class="primary" type="button">▶ Start Narration</button></div>
- <p class="mixo-watch-note">Choose a Female or Male narrator and adjust the voice volume. MixoLabs uses the connected natural narrator service when available: Male uses the creator voice and Female uses its feminine remix. If the service has not been connected yet, the browser voice is used as a temporary fallback. No tutorial action purchases credits or submits passwords.</p>
+ <p class="mixo-watch-note">Choose the authorised creator voice or its natural feminine version and adjust the volume. Until those two voice profiles are connected, MixoLabs uses the best available browser voice as a temporary fallback. No tutorial action purchases credits or submits passwords.</p>
 </div>
 <div class="mixo-tutorial-grid"><button class="mixo-tutorial-chapter" data-tour-start="0"><b>1. Account & Profile</b><small>Log in, create an account and set up your creator identity.</small></button><button class="mixo-tutorial-chapter" data-tour-start="4"><b>2. Plans & Credits</b><small>Subscriptions, reusable credit packs and generation costs.</small></button><button class="mixo-tutorial-chapter" data-tour-start="7"><b>3. Appearance</b><small>Change the full-page skin and Creativity banner background.</small></button><button class="mixo-tutorial-chapter" data-tour-start="10"><b>4. Generator</b><small>Prompt, Random Idea, text, quantity, quality, ratio, background, references, category, style, theme, colours and resin calculator.</small></button><button class="mixo-tutorial-chapter" data-tour-start="25"><b>5. Results & Angle Sheets</b><small>Select, download, fullscreen, save, favourite and create angle sheets.</small></button><button class="mixo-tutorial-chapter" data-tour-start="31"><b>6. Gallery & Publishing</b><small>Open, remove and publish saved creations.</small></button><button class="mixo-tutorial-chapter" data-tour-start="35"><b>7. Favorites</b><small>Open and remove favourite creations.</small></button><button class="mixo-tutorial-chapter" data-tour-start="37"><b>8. Community Chat</b><small>Choose a display name, send messages and upload images.</small></button></div><button id="mixoTutorialStart" class="mixo-tour-start" type="button">▶ Start Complete MixoLabs Tour</button><p class="mixo-tutorial-intro" style="margin-bottom:0">The tour demonstrates controls without making purchases or generating images automatically. Features that are still in testing mode are clearly identified.</p></div></div>
 <div id="mixoTourCoach" class="hidden"><div id="mixoTourCount" class="mixo-tour-count"></div><div id="mixoTourTitle" class="mixo-tour-title"></div><div id="mixoTourText" class="mixo-tour-text"></div><div id="mixoTourDemo" class="mixo-tour-demo"></div><div class="mixo-tour-actions"><button id="mixoTourBack" type="button">Back</button><button id="mixoTourExit" type="button">Exit</button><button id="mixoTourNext" class="next" type="button">Next</button></div></div>
@@ -1205,12 +1205,7 @@ if(voiceSel)voiceSel.onchange=()=>{if(playing)speak()};
   }
   function addToHeading(sel,scene,label){const el=document.querySelector(sel);if(!el||el.querySelector('.mixo-overlay-help'))return;el.appendChild(make(scene,label))}
 
-  // Main navigation: every destination has direct contextual tutorial access.
-  const generatorNav=document.querySelector('.mixo-nav .active');
-  if(generatorNav&&!generatorNav.nextElementSibling?.matches('[data-v9-help]'))generatorNav.insertAdjacentElement('afterend',make(3,'Generator tutorial'));
-  addAfter('#galleryButton',13,'Gallery tutorial'); addAfter('#favoritesButton',14,'Favorites tutorial');
-  addAfter('#settingsButton',18,'Settings tutorial'); addAfter('#accountButton',0,'Account and login tutorial'); addAfter('#skinButton',2,'Appearance tutorial');
-  addAfter('#mixoCommunityButton',17,'Community Chat tutorial');
+  // Top navigation help is owned by the contextual-help system above so each item has exactly one icon.
 
   // Appearance controls.
   addToHeading('#skinPanel .skin-head strong',2,'Appearance tutorial');
@@ -1281,7 +1276,7 @@ if(voiceSel)voiceSel.onchange=()=>{if(playing)speak()};
  async function fastNatural(text,kind,onDone){
    if(narrationUnavailable){browserSpeak(text,kind,onDone);return}
    stopNow(); const c=new AbortController(); activeController=c;
-   const timer=setTimeout(()=>c.abort(),650);
+   const timer=setTimeout(()=>c.abort(),10000);
    try{
      const r=await fetch('/api/narration',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:kind}),signal:c.signal});
      clearTimeout(timer); activeController=null;
@@ -1298,6 +1293,7 @@ if(voiceSel)voiceSel.onchange=()=>{if(playing)speak()};
  document.addEventListener('click',e=>{if(e.target.closest('.mixo-help-btn,.mixo-overlay-help,[data-narrated-scene],#mixoWatchNext,#mixoWatchPrev,#mixoWatchRestart,#mixoWatchPlay'))document.documentElement.style.scrollBehavior='auto'},true);
  // Warm browser voices so the first narration starts promptly.
  try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices()}catch(_){}
+ const narrator=$('mixoVoiceSelect');if(narrator){narrator.innerHTML='<option value="female">Female narrator — natural feminine voice</option><option value="male">Male narrator — authorised creator voice</option>';narrator.value='female'}
  // Mark natural service unavailable quickly on this session if it is not connected yet.
  fetch('/api/narration',{method:'OPTIONS'}).then(r=>{if(r.status===404)narrationUnavailable=true}).catch(()=>{});
  window.mixoFastNarration={speak:fastNatural,stop:stopNow};

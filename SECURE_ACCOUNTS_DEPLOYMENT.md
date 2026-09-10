@@ -10,7 +10,7 @@ This build replaces browser-only login with real accounts, PostgreSQL sessions, 
 4. Set `NODE_ENV` to `production`.
 5. Set `APP_ORIGIN` to the exact public origin, with no trailing slash, for example `https://mixolab.art`.
 6. Keep `GEMINI_API_KEY` and `MESHY_API_KEY` in Render environment variables only.
-7. Set `STARTER_CREDITS` to `0` until the free-trial policy is approved.
+7. New accounts always start at 0 credits. Remove any obsolete `STARTER_CREDITS` environment variable from Render.
 8. Deploy, then confirm `/api/health` reports `ok: true` and `database: true`.
 
 The database schema is created automatically when the service starts. A failed database connection prevents the server from accepting traffic.
@@ -28,16 +28,9 @@ The database schema is created automatically when the service starts. A failed d
 
 ## Stripe test-mode setup
 
-Keep Stripe in test mode. Create six GBP prices and add their IDs to Render:
+Keep Stripe in test mode. MixoLabs creates custom GBP prices securely at checkout, so fixed Stripe Price IDs are not required. Customers can choose £1.99–£1,000 as either a repeatable one-time pack or a monthly subscription. Using the current 6p-per-credit cost assumption, one-time allowances target approximately a 28% contribution margin and monthly allowances target approximately 22% so subscribers receive more credits. These figures exclude hosting, tax, disputes and support costs.
 
-- `STRIPE_PRICE_CREATOR_MONTHLY`: £9.99 monthly, 100 credits
-- `STRIPE_PRICE_PRO_MONTHLY`: £19.99 monthly, 230 credits
-- `STRIPE_PRICE_STUDIO_MONTHLY`: £34.99 monthly, 450 credits
-- `STRIPE_PRICE_PACK_50`: £5.99 one time
-- `STRIPE_PRICE_PACK_110`: £11.99 one time
-- `STRIPE_PRICE_PACK_250`: £24.99 one time
-
-Also add `STRIPE_SECRET_KEY` using the test secret key. In Stripe Workbench, create a webhook endpoint at `https://stylemaster-ai-pro.onrender.com/api/stripe/webhook`, subscribe to `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `invoice.paid`, `customer.subscription.updated`, and `customer.subscription.deleted`, then add its test signing secret to Render as `STRIPE_WEBHOOK_SECRET`.
+Add `STRIPE_SECRET_KEY` using the test secret key. In Stripe Workbench, create a webhook endpoint at `https://stylemaster-ai-pro.onrender.com/api/stripe/webhook`, subscribe to `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `invoice.paid`, `customer.subscription.updated`, and `customer.subscription.deleted`, then add its test signing secret to Render as `STRIPE_WEBHOOK_SECRET`.
 
 Never paste keys into source files, GitHub, screenshots, or chat. Use Render's secret environment-value fields.
 
