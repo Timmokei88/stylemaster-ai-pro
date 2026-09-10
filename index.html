@@ -252,7 +252,7 @@
   </div>
   <label class="mixo-billing-note" style="display:flex;gap:9px;align-items:flex-start"><input id="mixoDigitalConsent" type="checkbox" style="margin-top:3px"><span>I request immediate supply of the digital service. I understand that credits used for a successfully delivered AI generation are non-refundable for change of mind, without affecting my statutory rights.</span></label>
   <div id="mixoBillingStatus" class="mixo-billing-status" aria-live="polite"></div>
-  <div class="mixo-billing-note mixo-billing-note-row"><span><b id="mixoBillingNotice">Stripe test mode:</b> use Stripe's test card details only. Test payments do not move real money.</span><button id="mixoManageBilling" type="button">Manage Billing</button></div>
+  <div class="mixo-billing-note mixo-billing-note-row"><span id="mixoBillingNotice">Sign in to view your secure Stripe billing status.</span><button id="mixoManageBilling" type="button">Manage Billing</button></div>
  </div>
 </div>
 
@@ -731,7 +731,7 @@ const creditsOut=document.getElementById("mixoPreviewCredits");
 const fill=document.getElementById("mixoCreditFill");
 const settingsSummary=document.getElementById("settingsPlanSummary");
 const mode=document.getElementById("mixoBillingMode"),notice=document.getElementById("mixoBillingNotice");
-function paint(user,enabled,testMode){const plan=user?.subscriptionPlan||"none",credits=Number(user?.credits||0);document.querySelectorAll("[data-plan-card]").forEach(c=>c.classList.toggle("active",c.dataset.planCard===plan));planOut.textContent=plan==="none"?"None":plan[0].toUpperCase()+plan.slice(1);creditsOut.textContent=credits+" available";fill.style.width=Math.min(100,credits/4.5)+"%";mode.textContent=!enabled?"Not configured":testMode?"TEST MODE":"Live";notice.textContent=testMode?"Stripe test mode:":"Secure Stripe billing:";if(settingsSummary)settingsSummary.textContent=`Current plan: ${planOut.textContent} • ${credits} credits`}
+function paint(user,enabled,testMode){const plan=user?.subscriptionPlan||"none",credits=Number(user?.credits||0);document.querySelectorAll("[data-plan-card]").forEach(c=>c.classList.toggle("active",c.dataset.planCard===plan));planOut.textContent=plan==="none"?"None":plan[0].toUpperCase()+plan.slice(1);creditsOut.textContent=credits+" available";fill.style.width=Math.min(100,credits/4.5)+"%";mode.textContent=!enabled?"Not configured":testMode?"TEST MODE":"Live";notice.textContent=!enabled?"Sign in to view your secure Stripe billing status.":testMode?"Stripe test mode: use Stripe's test card details only. Test payments do not move real money.":"Secure Stripe billing is live. Payments made through Checkout are real charges.";if(settingsSummary)settingsSummary.textContent=`Current plan: ${planOut.textContent} • ${credits} credits`}
 async function refresh(){try{const sync=await fetch("/api/billing/reconcile-refunds",{method:"POST"});if(sync.status===401){paint(null,false,true);status.textContent="Log in before choosing a plan or buying credits.";return}const r=await fetch("/api/billing/status"),d=await r.json();if(!r.ok)throw Error(d.error||"Billing status could not be loaded.");paint(d.user,d.enabled,d.testMode)}catch(_){status.textContent="Billing status could not be loaded."}}
 function show(){status.textContent="";overlay.classList.remove("hidden");refresh()}
 function hide(){overlay.classList.add("hidden")}
