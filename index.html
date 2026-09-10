@@ -37,6 +37,8 @@
 .mixo-legal-note{padding:12px 14px;border:1px solid rgba(255,196,74,.3);border-radius:10px;background:rgba(112,75,8,.15);color:#f2dca4;margin-bottom:16px}
 .mixo-support-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.mixo-support-box{border:1px solid rgba(74,143,217,.25);border-radius:12px;background:#061127;padding:14px}
 .mixo-support-box b{color:#fff;display:block;margin-bottom:4px}
+.mixo-faq-search{width:100%;box-sizing:border-box;margin:0 0 14px;padding:12px 14px;border:1px solid rgba(76,190,255,.45);border-radius:10px;background:#020b1c;color:#fff;font:inherit}.mixo-faq-search:focus{outline:2px solid rgba(66,210,255,.35)}
+.mixo-faq-group{margin:20px 0 8px;color:#66ddff!important}.mixo-faq-item{margin:8px 0;border:1px solid rgba(74,143,217,.28);border-radius:10px;background:#061127;overflow:hidden}.mixo-faq-item summary{cursor:pointer;padding:12px 14px;color:#fff;font-weight:800;list-style-position:inside}.mixo-faq-item div{padding:0 14px 13px;color:#cbd6e8}.mixo-faq-empty{padding:18px;text-align:center;color:#9cabc2}
 @media(max-width:650px){.mixo-legal-overlay{padding:8px}.mixo-legal-card{padding:18px}.mixo-support-grid{grid-template-columns:1fr}}
 </style>
 
@@ -194,6 +196,7 @@
 <footer class="mixo-footer"><span>© 2026 MixoLabs. All rights reserved.</span><div class="links">
 <button type="button" data-legal-open="privacy">Privacy</button>
 <button type="button" data-legal-open="terms">Terms</button>
+<button type="button" data-legal-open="faq">FAQ</button>
 <button type="button" data-legal-open="support">Support</button>
 </div><div class="social" aria-label="Social links"><span>◉</span><span>▶</span><span>◎</span><span>𝕏</span><span>♪</span></div></footer></div>
 
@@ -220,7 +223,7 @@
   <div class="mixo-settings-section"><h3>Appearance</h3><p>Your MixoLabs skin controls are already available from Appearance in the main navigation.</p><div class="mixo-settings-row"><span>Background &amp; skin</span><button id="settingsAppearanceButton" class="mixo-settings-action" type="button">Open Appearance</button></div></div>
   <div class="mixo-settings-section"><h3>Subscription &amp; Credits</h3><p>View plans, buy credit packs, or manage billing securely through Stripe.</p><div class="mixo-settings-row"><span id="settingsPlanSummary">Current plan: None</span><button class="mixo-settings-action" data-open-billing type="button">View Plans &amp; Credits</button></div></div>
   <div class="mixo-settings-section"><h3>Privacy &amp; Legal</h3><p>Review the MixoLabs legal information at any time.</p><div class="mixo-settings-row"><span>Policies</span><div style="display:flex;gap:6px"><button class="mixo-settings-action" type="button" data-settings-legal="privacy">Privacy</button><button class="mixo-settings-action" type="button" data-settings-legal="terms">Terms</button></div></div></div>
-  <div class="mixo-settings-section"><h3>Support</h3><p>Get help with product, billing, account, privacy and safety questions.</p><div class="mixo-settings-row"><span>Need help?</span><button class="mixo-settings-action" type="button" data-settings-legal="support">Open Support</button></div></div>
+  <div class="mixo-settings-section"><h3>Help &amp; Support</h3><p>Find instant answers or contact MixoLabs about product, billing, account, privacy and safety questions.</p><div class="mixo-settings-row"><span>How can we help?</span><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="mixo-settings-action" type="button" data-settings-legal="faq">Open FAQ</button><button class="mixo-settings-action" type="button" data-settings-legal="support">Contact Support</button></div></div></div>
  </div>
 </div>
 
@@ -228,7 +231,7 @@
 <div id="mixoBillingOverlay" class="mixo-billing-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="mixoBillingTitle">
  <div class="mixo-billing-card">
   <div class="mixo-billing-head">
-  <div><h2 id="mixoBillingTitle">Plans &amp; Credits</h2><p>Secure Stripe Checkout. Test mode is used until MixoLabs is ready for paid launch.</p></div>
+  <div><h2 id="mixoBillingTitle">Plans &amp; Credits</h2><p>Secure Stripe Checkout for one-time credit packs and flexible monthly plans.</p></div>
    <button id="mixoBillingClose" class="mixo-billing-close" type="button" aria-label="Close">&times;</button>
   </div>
   <div class="mixo-billing-summary">
@@ -553,6 +556,42 @@ terms:`<div class="mixo-legal-note"><strong>Terms &amp; Conditions</strong><br>L
 <h3>11. Cancellations and refunds</h3><p>Because each AI generation is created on demand and incurs processing costs, credits used for a successfully delivered generation are non-refundable for change of mind, dissatisfaction with an artistic result, or failure of an output to match subjective expectations. Unused credit purchases and subscription cancellations are handled in accordance with the cancellation information shown at checkout and applicable law. Subscription cancellation prevents future renewal but does not normally refund a completed billing period. If MixoLabs charges credits for a generation that fails to deliver, the affected credits will normally be restored. If digital content or the service is faulty, unavailable, or not as described, contact Support so that MixoLabs can investigate and provide any remedy required by law. Nothing in these terms limits mandatory statutory rights.</p>
 <h3>12. Governing law</h3><p>These terms are governed by the laws of England and Wales. Consumers retain any mandatory protections and rights to bring proceedings available in the part of the United Kingdom or other country where they live.</p>
 <h3>13. Contact</h3><p>Questions about these terms can be sent to <a href="mailto:{{SUPPORT_EMAIL}}">{{SUPPORT_EMAIL}}</a>. Operator: {{LEGAL_NAME}}, {{LEGAL_ADDRESS}}.</p>`,
+faq:`<input id="mixoFaqSearch" class="mixo-faq-search" type="search" placeholder="Search questions, for example: credits, refund or download" aria-label="Search frequently asked questions"><div id="mixoFaqList">
+<h3 class="mixo-faq-group">Getting started</h3>
+<details class="mixo-faq-item"><summary>What is MixoLabs?</summary><div>MixoLabs is an AI image-generation workspace for creating original visual concepts from a written prompt, optional reference images and creative controls.</div></details>
+<details class="mixo-faq-item"><summary>How do I create an account?</summary><div>Select Log In in the top navigation, choose Create Account, enter the requested details and submit the form. Keep your password private.</div></details>
+<details class="mixo-faq-item"><summary>How do I generate my first image?</summary><div>Enter a clear description in Prompt / Idea, choose the number of variations, quality and aspect ratio, review the displayed credit cost, then select Generate.</div></details>
+<details class="mixo-faq-item"><summary>What should I write in a prompt?</summary><div>Describe the subject, setting, composition, lighting, mood and important materials or colours. Put the most important requirements first. AI results vary, so refining the prompt may improve later generations.</div></details>
+<details class="mixo-faq-item"><summary>What does Random Idea do?</summary><div>Random Idea adds a creative starting point to the prompt. You can edit everything it adds before generating.</div></details>
+<h3 class="mixo-faq-group">Generation controls</h3>
+<details class="mixo-faq-item"><summary>Can I generate more than one image?</summary><div>Yes. Choose between one and six variations. Every generated image uses the number of credits displayed before you press Generate.</div></details>
+<details class="mixo-faq-item"><summary>What are 1K, 2K and 4K quality?</summary><div>They are output-quality choices. Higher quality costs more credits because it requires more processing. The exact cost appears in Credit Cost Preview before generation.</div></details>
+<details class="mixo-faq-item"><summary>What does aspect ratio change?</summary><div>Aspect ratio changes the shape of the image. For example, 1:1 is square, 9:16 is portrait and 16:9 is landscape.</div></details>
+<details class="mixo-faq-item"><summary>How do reference images work?</summary><div>Open Advanced Options and select Add Photos. Reference images guide the generation but do not guarantee an identical result. Upload only material you have permission to use.</div></details>
+<details class="mixo-faq-item"><summary>How do category, style and theme work?</summary><div>These optional controls add structured guidance to your prompt. You can use any combination or leave them blank.</div></details>
+<details class="mixo-faq-item"><summary>How do colours and shades work?</summary><div>Select a colour family and then a shade. MixoLabs adds that colour choice to the generation instructions; lighting and surrounding colours can still affect its appearance in the final image.</div></details>
+<details class="mixo-faq-item"><summary>What is an angle sheet?</summary><div>After selecting a generated image, choose the required views and generate an angle sheet. It creates several views together as one new image and uses the credit cost shown on the button.</div></details>
+<h3 class="mixo-faq-group">Results and files</h3>
+<details class="mixo-faq-item"><summary>How do I see a generated image in detail?</summary><div>Select the image you want from the results. MixoLabs opens the larger Active Masterpiece view with download, fullscreen, gallery, favourite and angle-sheet controls.</div></details>
+<details class="mixo-faq-item"><summary>How do I download an image?</summary><div>Open the image in Active Masterpiece and select Download Image. Your browser will save the available image file to its normal download location.</div></details>
+<details class="mixo-faq-item"><summary>What is the difference between Gallery and Favorites?</summary><div>Gallery is for creations you choose to save. Favorites is a quick collection of images you especially like. Follow any storage notice shown in those areas.</div></details>
+<details class="mixo-faq-item"><summary>Are AI images guaranteed to be unique or suitable for commercial use?</summary><div>No. AI outputs can resemble other works and legal protection varies. You are responsible for reviewing an image, checking relevant rights and deciding whether it is suitable before publishing or commercial use.</div></details>
+<h3 class="mixo-faq-group">Credits and payments</h3>
+<details class="mixo-faq-item"><summary>What is a credit?</summary><div>A credit is used to request image-generation processing. Different quality levels and features use different amounts. Credits have no cash value and cannot be transferred.</div></details>
+<details class="mixo-faq-item"><summary>When are credits deducted?</summary><div>The displayed amount is deducted when you submit a generation. If MixoLabs detects that the generation failed, those generation credits are normally restored automatically.</div></details>
+<details class="mixo-faq-item"><summary>How do I buy credits?</summary><div>Open Plans &amp; Credits, choose One-time Pack or Monthly, enter or select an amount, review the estimated credits, accept the immediate digital-supply acknowledgement and continue to Stripe Checkout.</div></details>
+<details class="mixo-faq-item"><summary>What is the difference between a one-time pack and a monthly plan?</summary><div>A one-time pack is a single purchase. A monthly plan renews automatically at the selected interval until cancelled and provides the allowance shown before purchase.</div></details>
+<details class="mixo-faq-item"><summary>How do I cancel a monthly plan?</summary><div>Open Plans &amp; Credits and select Manage Billing. In Stripe's secure billing portal, choose the subscription and follow the cancellation instructions. Cancellation normally stops future renewals rather than refunding the current paid period.</div></details>
+<details class="mixo-faq-item"><summary>Can I receive a refund after using credits?</summary><div>Successfully delivered generations are not normally refunded merely because you changed your mind or disliked an artistic result. MixoLabs reviews duplicate charges, missing credits, faulty service and other circumstances where a remedy may be required. Mandatory statutory rights are unaffected.</div></details>
+<details class="mixo-faq-item"><summary>What happens to credits if MixoLabs issues a refund?</summary><div>A refund issued through Stripe removes the corresponding unused purchased credits. Credits already consumed cannot make the balance negative, and credits from a later unrelated purchase are not removed to recover previously used credits.</div></details>
+<details class="mixo-faq-item"><summary>Why has a card refund not arrived yet?</summary><div>Stripe and the card issuer require processing time after a refund is submitted. Check the payment in Stripe's receipt or contact Support with the transaction details if it remains outstanding.</div></details>
+<h3 class="mixo-faq-group">Accounts, privacy and support</h3>
+<details class="mixo-faq-item"><summary>How is my payment information handled?</summary><div>Payment entry and processing are handled through Stripe Checkout. Never send MixoLabs your password, complete card number, security code, API key or webhook secret.</div></details>
+<details class="mixo-faq-item"><summary>Are my prompts and reference images public?</summary><div>They should remain private unless you deliberately use a publishing or sharing feature. Review the Privacy Policy for information about processing and service providers.</div></details>
+<details class="mixo-faq-item"><summary>What content am I not allowed to create?</summary><div>You must not use MixoLabs unlawfully, infringe another person's rights, impersonate people deceptively, distribute harmful material or bypass security and billing controls. Review the Terms for the complete conditions.</div></details>
+<details class="mixo-faq-item"><summary>What should I do if I cannot sign in?</summary><div>Check the email address and password carefully and try again. If access still fails, contact Support from the email associated with the account. Never email your password.</div></details>
+<details class="mixo-faq-item"><summary>How do I contact Support?</summary><div>Email <a href="mailto:{{SUPPORT_EMAIL}}">{{SUPPORT_EMAIL}}</a> with your account email, the approximate date and a clear description. Include a transaction or generation reference if available, but never include passwords or complete payment-card information.</div></details>
+</div><p id="mixoFaqEmpty" class="mixo-faq-empty hidden">No matching questions found. Try a shorter search or contact Support.</p>`,
 support:`<p>For account access, billing, generation failures, privacy requests, safety reports or intellectual-property concerns, email <a href="mailto:{{SUPPORT_EMAIL}}">{{SUPPORT_EMAIL}}</a>. Include your account email and relevant transaction or generation details, but never send passwords or complete payment-card information.</p>
 <div class="mixo-support-grid">
 <div class="mixo-support-box"><b>Image generation</b><span>Help with prompts, reference images, output quality, variations and angle sheets.</span></div>
@@ -563,7 +602,7 @@ support:`<p>For account access, billing, generation failures, privacy requests, 
 <h3>Refund and failed-generation requests</h3><p>Explain what happened and provide the approximate date, your account email and any transaction or generation reference available. Do not resend sensitive source images unless Support specifically requests them through an approved route.</p>
 <h3>Business contact</h3><p>{{LEGAL_NAME}}, {{LEGAL_ADDRESS}}.<br>Email: <a href="mailto:{{SUPPORT_EMAIL}}">{{SUPPORT_EMAIL}}</a>.</p>`
 };
-function openPage(which){title.textContent=which==="privacy"?"Privacy Policy":which==="terms"?"Terms & Conditions":"MixoLabs Support";body.innerHTML=pages[which]||"";overlay.classList.remove("hidden");body.parentElement.scrollTop=0}
+function openPage(which){title.textContent=which==="privacy"?"Privacy Policy":which==="terms"?"Terms & Conditions":which==="faq"?"Frequently Asked Questions":"MixoLabs Support";body.innerHTML=pages[which]||"";overlay.classList.remove("hidden");body.parentElement.scrollTop=0;if(which==="faq"){const search=document.getElementById("mixoFaqSearch"),items=[...body.querySelectorAll(".mixo-faq-item")],groups=[...body.querySelectorAll(".mixo-faq-group")],empty=document.getElementById("mixoFaqEmpty");search?.addEventListener("input",()=>{const query=search.value.trim().toLowerCase();items.forEach(item=>item.classList.toggle("hidden",!!query&&!item.textContent.toLowerCase().includes(query)));groups.forEach(group=>{let next=group.nextElementSibling,visible=false;while(next&&!next.classList.contains("mixo-faq-group")){if(next.classList.contains("mixo-faq-item")&&!next.classList.contains("hidden"))visible=true;next=next.nextElementSibling}group.classList.toggle("hidden",!visible)});empty?.classList.toggle("hidden",items.some(item=>!item.classList.contains("hidden")))})}}
 document.querySelectorAll("[data-legal-open]").forEach(b=>b.addEventListener("click",()=>openPage(b.dataset.legalOpen)));
 close.addEventListener("click",()=>overlay.classList.add("hidden"));
 overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.classList.add("hidden")});
