@@ -206,14 +206,14 @@
 <div id="mixoFavoritesOverlay" class="mixo-favorites-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="mixoFavoritesTitle">
  <div class="mixo-favorites-card">
   <div class="mixo-favorites-head"><div><h2 id="mixoFavoritesTitle">My Favorites</h2><p style="margin:4px 0 0;color:#9facc7;font-size:11px">Keep the MixoLabs creations you love close at hand.</p></div><button id="mixoFavoritesClose" class="mixo-favorites-close" type="button" aria-label="Close">&times;</button></div>
-  <div id="mixoFavoritesLibrary" class="mixo-library-grid"></div><button id="favoritesCreateButton" class="mixo-favorites-action" type="button">Create an Image</button><p style="margin:10px 0 0;color:#74839f;font-size:10px">Testing mode: favorites are saved only in this browser. Account cloud storage will replace this before paid launch.</p>
+  <div id="mixoFavoritesLibrary" class="mixo-library-grid"></div><button id="favoritesCreateButton" class="mixo-favorites-action" type="button">Create an Image</button><p style="margin:10px 0 0;color:#74839f;font-size:10px">Favourites are stored securely with your MixoLabs account and are available when you sign in on another supported device.</p>
  </div>
 </div>
 <div id="mixoGalleryOverlay" class="mixo-gallery-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="mixoGalleryTitle">
  <div class="mixo-gallery-card">
   <div class="mixo-gallery-head"><div><h2 id="mixoGalleryTitle">My Gallery</h2><p style="margin:4px 0 0;color:#9facc7;font-size:11px">Your MixoLabs creations will live here.</p></div><button id="mixoGalleryClose" class="mixo-gallery-close" type="button" aria-label="Close">&times;</button></div>
   <div class="mixo-gallery-tabs"><button id="mixoGalleryCreationsTab" class="active" type="button">My Creations</button><button id="mixoGallerySavedTab" type="button">Saved</button><button id="mixoGalleryPublishedTab" type="button">Published</button></div>
-  <div id="mixoGalleryLibrary" class="mixo-library-grid"></div><button id="galleryCreateButton" class="mixo-gallery-action" type="button">Create an Image</button><p style="margin:10px 0 0;color:#74839f;font-size:10px">Testing mode: saved only in this browser. Account cloud storage will replace this before paid launch.</p>
+  <div id="mixoGalleryLibrary" class="mixo-library-grid"></div><button id="galleryCreateButton" class="mixo-gallery-action" type="button">Create an Image</button><p style="margin:10px 0 0;color:#74839f;font-size:10px">Gallery images are stored securely with your MixoLabs account and are available when you sign in on another supported device.</p>
  </div>
 </div>
 <div id="mixoSettingsOverlay" class="mixo-settings-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="mixoSettingsTitle">
@@ -457,20 +457,15 @@ $("backBtn").onclick=()=>{$("activeArea").classList.add("hidden");$("angleArea")
 $("downloadBtn").onclick=()=>activeSelectedImage&&download(activeSelectedImage,"mixolabs-masterpiece.png");
 function download(url,name){const a=document.createElement("a");a.href=url;a.download=name;a.click();}
 
-// Local testing library. Browser-only until secure account storage is connected.
 const saveImageStatus=$("saveImageStatus");
-const MIXO_GALLERY_KEY="mixolabs.localGallery.v1", MIXO_FAVORITES_KEY="mixolabs.localFavorites.v1";
-function readLocalLibrary(key){try{return JSON.parse(localStorage.getItem(key)||"[]")}catch(_){return[]}}
-function saveLocalImage(kind){
+async function saveAccountImage(kind){
   if(!activeSelectedImage)return;
-  const key=kind==="gallery"?MIXO_GALLERY_KEY:MIXO_FAVORITES_KEY, items=readLocalLibrary(key);
-  if(items.some(x=>x.url===activeSelectedImage)){saveImageStatus.textContent=kind==="gallery"?"Already saved to My Gallery on this browser.":"Already in My Favorites on this browser.";return}
-  items.unshift({id:Date.now()+"-"+Math.random().toString(36).slice(2),url:activeSelectedImage,ts:Date.now()});
-  try{localStorage.setItem(key,JSON.stringify(items.slice(0,12)));saveImageStatus.textContent=kind==="gallery"?"✓ Saved to My Gallery on this browser.":"♥ Added to My Favorites on this browser.";window.dispatchEvent(new Event("mixo:library-changed"))}
-  catch(_){saveImageStatus.textContent="Browser storage is full. Remove an older saved image and try again."}
+  if(!String(activeSelectedImage).startsWith("data:image/")){saveImageStatus.textContent="This image cannot be copied into account storage.";return}
+  saveImageStatus.textContent="Saving securely to your account…";
+  try{const r=await fetch("/api/library/images",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({kind,imageData:activeSelectedImage,prompt:$("prompt")?.value||""})}),d=await r.json();if(!r.ok)throw Error(d.error||"The image could not be saved.");saveImageStatus.textContent=d.alreadySaved?(kind==="gallery"?"Already saved to My Gallery.":"Already in My Favourites."):(kind==="gallery"?"✓ Saved permanently to My Gallery.":"♥ Added permanently to My Favourites.");window.dispatchEvent(new Event("mixo:library-changed"))}catch(e){saveImageStatus.textContent=e.message}
 }
-$("saveToGalleryBtn").onclick=()=>saveLocalImage("gallery");
-$("saveToFavoritesBtn").onclick=()=>saveLocalImage("favorites");
+$("saveToGalleryBtn").onclick=()=>saveAccountImage("gallery");
+$("saveToFavoritesBtn").onclick=()=>saveAccountImage("favorites");
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
 
 function selectedAngles(){return [...document.querySelectorAll(".pre-angle-choice:checked")].map(x=>x.value);}
@@ -700,10 +695,10 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.classList.
 
 <script id="mixo-gallery-foundation-system">
 (()=>{
-const overlay=document.getElementById("mixoGalleryOverlay"),open=document.getElementById("galleryButton"),close=document.getElementById("mixoGalleryClose"),create=document.getElementById("galleryCreateButton"),host=document.getElementById("mixoGalleryLibrary"),key="mixolabs.localGallery.v1";
+const overlay=document.getElementById("mixoGalleryOverlay"),open=document.getElementById("galleryButton"),close=document.getElementById("mixoGalleryClose"),create=document.getElementById("galleryCreateButton"),host=document.getElementById("mixoGalleryLibrary");
 if(!overlay||!open)return;
-const read=()=>{try{return JSON.parse(localStorage.getItem(key)||"[]")}catch(_){return[]}};
-function render(){const items=read();if(!host)return;if(!items.length){host.innerHTML='<div class="mixo-library-empty-note">No saved creations yet.<br>Choose an image and press <b>Save to Gallery</b>.</div>';return}host.innerHTML=items.map(x=>`<div class="mixo-library-item" data-id="${x.id}"><img src="${x.url}" alt="Saved MixoLabs creation"><div class="mixo-library-actions"><button data-open="${x.id}" type="button">Open</button><button data-remove="${x.id}" type="button">Remove</button></div></div>`).join("");host.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{const x=read().find(i=>i.id===b.dataset.open);if(x&&typeof selectImage==="function"){hide();selectImage(x.url)}});host.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{localStorage.setItem(key,JSON.stringify(read().filter(i=>i.id!==b.dataset.remove)));render()})}
+let items=[];
+async function render(){if(!host)return;host.innerHTML='<div class="mixo-library-empty-note">Loading your Gallery…</div>';try{const r=await fetch("/api/library/images?kind=gallery"),d=await r.json();if(!r.ok)throw Error(d.error||"Gallery could not be loaded.");items=d.images||[];if(!items.length){host.innerHTML='<div class="mixo-library-empty-note">No saved creations yet.<br>Choose an image and press <b>Save to Gallery</b>.</div>';return}host.innerHTML=items.map(x=>`<div class="mixo-library-item" data-id="${x.id}"><img src="${x.url}" alt="Saved MixoLabs creation"><div class="mixo-library-actions"><button data-open="${x.id}" type="button">Open</button><button data-remove="${x.id}" type="button">Remove</button></div></div>`).join("");host.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{const x=items.find(i=>i.id===b.dataset.open);if(x&&typeof selectImage==="function"){hide();selectImage(x.url)}});host.querySelectorAll("[data-remove]").forEach(b=>b.onclick=async()=>{if(!confirm("Remove this image from your Gallery?"))return;const q=await fetch(`/api/library/images/${encodeURIComponent(b.dataset.remove)}?kind=gallery`,{method:"DELETE"});if(!q.ok){const e=await q.json().catch(()=>({}));alert(e.error||"The image could not be removed.");return}render()})}catch(e){items=[];host.innerHTML=`<div class="mixo-library-empty-note">${String(e.message||e)}</div>`}}
 const hide=()=>overlay.classList.add("hidden");
 open.addEventListener("click",()=>{render();overlay.classList.remove("hidden")});close.addEventListener("click",hide);overlay.addEventListener("click",e=>{if(e.target===overlay)hide()});create?.addEventListener("click",()=>{hide();document.querySelector(".mixo-studio")?.scrollTo({top:0,behavior:"smooth"});document.getElementById("prompt")?.focus()});window.addEventListener("mixo:library-changed",render);document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.classList.contains("hidden"))hide()});
 })();
@@ -712,10 +707,10 @@ open.addEventListener("click",()=>{render();overlay.classList.remove("hidden")})
 
 <script id="mixo-favorites-foundation-system">
 (()=>{
-const overlay=document.getElementById("mixoFavoritesOverlay"),open=document.getElementById("favoritesButton"),close=document.getElementById("mixoFavoritesClose"),create=document.getElementById("favoritesCreateButton"),host=document.getElementById("mixoFavoritesLibrary"),key="mixolabs.localFavorites.v1";
+const overlay=document.getElementById("mixoFavoritesOverlay"),open=document.getElementById("favoritesButton"),close=document.getElementById("mixoFavoritesClose"),create=document.getElementById("favoritesCreateButton"),host=document.getElementById("mixoFavoritesLibrary");
 if(!overlay||!open)return;
-const read=()=>{try{return JSON.parse(localStorage.getItem(key)||"[]")}catch(_){return[]}};
-function render(){const items=read();if(!host)return;if(!items.length){host.innerHTML='<div class="mixo-library-empty-note">No favorites yet.<br>Choose an image and press <b>Add to Favorites</b>.</div>';return}host.innerHTML=items.map(x=>`<div class="mixo-library-item" data-id="${x.id}"><img src="${x.url}" alt="Favorite MixoLabs creation"><div class="mixo-library-actions"><button data-open="${x.id}" type="button">Open</button><button data-remove="${x.id}" type="button">Remove</button></div></div>`).join("");host.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{const x=read().find(i=>i.id===b.dataset.open);if(x&&typeof selectImage==="function"){hide();selectImage(x.url)}});host.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{localStorage.setItem(key,JSON.stringify(read().filter(i=>i.id!==b.dataset.remove)));render()})}
+let items=[];
+async function render(){if(!host)return;host.innerHTML='<div class="mixo-library-empty-note">Loading your Favourites…</div>';try{const r=await fetch("/api/library/images?kind=favorites"),d=await r.json();if(!r.ok)throw Error(d.error||"Favourites could not be loaded.");items=d.images||[];if(!items.length){host.innerHTML='<div class="mixo-library-empty-note">No favourites yet.<br>Choose an image and press <b>Add to Favourites</b>.</div>';return}host.innerHTML=items.map(x=>`<div class="mixo-library-item" data-id="${x.id}"><img src="${x.url}" alt="Favourite MixoLabs creation"><div class="mixo-library-actions"><button data-open="${x.id}" type="button">Open</button><button data-remove="${x.id}" type="button">Remove</button></div></div>`).join("");host.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{const x=items.find(i=>i.id===b.dataset.open);if(x&&typeof selectImage==="function"){hide();selectImage(x.url)}});host.querySelectorAll("[data-remove]").forEach(b=>b.onclick=async()=>{if(!confirm("Remove this image from your Favourites?"))return;const q=await fetch(`/api/library/images/${encodeURIComponent(b.dataset.remove)}?kind=favorites`,{method:"DELETE"});if(!q.ok){const e=await q.json().catch(()=>({}));alert(e.error||"The image could not be removed.");return}render()})}catch(e){items=[];host.innerHTML=`<div class="mixo-library-empty-note">${String(e.message||e)}</div>`}}
 const hide=()=>overlay.classList.add("hidden");open.addEventListener("click",()=>{render();overlay.classList.remove("hidden")});close?.addEventListener("click",hide);overlay.addEventListener("click",e=>{if(e.target===overlay)hide()});create?.addEventListener("click",()=>{hide();document.querySelector(".mixo-studio")?.scrollTo({top:0,behavior:"smooth"});document.getElementById("prompt")?.focus()});window.addEventListener("mixo:library-changed",render);document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.classList.contains("hidden"))hide()});
 })();
 </script>
