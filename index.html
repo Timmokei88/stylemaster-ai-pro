@@ -114,6 +114,10 @@
 .mixo-plan button,.mixo-settings-action[data-open-billing]{border:1px solid #2e6b99;background:#102443;color:white;border-radius:9px;padding:9px 11px;font-weight:700;cursor:pointer}
 .mixo-plan button.primary{border:0;background:linear-gradient(90deg,#28bff0,#cb35ef)}
 .mixo-billing-note{margin:15px 0 0;padding:12px;border:1px dashed #2d486c;border-radius:12px;color:#9aaaca;font-size:10px;line-height:1.5}
+.mixo-billing-note-row{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+#mixoManageBilling{appearance:none;border:2px solid #62dcff;background:linear-gradient(135deg,#087fd1,#2456e8);color:#fff;border-radius:11px;padding:12px 22px;font-size:16px;font-weight:900;line-height:1.2;cursor:pointer;box-shadow:0 7px 22px rgba(20,130,235,.38);white-space:nowrap;transition:transform .15s ease,box-shadow .15s ease,filter .15s ease}
+#mixoManageBilling:hover{filter:brightness(1.12);transform:translateY(-1px);box-shadow:0 10px 26px rgba(20,130,235,.48)}
+#mixoManageBilling:focus-visible{outline:3px solid #fff;outline-offset:3px}
 .mixo-billing-status{min-height:17px;color:#68e5ff;font-size:10px;margin-top:8px}
 .mixo-billing-tabs{display:flex;gap:8px;margin:0 0 15px;flex-wrap:wrap}
 .mixo-billing-tab{border:1px solid #2b4c73;background:#0b1d39;color:#dce9fa;border-radius:9px;padding:9px 14px;font-weight:800;cursor:pointer}
@@ -245,7 +249,7 @@
   </div>
   <label class="mixo-billing-note" style="display:flex;gap:9px;align-items:flex-start"><input id="mixoDigitalConsent" type="checkbox" style="margin-top:3px"><span>I request immediate supply of the digital service. I understand that credits used for a successfully delivered AI generation are non-refundable for change of mind, without affecting my statutory rights.</span></label>
   <div id="mixoBillingStatus" class="mixo-billing-status" aria-live="polite"></div>
-  <div class="mixo-billing-note"><b id="mixoBillingNotice">Stripe test mode:</b> use Stripe's test card details only. Test payments do not move real money. <button id="mixoManageBilling" type="button">Manage Billing</button></div>
+  <div class="mixo-billing-note mixo-billing-note-row"><span><b id="mixoBillingNotice">Stripe test mode:</b> use Stripe's test card details only. Test payments do not move real money.</span><button id="mixoManageBilling" type="button">Manage Billing</button></div>
  </div>
 </div>
 
@@ -326,8 +330,22 @@ const THEMES = [
 ];
 
 const COLOR_FAMILIES = {
-Black:[0,0],White:[0,100],Grey:[0,50],Blue:[215,55],Green:[135,45],Yellow:[52,55],Orange:[28,50],Pink:[335,65],
-Purple:[275,55],Red:[3,48],Brass:[43,42],Bronze:[30,32],Silver:[210,72],Gold:[46,52],Platinum:[210,82],Chrome:[205,78]
+Black:{h:0,hRange:0,sMin:0,sMax:0,lMin:1,lMax:25,preview:"#050505"},
+White:{h:0,hRange:0,sMin:0,sMax:0,lMin:76,lMax:100,preview:"#ffffff"},
+Grey:{h:0,hRange:0,sMin:0,sMax:0,lMin:5,lMax:95,preview:"#808080"},
+Blue:{h:220,hRange:12,sMin:68,sMax:100,lMin:10,lMax:90,preview:"#3f76c9"},
+Green:{h:132,hRange:12,sMin:50,sMax:90,lMin:10,lMax:88,preview:"#3dbb63"},
+Yellow:{h:55,hRange:8,sMin:78,sMax:100,lMin:12,lMax:90,preview:"#dfd34c"},
+Orange:{h:28,hRange:8,sMin:75,sMax:100,lMin:10,lMax:88,preview:"#d98632"},
+Pink:{h:335,hRange:12,sMin:62,sMax:100,lMin:12,lMax:92,preview:"#d86f9e"},
+Purple:{h:275,hRange:14,sMin:55,sMax:95,lMin:10,lMax:90,preview:"#9b60ca"},
+Red:{h:0,hRange:6,sMin:72,sMax:100,lMin:8,lMax:90,preview:"#cf3f3f"},
+Brass:{h:45,hRange:6,sMin:38,sMax:72,lMin:10,lMax:86,preview:"#a88a36"},
+Bronze:{h:29,hRange:6,sMin:32,sMax:68,lMin:8,lMax:82,preview:"#8f6338"},
+Silver:{h:210,hRange:8,sMin:2,sMax:12,lMin:18,lMax:94,preview:"#aeb9c3"},
+Gold:{h:48,hRange:7,sMin:62,sMax:100,lMin:10,lMax:88,preview:"#d4b64f"},
+Platinum:{h:210,hRange:6,sMin:1,sMax:8,lMin:26,lMax:96,preview:"#d7dcdf"},
+Chrome:{h:205,hRange:10,sMin:0,sMax:10,lMin:8,lMax:98,preview:"#c5d1d8"}
 };
 
 let uploadedImages=[], activeSelectedColor="", activeSelectedImage="";
@@ -348,26 +366,29 @@ styleSelect.innerHTML='<option value="">Select Style (Optional)...</option>';
 
 function initColors(){
 const host=$("families"); host.innerHTML="";
-Object.entries(COLOR_FAMILIES).forEach(([name,[h,l]])=>{
+Object.entries(COLOR_FAMILIES).forEach(([name,profile])=>{
 const b=document.createElement("button"); b.type="button"; b.className="family text-[10px] rounded p-2 border border-slate-700";
-b.textContent=name;b.style.background=`hsl(${h} 45% ${l}%)`;b.style.color=(l>65?"#111":"#fff");
-b.onclick=()=>showShades(name,h,l,b);host.appendChild(b);
+b.textContent=name;b.style.background=profile.preview;b.style.color=(name==="White"||name==="Yellow"||name==="Silver"||name==="Gold"||name==="Platinum"||name==="Chrome")?"#111":"#fff";
+b.onclick=()=>showShades(name,profile,b);host.appendChild(b);
 });
 }
-function showShades(name,h,baseL,btn){
+function hslToHex(h,s,l){
+s/=100;l/=100;const k=n=>(n+h/30)%12,a=s*Math.min(l,1-l),f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));
+return "#"+[f(0),f(8),f(4)].map(x=>Math.round(255*x).toString(16).padStart(2,"0")).join("");
+}
+function showShades(name,profile,btn){
 document.querySelectorAll(".family").forEach(x=>x.classList.remove("active"));btn.classList.add("active");
 $("shadePanel").classList.remove("hidden");$("familyTitle").textContent=`${name} — 200 Shades`;
 const host=$("shades");host.innerHTML="";
 for(let i=0;i<200;i++){
-const sat=(name==="Black"||name==="White"||name==="Grey"||name==="Silver"||name==="Platinum"||name==="Chrome")?Math.min(18,(i%20)):Math.min(100,45+(i%20)*2.7);
-let light;
-if(name==="Black") light=3+(i/199)*28;
-else if(name==="White") light=72+(i/199)*27;
-else light=10+(i/199)*80;
-const hue=(h+Math.floor(i/20)*1.3)%360;
-const css=`hsl(${hue} ${sat}% ${light}%)`;
+const tone=i/199,variation=((i%10)/9)-.5;
+const sat=profile.sMin+(profile.sMax-profile.sMin)*((i%10)/9);
+const light=profile.lMin+(profile.lMax-profile.lMin)*tone;
+const hue=(profile.h+(profile.hRange*variation)+360)%360;
+const css=`hsl(${hue.toFixed(1)} ${sat.toFixed(1)}% ${light.toFixed(1)}%)`,hex=hslToHex(hue,sat,light);
 const b=document.createElement("button");b.type="button";b.className="swatch h-5 rounded border border-slate-800";b.style.background=css;b.title=`${name} Shade ${i+1}`;
-b.onclick=()=>{document.querySelectorAll(".swatch").forEach(x=>x.classList.remove("active"));b.classList.add("active");activeSelectedColor=`${name} Shade ${i+1} (${css})`;$("selectedColor").textContent=`${name} #${i+1}`;};
+b.setAttribute("aria-label",`${name} shade ${i+1}, ${hex}`);
+b.onclick=()=>{document.querySelectorAll(".swatch").forEach(x=>x.classList.remove("active"));b.classList.add("active");activeSelectedColor=`${name} Shade ${i+1} (${hex}; ${css})`;$("selectedColor").textContent=`${name} #${i+1} • ${hex}`;};
 host.appendChild(b);
 }
 }
@@ -955,7 +976,7 @@ const steps=[
 ["#categorySelect","Category","Choose the broad creative category for the image."],
 ["#styleSelect","Style","Choose a style available for the selected category."],
 ["#themeSelect","Theme / Atmosphere","Set the mood, environment or atmosphere."],
-["#families","Colour system","Pick a colour family and then choose from 200 shades in that family."],
+["#families","Colour system","Pick a colour family and then choose from 200 accurately matched shades. Neutral families stay neutral, while coloured and metallic families remain within their named hue."],
 [".resin-box","Resin Mixing Calculator","Enter the total amount and mixing ratio to calculate resin parts for physical resin projects."],
 ["#generateBtn","Generate","The Generate button shows the exact credit cost. Press it when your settings are ready.","The tutorial will not spend credits or generate automatically."],
 ["#grid","Variation results","Generated variations appear in the results grid. Select the image you want to make your Active Masterpiece."],
@@ -1000,7 +1021,7 @@ const scenes=[
 ["Aspect Ratio & Background","Choose the image shape with Aspect Ratio, then select a contextual, isolated, solid or studio-style background.","#aspectRatioSelect"],
 ["Reference Images","Open Advanced Options and use Add Photos to upload up to ten reference images. References can help guide identity, design, materials and visual direction.","#addPhotos"],
 ["Category, Style & Theme","Category sets the broad creative direction. Style gives you choices within that category, while Theme or Atmosphere controls the mood and environment.","#categorySelect"],
-["Colour System","Choose a colour family, then select from two hundred shades. The selected colour becomes part of the generation direction.","#families"],
+["Colour System","Choose a colour family, then select from two hundred accurately matched shades. Grey, black and white remain neutral; coloured and metallic families stay within their named hue. The selected colour and its exact hex value become part of the generation direction.","#families"],
 ["Resin Calculator","For physical resin projects, enter a total amount and mixing ratio. The Resin Mixing Calculator works out the component quantities for you.",".resin-box"],
 ["Generate","The Generate button always shows the number of images and expected credit cost before generation. Press it only when your settings are ready.","#generateBtn"],
 ["Results & Active Masterpiece","Your generated variations appear in the results grid. Select one to make it your Active Masterpiece, where you can view it larger, download it or open it fullscreen.","#activeArea"],
@@ -1043,7 +1064,7 @@ const sceneData=[
 ["Aspect Ratio & Background","Set the shape of the image with Aspect Ratio, then choose the background treatment you want.","#aspectRatioSelect"],
 ["Reference Images","Open Advanced Options and choose Add Photos. You can supply up to ten reference images to guide the generation.","#addPhotos"],
 ["Category, Style & Theme","Choose a Category for the broad direction, a Style for the visual treatment and a Theme or Atmosphere for the mood.","#categorySelect"],
-["Colour System","Choose a colour family and then one of its shades. Your selected colour becomes part of the image direction.","#families"],
+["Colour System","Choose a colour family and then one of its accurately matched shades. Neutral colours contain no unwanted brown or red tint, and the exact selected hex colour becomes part of the image direction.","#families"],
 ["Resin Calculator","For physical resin projects, enter the total amount and mixing ratio. The calculator works out the quantities for each component.",".resin-box"],
 ["Generate Images","Check the image count, quality and displayed credit cost. When everything is ready, press Generate Images.","#generateBtn"],
 ["Results & Active Masterpiece","Generated images appear in the results area. Select a result to make it the Active Masterpiece, then use its viewing and download controls.","#activeArea"],
@@ -1135,7 +1156,7 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
   ['#categorySelect','Category','Category sets the broad type of creation and changes the related style choices available below it.'],
   ['#styleSelect','Style','Style controls the visual treatment within the selected category, such as photographic, illustrated or design-led approaches.'],
   ['#themeSelect','Theme or Atmosphere','Theme controls mood and environmental direction, including lighting, energy and overall emotional character.'],
-  ['#families','Colour System','Choose a colour family and then a precise shade. The selected colour is added to the generation direction.'],
+  ['#families','Colour System','Choose a colour family and then a precise, accurately matched shade. Grey, black and white remain neutral, and the selected hex colour is added to the generation direction.'],
   ['.resin-box','Resin Mixing Calculator','Enter the required total quantity and mixing ratio. The calculator works out each component amount for planning a physical resin project.'],
   ['#generateBtn','Generate Images','This button displays the number of images and total credit cost. Selecting it submits the configured request and uses credits only under the generation rules shown in the Terms.'],
   ['#activeArea','Active Masterpiece','Select a generated result to make it the active image. From here you can inspect, download, save, favourite or use compatible follow-on tools.'],
