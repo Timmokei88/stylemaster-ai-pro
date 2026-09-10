@@ -258,15 +258,15 @@
 
 <div id="mixoProfileOverlay" class="mixo-profile-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="mixoProfileTitle">
  <div class="mixo-profile-card">
-  <div class="mixo-profile-head"><div><h2 id="mixoProfileTitle">Creator Profile</h2><p style="margin:4px 0 0;color:#9facc7;font-size:11px">Prepare how your MixoLabs identity will appear when secure accounts and publishing are connected.</p></div><button id="mixoProfileClose" class="mixo-profile-close" type="button" aria-label="Close">&times;</button></div>
-  <div class="mixo-profile-preview"><div id="mixoProfileAvatar" class="mixo-profile-avatar">M</div><div><b id="mixoProfilePreviewName">MixoLabs Creator</b><small id="mixoProfilePreviewHandle">@creator</small><small id="mixoProfilePreviewVisibility">Private profile • testing mode</small></div></div>
+  <div class="mixo-profile-head"><div><h2 id="mixoProfileTitle">Creator Profile</h2><p style="margin:4px 0 0;color:#9facc7;font-size:11px">Manage the creator identity securely connected to your MixoLabs account.</p></div><button id="mixoProfileClose" class="mixo-profile-close" type="button" aria-label="Close">&times;</button></div>
+  <div class="mixo-profile-preview"><div id="mixoProfileAvatar" class="mixo-profile-avatar">M</div><div><b id="mixoProfilePreviewName">MixoLabs Creator</b><small id="mixoProfilePreviewHandle">@creator</small><small id="mixoProfilePreviewVisibility">Private profile</small></div></div>
   <form id="mixoProfileForm" class="mixo-profile-form">
    <div class="mixo-profile-two"><div><label for="mixoProfileName">Display name</label><input id="mixoProfileName" maxlength="40" placeholder="Your creator name"></div><div><label for="mixoProfileHandle">Creator handle</label><input id="mixoProfileHandle" maxlength="24" placeholder="creatorname"></div></div>
    <div><label for="mixoProfileBio">Bio</label><textarea id="mixoProfileBio" maxlength="220" placeholder="Tell people what you create..."></textarea></div>
    <div class="mixo-profile-two"><div><label for="mixoProfileType">Creator type</label><select id="mixoProfileType"><option value="Creator">Creator</option><option value="Artist">Artist</option><option value="Designer">Designer</option><option value="Brand">Brand</option><option value="Photographer">Photographer</option><option value="Hobbyist">Hobbyist</option><option value="Other">Other</option></select></div><div><label for="mixoProfileVisibility">Future profile visibility</label><select id="mixoProfileVisibility"><option value="private">Private</option><option value="public">Public when publishing launches</option></select></div></div>
-   <button class="mixo-profile-save" type="submit">Save Profile on This Browser</button>
+   <button class="mixo-profile-save" type="submit">Save Profile to My Account</button>
    <div id="mixoProfileStatus" class="mixo-profile-status" aria-live="polite"></div>
-   <p class="mixo-profile-note">Testing mode only: profile details are stored locally in this browser. No email, password or secure account is created here. Production account storage will replace this before paid launch.</p>
+   <p class="mixo-profile-note">Your profile is stored securely with your signed-in account. Public visibility applies only to information you choose to publish.</p>
   </form>
  </div>
 </div>
@@ -642,18 +642,16 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.classList.
 
 <script id="mixo-profile-foundation-system">
 (()=>{
-const KEY="mixolabs.profile.v1";
 const overlay=document.getElementById("mixoProfileOverlay"),close=document.getElementById("mixoProfileClose"),form=document.getElementById("mixoProfileForm"),name=document.getElementById("mixoProfileName"),handle=document.getElementById("mixoProfileHandle"),bio=document.getElementById("mixoProfileBio"),type=document.getElementById("mixoProfileType"),visibility=document.getElementById("mixoProfileVisibility"),status=document.getElementById("mixoProfileStatus"),avatar=document.getElementById("mixoProfileAvatar"),previewName=document.getElementById("mixoProfilePreviewName"),previewHandle=document.getElementById("mixoProfilePreviewHandle"),previewVisibility=document.getElementById("mixoProfilePreviewVisibility"),summary=document.getElementById("settingsProfileSummary");
 if(!overlay||!form)return;
-const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||"null")}catch(_){return null}};
 const cleanHandle=v=>String(v||"").trim().replace(/^@+/,"").replace(/[^a-zA-Z0-9_.-]/g,"").slice(0,24);
-function render(p=read()){const n=(p?.name||"MixoLabs Creator").trim(),h=cleanHandle(p?.handle)||"creator";avatar.textContent=(n[0]||"M").toUpperCase();previewName.textContent=n;previewHandle.textContent="@"+h;previewVisibility.textContent=(p?.visibility==="public"?"Public when publishing launches":"Private profile")+" • testing mode";if(summary)summary.textContent=p?.name?"Local profile: "+p.name:"Local profile not set up"}
-function load(){const p=read()||{};name.value=p.name||"";handle.value=p.handle||"";bio.value=p.bio||"";type.value=p.type||"Creator";visibility.value=p.visibility||"private";status.textContent="";render(p)}
-window.mixoOpenProfile=()=>{load();overlay.classList.remove("hidden")};
+function render(p={}){const n=(p?.name||"MixoLabs Creator").trim(),h=cleanHandle(p?.handle)||"creator";avatar.textContent=(n[0]||"M").toUpperCase();previewName.textContent=n;previewHandle.textContent="@"+h;previewVisibility.textContent=p?.visibility==="public"?"Public profile":"Private profile";if(summary)summary.textContent=p?.handle?"Creator profile: @"+h:"Creator profile not set up"}
+async function load(){status.textContent="Loading your profile…";try{const r=await fetch("/api/profile"),d=await r.json();if(!r.ok)throw Error(d.error||"Profile could not be loaded.");const p=d.profile||{};name.value=p.name||"";handle.value=p.handle||"";bio.value=p.bio||"";type.value=p.type||"Creator";visibility.value=p.visibility||"private";status.textContent="";render(p)}catch(e){status.textContent=e.message}}
+window.mixoOpenProfile=()=>{overlay.classList.remove("hidden");load()};
 document.getElementById("settingsProfileButton")?.addEventListener("click",()=>{document.getElementById("mixoSettingsOverlay")?.classList.add("hidden");window.mixoOpenProfile()});
 close.addEventListener("click",()=>overlay.classList.add("hidden"));overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.classList.add("hidden")});
 [name,handle,visibility].forEach(el=>el.addEventListener("input",()=>render({name:name.value,handle:handle.value,visibility:visibility.value})));visibility.addEventListener("change",()=>render({name:name.value,handle:handle.value,visibility:visibility.value}));
-form.addEventListener("submit",e=>{e.preventDefault();const p={name:name.value.trim().slice(0,40),handle:cleanHandle(handle.value),bio:bio.value.trim().slice(0,220),type:type.value,visibility:visibility.value,updatedAt:Date.now()};if(!p.name){status.textContent="Add a display name before saving.";name.focus();return}if(!p.handle){status.textContent="Add a creator handle before saving.";handle.focus();return}try{localStorage.setItem(KEY,JSON.stringify(p));render(p);status.textContent="✓ Profile saved on this browser for testing.";window.dispatchEvent(new CustomEvent("mixo:profile-changed",{detail:p}))}catch(_){status.textContent="This browser could not save the profile locally."}});
+form.addEventListener("submit",async e=>{e.preventDefault();const p={name:name.value.trim().slice(0,40),handle:cleanHandle(handle.value),bio:bio.value.trim().slice(0,220),type:type.value,visibility:visibility.value};if(!p.name){status.textContent="Add a display name before saving.";name.focus();return}if(!p.handle){status.textContent="Add a creator handle before saving.";handle.focus();return}status.textContent="Saving securely…";try{const r=await fetch("/api/profile",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)}),d=await r.json();if(!r.ok)throw Error(d.error||"Profile could not be saved.");render(d.profile);status.textContent="✓ Profile saved securely to your account.";window.dispatchEvent(new CustomEvent("mixo:profile-changed",{detail:d.profile}))}catch(x){status.textContent=x.message}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.classList.contains("hidden"))overlay.classList.add("hidden")});render();
 })();
 </script>
