@@ -209,6 +209,7 @@
   <div id="mixoFavoritesLibrary" class="mixo-library-grid"></div><button id="favoritesCreateButton" class="mixo-favorites-action" type="button">Create an Image</button><p style="margin:10px 0 0;color:#74839f;font-size:10px">Favourites are stored securely with your MixoLabs account and are available when you sign in on another supported device.</p>
  </div>
 </div>
+<style>#mixoGalleryPublishedTab,[data-publish]{display:none!important}</style>
 <div id="mixoGalleryOverlay" class="mixo-gallery-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="mixoGalleryTitle">
  <div class="mixo-gallery-card">
   <div class="mixo-gallery-head"><div><h2 id="mixoGalleryTitle">My Gallery</h2><p style="margin:4px 0 0;color:#9facc7;font-size:11px">Your MixoLabs creations will live here.</p></div><button id="mixoGalleryClose" class="mixo-gallery-close" type="button" aria-label="Close">&times;</button></div>
@@ -695,10 +696,11 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.classList.
 (()=>{
 const overlay=document.getElementById("mixoGalleryOverlay"),open=document.getElementById("galleryButton"),close=document.getElementById("mixoGalleryClose"),create=document.getElementById("galleryCreateButton"),host=document.getElementById("mixoGalleryLibrary");
 if(!overlay||!open)return;
-let items=[];
-async function render(){if(!host)return;host.innerHTML='<div class="mixo-library-empty-note">Loading your Gallery…</div>';try{const r=await fetch("/api/library/images?kind=gallery"),d=await r.json();if(!r.ok)throw Error(d.error||"Gallery could not be loaded.");items=d.images||[];if(!items.length){host.innerHTML='<div class="mixo-library-empty-note">No saved creations yet.<br>Choose an image and press <b>Save to Gallery</b>.</div>';return}host.innerHTML=items.map(x=>`<div class="mixo-library-item" data-id="${x.id}"><img src="${x.url}" alt="Saved MixoLabs creation"><div class="mixo-library-actions"><button data-open="${x.id}" type="button">Open</button><button data-remove="${x.id}" type="button">Remove</button></div></div>`).join("");host.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{const x=items.find(i=>i.id===b.dataset.open);if(x&&typeof selectImage==="function"){hide();selectImage(x.url)}});host.querySelectorAll("[data-remove]").forEach(b=>b.onclick=async()=>{if(!confirm("Remove this image from your Gallery?"))return;const q=await fetch(`/api/library/images/${encodeURIComponent(b.dataset.remove)}?kind=gallery`,{method:"DELETE"});if(!q.ok){const e=await q.json().catch(()=>({}));alert(e.error||"The image could not be removed.");return}render()})}catch(e){items=[];host.innerHTML=`<div class="mixo-library-empty-note">${String(e.message||e)}</div>`}}
+let items=[],current="gallery";
+async function render(){if(!host)return;host.innerHTML=`<div class="mixo-library-empty-note">Loading ${current==="published"?"published creations":"your Gallery"}…</div>`;try{const r=await fetch(current==="published"?"/api/community/posts":"/api/library/images?kind=gallery"),d=await r.json();if(!r.ok)throw Error(d.error||"Gallery could not be loaded.");items=current==="published"?(d.posts||[]).map(x=>({...x,url:x.imageUrl})):(d.images||[]);if(!items.length){host.innerHTML=`<div class="mixo-library-empty-note">${current==="published"?"No community creations have been published yet.":"No saved creations yet.<br>Choose an image and press <b>Save to Gallery</b>."}</div>`;return}host.innerHTML=items.filter(x=>x.url).map(x=>`<div class="mixo-library-item" data-id="${x.id}"><img src="${x.url}" alt="${current==="published"?"Published":"Saved"} MixoLabs creation"><div class="mixo-library-actions"><button data-open="${x.id}" type="button">Open</button>${current==="published"?'<button data-report-post="'+x.id+'" type="button">Report</button>':'<button data-publish="'+x.id+'" type="button">Publish</button><button data-remove="'+x.id+'" type="button">Remove</button>'}</div></div>`).join("");host.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{const x=items.find(i=>i.id===b.dataset.open);if(x&&typeof selectImage==="function"){hide();selectImage(x.url)}});host.querySelectorAll("[data-publish]").forEach(b=>b.onclick=async()=>{if(!confirm("Publish this image to the public MixoLabs Community?"))return;b.disabled=true;b.textContent="Publishing…";const q=await fetch("/api/community/publish",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({imageId:b.dataset.publish})}),e=await q.json().catch(()=>({}));if(!q.ok){alert(e.error||"The image could not be published.");b.disabled=false;b.textContent="Publish";return}b.textContent="Published ✓"});host.querySelectorAll("[data-report-post]").forEach(b=>b.onclick=async()=>{const reason=prompt("Report reason: spam, harassment, hate, sexual, violence, privacy, copyright or other","other");if(reason===null)return;const allowed=["spam","harassment","hate","sexual","violence","privacy","copyright","other"],chosen=allowed.includes(reason.trim().toLowerCase())?reason.trim().toLowerCase():"other",q=await fetch("/api/community/report",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contentType:"post",contentId:b.dataset.reportPost,reason:chosen})}),e=await q.json().catch(()=>({}));if(!q.ok){alert(e.error||"Report could not be submitted.");return}b.textContent="Reported ✓";b.disabled=true});host.querySelectorAll("[data-remove]").forEach(b=>b.onclick=async()=>{if(!confirm("Remove this image from your Gallery?"))return;const q=await fetch(`/api/library/images/${encodeURIComponent(b.dataset.remove)}?kind=gallery`,{method:"DELETE"});if(!q.ok){const e=await q.json().catch(()=>({}));alert(e.error||"The image could not be removed.");return}render()})}catch(e){items=[];host.innerHTML=`<div class="mixo-library-empty-note">${String(e.message||e)}</div>`}}
 const hide=()=>overlay.classList.add("hidden");
 open.addEventListener("click",()=>{render();overlay.classList.remove("hidden")});close.addEventListener("click",hide);overlay.addEventListener("click",e=>{if(e.target===overlay)hide()});create?.addEventListener("click",()=>{hide();document.querySelector(".mixo-studio")?.scrollTo({top:0,behavior:"smooth"});document.getElementById("prompt")?.focus()});window.addEventListener("mixo:library-changed",render);document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.classList.contains("hidden"))hide()});
+document.getElementById("mixoGalleryPublishedTab")?.addEventListener("click",()=>{current="published";document.querySelectorAll(".mixo-gallery-tabs button").forEach(x=>x.classList.remove("active"));document.getElementById("mixoGalleryPublishedTab").classList.add("active");render()});[document.getElementById("mixoGalleryCreationsTab"),document.getElementById("mixoGallerySavedTab")].forEach(tab=>tab?.addEventListener("click",()=>{current="gallery";render()}));
 })();
 </script>
 
@@ -756,10 +758,10 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay&&!overlay.c
 <div id="mixoCommunityOverlay" class="mixo-community-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="mixoCommunityTitle">
  <div class="mixo-community-card">
   <div class="mixo-community-head">
-   <div><h2 id="mixoCommunityTitle">MixoLabs Community</h2><p>Live creator chat foundation — share ideas and talk with other people currently using MixoLabs.</p></div>
+   <div><h2 id="mixoCommunityTitle">MixoLabs Community</h2><p>Share ideas and talk with other signed-in creators using MixoLabs.</p></div>
    <button id="mixoCommunityClose" class="mixo-community-close" type="button" aria-label="Close">&times;</button>
   </div>
-  <div class="mixo-community-meta"><span>Community Chat • testing mode</span><span id="mixoCommunityOnline" class="mixo-community-online">Connecting…</span></div>
+  <div class="mixo-community-meta"><span>Community Chat • Moderated</span><span id="mixoCommunityOnline" class="mixo-community-online">Connecting…</span></div>
   <div id="mixoChatList" class="mixo-chat-list"><div class="mixo-chat-empty">No messages loaded yet. This chat uses the existing MixoLabs live community server foundation. Do not share private or sensitive information.</div></div>
   <div class="mixo-chat-tools">
    <button id="mixoChatUploadButton" class="mixo-chat-upload" type="button">▧ Upload Image</button>
@@ -771,7 +773,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay&&!overlay.c
    <input id="mixoChatMessage" maxlength="800" placeholder="Share an idea or message…" autocomplete="off">
    <button id="mixoChatSend" class="mixo-chat-send" type="button">Send</button>
   </div>
-  <div id="mixoChatStatus" class="mixo-chat-note">Public testing chat. Secure accounts, moderation/reporting, blocking and production database storage must be connected before public launch.</div>
+  <div id="mixoChatStatus" class="mixo-chat-note">Public community space. Do not share private information. Use Report on content that violates the community rules.</div>
  </div>
 </div>
 <script id="mixo-community-chat-system">
@@ -792,7 +794,8 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay&&!overlay.c
    if(!m||!m.id||seen.has(m.id))return; seen.add(m.id);
    if(list.querySelector(".mixo-chat-empty"))list.innerHTML="";
    const row=document.createElement("div"); row.className="mixo-chat-msg";
-   row.innerHTML='<div class="mixo-chat-msg-top"><span class="mixo-chat-name">'+esc(m.name)+'</span><span class="mixo-chat-time">'+esc(m.createdAt||"")+'</span></div><div class="mixo-chat-text">'+esc(m.message||"")+'</div>'+(m.imageUrl?'<img class="mixo-chat-image" src="'+esc(m.imageUrl)+'" alt="Community shared image">':"");
+   row.innerHTML='<div class="mixo-chat-msg-top"><span class="mixo-chat-name">'+esc(m.name)+'</span><span class="mixo-chat-time">'+esc(m.createdAt||"")+'</span><button type="button" data-community-report="'+esc(m.id)+'" data-community-type="'+esc(m.contentType||"message")+'">Report</button></div><div class="mixo-chat-text">'+esc(m.message||"")+'</div>'+(m.imageUrl?'<img class="mixo-chat-image" src="'+esc(m.imageUrl)+'" alt="Community shared image">':"");
+   row.querySelector("[data-community-report]")?.addEventListener("click",async e=>{const button=e.currentTarget,reason=prompt("Report reason: spam, harassment, hate, sexual, violence, privacy, copyright or other","other");if(reason===null)return;const allowed=["spam","harassment","hate","sexual","violence","privacy","copyright","other"],chosen=allowed.includes(reason.trim().toLowerCase())?reason.trim().toLowerCase():"other";try{const r=await fetch("/api/community/report",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contentType:button.dataset.communityType,contentId:button.dataset.communityReport,reason:chosen})}),d=await r.json();if(!r.ok)throw Error(d.error||"Report could not be submitted.");button.textContent="Reported ✓";button.disabled=true;status.textContent="Thank you. The content has been reported for review."}catch(x){status.textContent=x.message}});
    list.appendChild(row); list.scrollTop=list.scrollHeight;
  }
  async function history(){
@@ -808,18 +811,9 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay&&!overlay.c
    socket.on("disconnect",()=>{online.textContent="Reconnecting…";});
    socket.on("community:online",n=>{online.textContent=Number(n||0)+" online";});
    socket.on("community:chat-message",add);
+   socket.on("community:content-hidden",x=>{const button=list.querySelector(`[data-community-report="${CSS.escape(String(x.contentId||""))}"]`);button?.closest(".mixo-chat-msg")?.remove()});
  }
- function profileName(){
-   try{
-    const keys=Object.keys(localStorage);
-    for(const k of keys){
-      if(/profile/i.test(k)){
-        try{const v=JSON.parse(localStorage.getItem(k)); if(v?.displayName)return v.displayName}catch(_){}
-      }
-    }
-   }catch(_){}
-   return "";
- }
+ function profileName(){return window.mixoUser?.displayName||""}
  function show(){overlay.classList.remove("hidden"); if(!name.value)name.value=profileName(); connect(); history(); setTimeout(()=>message.focus(),50)}
  function hide(){overlay.classList.add("hidden")}
  async function submit(){
@@ -834,16 +828,16 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay&&!overlay.c
        const d=await r.json();
        if(!r.ok)throw new Error(d.error||"Image upload failed.");
        const post=d.post||{};
-       add({id:"post-"+post.id,name:post.name,message:post.prompt||"",imageUrl:post.imageUrl,createdAt:post.createdAt});
+       add({id:post.id,contentType:"post",name:post.name,message:post.prompt||"",imageUrl:post.imageUrl,createdAt:post.createdAt});
        selectedFile=null; fileInput.value=""; preview.classList.remove("show"); previewImage.removeAttribute("src"); previewName.textContent="";
-       message.value=""; status.textContent="Image shared to this live testing session.";
+       message.value=""; status.textContent="Image shared securely with the live community.";
        return;
      }catch(e){status.textContent=e.message||"Image upload failed.";return}
    }
    connect();
    if(!socket?.connected){status.textContent="Chat is reconnecting. Try again in a moment.";return}
    socket.emit("community:chat-send",{name:n,message:msg});
-   message.value=""; status.textContent="Message sent to the live testing chat.";
+   message.value=""; status.textContent="Message sent to the live community.";
  }
  uploadButton.addEventListener("click",()=>fileInput.click());
  fileInput.addEventListener("change",()=>{
@@ -869,6 +863,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay&&!overlay.c
 
 <script>
 (function(){
+ return; // Replaced by the authenticated R2-backed publishing system.
  const PKEY="mixolabs-published-testing-v1";
  const readPublished=()=>{try{return JSON.parse(localStorage.getItem(PKEY)||"[]")}catch{return[]}};
  const writePublished=(v)=>localStorage.setItem(PKEY,JSON.stringify(v.slice(0,100)));
@@ -937,6 +932,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay&&!overlay.c
 
 <script>
 (function(){
+ return; // Replaced by the authenticated R2-backed published view.
  function publishedItems(){
    try{return JSON.parse(localStorage.getItem("mixolabs-published-testing-v1")||"[]")}catch(e){return[]}
  }
