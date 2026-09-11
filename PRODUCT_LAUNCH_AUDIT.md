@@ -3,7 +3,7 @@
 ## Already strong
 - Gemini image generation with prompt controls, references, colour families, 1–6 variations and high-resolution options.
 - Pre-selected 1–6 orthographic angle workflow with stricter left/right side locking.
-- True 360° 3D workflow and downloadable 3D formats.
+- Selectable Gemini angle-sheet workflow.
 - Never-repeat random prompt engine.
 - Creative safety/originality guard.
 - Community inspiration feed, prompt reuse, likes and real-time chat.
@@ -21,7 +21,7 @@
 
 ## Highest-value growth features
 1. Remix attribution: every public creation gets a Remix button and keeps a link back to the original creator.
-2. Public share pages: one-tap share links for creations, prompts and 3D models with attractive social preview cards.
+2. Public share pages: one-tap share links for creations and prompts with attractive social preview cards.
 3. Creator profiles + Follow + Following feed.
 4. Trending feed ranked by a blend of likes, remixes and freshness.
 5. Weekly creative challenges with featured winners/badges.
@@ -36,4 +36,4 @@ The current V7/V8 prompt locking substantially constrains left/right views, but 
 
 
 ## V9 angle architecture correction
-The angle system now uses one reconstructed 3D mesh as the source of truth. Cardinal views come from Meshy's fixed 3D render outputs and top/bottom come from fixed model-viewer cameras. This removes the previous failure mode where Gemini independently imagined left and right profiles.
+The current angle system generates the selected views together in one Gemini angle-sheet image. This keeps the workflow simple and avoids a separate 3D service, although generative views cannot guarantee CAD-grade geometric consistency.

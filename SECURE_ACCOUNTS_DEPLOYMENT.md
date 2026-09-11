@@ -9,7 +9,7 @@ This build replaces browser-only login with real accounts, PostgreSQL sessions, 
 3. Add `SESSION_SECRET` using a randomly generated value of at least 32 characters.
 4. Set `NODE_ENV` to `production`.
 5. Set `APP_ORIGIN` to the exact public origin, with no trailing slash, for example `https://mixolab.art`.
-6. Keep `GEMINI_API_KEY` and `MESHY_API_KEY` in Render environment variables only.
+6. Keep `GEMINI_API_KEY` in Render environment variables only.
 7. New accounts always start at 0 credits. Remove any obsolete `STARTER_CREDITS` environment variable from Render.
 8. Deploy, then confirm `/api/health` reports `ok: true` and `database: true`.
 

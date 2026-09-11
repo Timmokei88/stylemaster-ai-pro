@@ -11,14 +11,13 @@ NEW:
 - Select exactly which of Front / Left / Right / Back / Top / Bottom you want.
 - Only selected angles generate, reducing unnecessary image-generation usage.
 - Live community MVP: image uploads, prompt sharing, likes, live feed, and one-click Use Prompt.
-- Existing Angle Lock V3, 200-shade colour system and True 360 3D builder are retained.
+- Existing angle-sheet workflow and 200-shade colour system are retained.
 
-LOCAL COMMUNITY / 3D SERVER:
+LOCAL SERVER:
 1. Install Node.js 18+.
 2. Run npm install.
-3. For 3D, copy .env.example to .env and add your Meshy API key.
-4. Run START-WINDOWS.bat.
-5. Open http://localhost:3000.
+3. Run START-WINDOWS.bat.
+4. Open http://localhost:3000.
 
 For a real public community launch, add authentication, a proper database/cloud image storage, moderation/reporting, anti-spam/rate limiting, backups, HTTPS, and privacy/terms controls.
 
@@ -62,34 +61,13 @@ AI image models can still occasionally fail perfect geometric consistency. V7 ma
 
 V8: Generated and angle images can now be clicked to open a full-screen zoomable viewer. Press Escape to close.
 
-V9 TRUE 3D FIXED-CAMERA ANGLES
-- Left/right/front/back are no longer generated independently by Gemini.
-- The selected master image is reconstructed once as a 3D model using Meshy Image-to-3D.
-- Meshy's true cardinal 3D thumbnails are used for Front, Right, Back and Left.
-- Top and Bottom are captured from the same GLB using fixed model-viewer camera positions.
-- Users still select any 1–6 desired views before generation.
-- Only selected views are displayed/rendered.
-- The same GLB is reused by the 360° model viewer/download workflow.
-- Re-generate buttons now re-render the same 3D geometry instead of asking Gemini to invent another side.
+CURRENT ANGLE-SHEET WORKFLOW
+- Users select any combination of Front, Left, Right, Back, Top and Bottom.
+- The selected views are generated together as one Gemini angle-sheet image.
+- No 3D-generation service or 3D-model charge is included.
 
 V10 ANGLE PROGRESS COUNTER
 - The loading panel now always shows selected-angle progress as X of N.
 - Examples: 1 of 2, 2 of 2; 1 of 4, 2 of 4, 3 of 4, 4 of 4.
-- During the shared 3D reconstruction stage it still keeps "1 of N" visible and adds the 3D build percentage.
-- Each selected view then advances the counter as its fixed camera render is completed.
+- The selected views are produced together in the angle sheet.
 
-
-V11 SERVER PREFLIGHT FIX
-- Accurate angle generation now checks the backend before showing the long loading state.
-- If the Node server is not running, the UI says "3D angle server not connected" instead of looking frozen.
-- If the Meshy key is missing, the UI says so explicitly.
-- Network requests now have timeouts and clearer errors.
-- Gemini Canvas can preview the HTML, but it cannot run the included Node.js backend. For the true-3D angle feature, run the FULL PACKAGE server.
-
-
-V12 CANVAS-SAFE STATUS FIX
-- Gemini Canvas now treats the missing Node/Meshy backend as a preview limitation, not a code failure.
-- The accurate-angle button remains disabled until the backend health check passes.
-- Selecting angle checkboxes can no longer accidentally re-enable the button while the backend is offline.
-- Canvas shows an amber message explaining that the Full Package server is required.
-- Public/hosted builds show green when connected and red only when the production backend is genuinely offline.
