@@ -462,8 +462,8 @@ catch(e){card.innerHTML=`<div class="mixo-generation-error">Variation ${i} faile
 $("loading").classList.add("hidden");
 };
 
-async function restoreRecentGenerations(){if(!$('placeholder')||!$('placeholder').offsetParent)return;try{const r=await fetch('/api/generations/recent'),d=await r.json();if(!r.ok)return;const completed=(d.generations||[]).filter(x=>x.status==='completed'&&x.url).slice(0,6);if(!completed.length)return;$('placeholder').classList.add('hidden');$('grid').classList.remove('hidden');$('grid').innerHTML=completed.map((x,i)=>`<div class="mixo-generation-card"><img src="${x.url}" alt="Recent generated image ${i+1}" title="Open recent creation"><div class="mixo-generation-hint">Recovered creation • ${new Date(x.completedAt||x.createdAt).toLocaleString()}</div></div>`).join('');$('grid').querySelectorAll('img').forEach(img=>img.onclick=()=>selectImage(img.src))}catch{}}
-window.addEventListener('mixo:auth-changed',()=>setTimeout(restoreRecentGenerations,150));setTimeout(restoreRecentGenerations,400);
+function clearTemporaryCreations(){activeSelectedImage="";$('grid').innerHTML="";$('grid').classList.add('hidden');$('activeArea').classList.add('hidden');$('angleArea').classList.add('hidden');$('placeholder').classList.remove('hidden');if(saveImageStatus)saveImageStatus.textContent=""}
+window.addEventListener('mixo:auth-changed',clearTemporaryCreations);
 
 function selectImage(url){activeSelectedImage=url;$("outputImage").src=url;$("grid").classList.add("hidden");$("activeArea").classList.remove("hidden");$("angleArea").classList.add("hidden");$("activeArea").scrollIntoView({behavior:"smooth",block:"start"});}
 $("backBtn").onclick=()=>{$("activeArea").classList.add("hidden");$("angleArea").classList.add("hidden");$("grid").classList.remove("hidden");};
