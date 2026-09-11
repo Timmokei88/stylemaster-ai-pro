@@ -47,4 +47,21 @@ window.addEventListener("load",()=>{
    prompt.dispatchEvent(new Event("input",{bubbles:true}));
  });
 });
+
+window.addEventListener("load",()=>{
+ const angleButton=document.getElementById("generateChosenAnglesBtn");
+ if(angleButton)angleButton.closest("div[style*='margin-top:13px']")?.remove();
+ document.getElementById("angleArea")?.remove();
+ document.querySelectorAll(".credit-rate").forEach(item=>{if(/angle sheet/i.test(item.textContent))item.remove()});
+ const scrub=()=>{
+  document.querySelectorAll("[data-support-question]").forEach(item=>{if(/angle[ -]?sheet/i.test(item.textContent+" "+item.dataset.supportQuestion))item.remove()});
+  document.querySelectorAll(".mixo-faq-item").forEach(item=>{const summary=item.querySelector("summary");if(/angle[ -]?sheet/i.test(summary?.textContent||""))item.remove();else if(/angle[ -]?sheet/i.test(item.textContent)){const body=item.querySelector("div");if(body)body.textContent="Select the image you want from the results. MixoLabs opens the larger Active Masterpiece view with download, fullscreen, gallery and favourite controls."}});
+  document.querySelectorAll(".mixo-support-box").forEach(item=>{if(/angle[ -]?sheet/i.test(item.textContent)){const copy=item.querySelector("span");if(copy)copy.textContent="Help with prompts, reference images, output quality and variations."}});
+  document.querySelectorAll(".mixo-tutorial-chapter").forEach(item=>{if(/Results & Angle Sheets/i.test(item.textContent)){const title=item.querySelector("b"),copy=item.querySelector("small");if(title)title.textContent="5. Results & Downloads";if(copy)copy.textContent="Select, download, view fullscreen, save and favourite your creations."}});
+  document.querySelectorAll(".mixo-tutorial-card").forEach(item=>{if(/angle[ -]?sheet/i.test(item.textContent))item.remove()});
+  const tourTitle=document.getElementById("mixoTourTitle"),tourText=document.getElementById("mixoTourText");
+  if(/angle[ -]?sheet/i.test((tourTitle?.textContent||"")+" "+(tourText?.textContent||""))){if(tourTitle)tourTitle.textContent="Results & Downloads";if(tourText)tourText.textContent="Select a result to download it, view it fullscreen, save it to your gallery or add it to favourites."}
+ };
+ scrub();new MutationObserver(scrub).observe(document.body,{childList:true,subtree:true});
+});
 })();

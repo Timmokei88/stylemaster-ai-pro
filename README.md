@@ -8,10 +8,10 @@ PRIVATE MODEL COMPARISON TEST:
 - Aggregate votes are stored in PostgreSQL. The comparison prompt is represented only by a one-way hash and is not stored as readable text.
 
 NEW:
-- Select exactly which of Front / Left / Right / Back / Top / Bottom you want.
-- Only selected angles generate, reducing unnecessary image-generation usage.
+- The dedicated angle-sheet workflow has been retired because generative image models cannot guarantee correct view geometry every time.
+- Users can still describe a multi-panel or multi-view composition in the normal prompt box; it is treated and charged as one ordinary image generation.
 - Live community MVP: image uploads, prompt sharing, likes, live feed, and one-click Use Prompt.
-- Existing angle-sheet workflow and 200-shade colour system are retained.
+- The existing 200-shade colour system is retained.
 
 LOCAL SERVER:
 1. Install Node.js 18+.
@@ -70,4 +70,3 @@ V10 ANGLE PROGRESS COUNTER
 - The loading panel now always shows selected-angle progress as X of N.
 - Examples: 1 of 2, 2 of 2; 1 of 4, 2 of 4, 3 of 4, 4 of 4.
 - The selected views are produced together in the angle sheet.
-
