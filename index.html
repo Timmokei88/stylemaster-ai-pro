@@ -1435,4 +1435,39 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
 })();
 </script>
 
+<style id="mixo-readable-ui-v57">
+.mixo-settings #prompt{min-height:140px;max-height:440px;resize:none;overflow-y:hidden;font-size:15px;line-height:1.55;transition:height .12s ease}
+.mixo-billing-head p{font-size:14px;line-height:1.5;color:#b9c6dc}.mixo-billing-stat span{font-size:13px;color:#aebed5}.mixo-plan .muted,.mixo-plan ul,.mixo-pack p,.mixo-rollover,.mixo-billing-note,.mixo-billing-status{font-size:13px;line-height:1.6;color:#bdcbe0}.mixo-custom-offer>p{font-size:14px;line-height:1.6;color:#b4c2d8}.mixo-custom-amount label,.mixo-custom-result span{font-size:13px}.mixo-legal-body{font-size:15px;line-height:1.75}
+.mixo-legal-narrator{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 16px;padding:12px 14px;border:1px solid rgba(67,211,255,.48);border-radius:11px;background:rgba(5,22,47,.96);box-shadow:0 8px 24px rgba(0,0,0,.25)}.mixo-legal-narrator button{border:0;border-radius:8px;background:linear-gradient(90deg,#0d91c5,#824fe2);color:#fff;padding:9px 13px;font-size:14px;font-weight:900;cursor:pointer}.mixo-legal-narrator button.playing{background:linear-gradient(90deg,#b43e6f,#8d31b9)}.mixo-legal-narrator select{border:1px solid #385f87;border-radius:8px;background:#07152c;color:#fff;padding:8px 10px;font-size:14px}.mixo-legal-narrator span{color:#a9bdd8;font-size:13px}
+</style>
+<script id="mixo-readable-ui-v57-system">
+(()=>{
+ const prompt=document.getElementById('prompt');
+ if(prompt){
+  const resize=()=>{prompt.style.height='auto';const height=Math.min(Math.max(prompt.scrollHeight,140),440);prompt.style.height=height+'px';prompt.style.overflowY=prompt.scrollHeight>440?'auto':'hidden'};
+  prompt.addEventListener('input',resize);window.addEventListener('resize',resize);
+  document.getElementById('randomBtn')?.addEventListener('click',()=>requestAnimationFrame(resize));
+  document.getElementById('clearBtn')?.addEventListener('click',()=>requestAnimationFrame(resize));
+  requestAnimationFrame(resize);
+ }
+ const legalBody=document.getElementById('mixoLegalBody');
+ if(!legalBody)return;
+ let reading=false;
+ function stopLegal(){reading=false;if(window.mixoFastNarration?.stop)window.mixoFastNarration.stop();if('speechSynthesis' in window)window.speechSynthesis.cancel()}
+ function addNarrator(){
+  const title=document.getElementById('mixoLegalTitle')?.textContent||'';
+  if(!/Privacy|Terms/i.test(title)||legalBody.querySelector('.mixo-legal-narrator'))return;
+  const text=[...legalBody.querySelectorAll('h3,p,li,.mixo-legal-note')].map(node=>node.innerText.trim()).filter(Boolean).join('. ');
+  const bar=document.createElement('div');bar.className='mixo-legal-narrator';bar.setAttribute('role','group');bar.setAttribute('aria-label','Policy narrator');
+  bar.innerHTML='<button type="button">▶ Read this page aloud</button><select aria-label="Narrator voice"><option value="female">Female narrator</option><option value="male">Male narrator</option></select><span>Listen to the complete policy.</span>';
+  const button=bar.querySelector('button'),voice=bar.querySelector('select');
+  const finish=()=>{reading=false;button.classList.remove('playing');button.textContent='▶ Read this page aloud';bar.querySelector('span').textContent='Listen to the complete policy.'};
+  button.addEventListener('click',()=>{if(reading){stopLegal();finish();return}stopLegal();reading=true;button.classList.add('playing');button.textContent='■ Stop reading';const sentences=text.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[text],chunks=[];let chunk='';sentences.forEach(sentence=>{if((chunk+' '+sentence).length>1500&&chunk){chunks.push(chunk.trim());chunk=sentence}else chunk+=' '+sentence});if(chunk.trim())chunks.push(chunk.trim());let index=0;const next=()=>{if(!reading)return;if(index>=chunks.length){finish();return}bar.querySelector('span').textContent=`Reading section ${index+1} of ${chunks.length}…`;const part=chunks[index++];if(window.mixoFastNarration?.speak)window.mixoFastNarration.speak(part,voice.value,next);else if('speechSynthesis' in window){const utterance=new SpeechSynthesisUtterance(part);utterance.rate=.92;utterance.onend=next;utterance.onerror=finish;window.speechSynthesis.speak(utterance)}else finish()};next()});
+  legalBody.prepend(bar);
+ }
+ const observer=new MutationObserver(()=>requestAnimationFrame(addNarrator));observer.observe(legalBody,{childList:true});
+ document.getElementById('mixoLegalClose')?.addEventListener('click',stopLegal);
+ requestAnimationFrame(addNarrator);
+})();
+</script>
 </body></html>
