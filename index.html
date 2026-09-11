@@ -1284,7 +1284,7 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
 \n<style id="mixo-tutorial-exit-fix-styles">
 #mixoTutorialDismissLayer{position:fixed;inset:0;z-index:100150;background:transparent;display:none;pointer-events:none}
 #mixoTutorialDismissLayer.active{display:block}
-#mixoTutorialQuickExit{position:fixed;right:22px;top:22px;z-index:100210;display:none;align-items:center;gap:8px;border:1px solid rgba(103,226,255,.85);border-radius:999px;padding:10px 15px;background:#07172d;color:#fff;font:800 12px/1 system-ui,-apple-system,Segoe UI,sans-serif;box-shadow:0 8px 32px rgba(0,0,0,.55),0 0 20px rgba(70,220,255,.2);cursor:pointer}
+#mixoTutorialQuickExit{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:100210;display:none;align-items:center;gap:10px;border:2px solid rgba(103,226,255,.95);border-right:0;border-radius:14px 0 0 14px;padding:18px 20px;background:linear-gradient(135deg,#0a284b,#7a2d9d);color:#fff;font:900 16px/1.2 system-ui,-apple-system,Segoe UI,sans-serif;box-shadow:0 10px 38px rgba(0,0,0,.68),0 0 25px rgba(70,220,255,.28);cursor:pointer}
 #mixoTutorialQuickExit.active{display:flex}
 #mixoTutorialQuickExit:hover,#mixoTutorialQuickExit:focus{background:#10345c;outline:2px solid #46dcff;outline-offset:2px}
 </style>
@@ -1303,7 +1303,8 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
   document.body.appendChild(quick);
 
   function highlighted(){return document.querySelectorAll('.mixo-tour-highlight').length>0}
-  function sync(){const on=highlighted();layer.classList.toggle('active',on);quick.classList.toggle('active',on)}
+  function tutorialOpen(){const overlay=document.getElementById('mixoTutorialOverlay'),panel=document.getElementById('mixoWatchPanel');return !!(overlay&&!overlay.classList.contains('hidden'))||!!panel?.classList.contains('mixo-guided-active')||highlighted()}
+  function sync(){const on=tutorialOpen();layer.classList.toggle('active',highlighted());quick.classList.toggle('active',on)}
   function stopAll(){
     if(typeof window.mixoTutorialExit==='function'){window.mixoTutorialExit();return}
     try{speechSynthesis.cancel()}catch(_){}
@@ -1452,8 +1453,8 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
  }
  const legalBody=document.getElementById('mixoLegalBody');
  if(!legalBody)return;
- let reading=false;
- function stopLegal(){reading=false;if(window.mixoFastNarration?.stop)window.mixoFastNarration.stop();if('speechSynthesis' in window)window.speechSynthesis.cancel()}
+ let reading=false,legalAudio=null,legalController=null;
+ function stopLegal(){reading=false;if(legalController){legalController.abort();legalController=null}if(legalAudio){try{legalAudio.pause();URL.revokeObjectURL(legalAudio.src)}catch(_){}legalAudio=null}if(window.mixoFastNarration?.stop)window.mixoFastNarration.stop();if('speechSynthesis' in window)window.speechSynthesis.cancel()}
  function addNarrator(){
   const title=document.getElementById('mixoLegalTitle')?.textContent||'';
   if(!/Privacy|Terms/i.test(title)||legalBody.querySelector('.mixo-legal-narrator'))return;
@@ -1461,8 +1462,9 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
   const bar=document.createElement('div');bar.className='mixo-legal-narrator';bar.setAttribute('role','group');bar.setAttribute('aria-label','Policy narrator');
   bar.innerHTML='<button type="button">▶ Read this page aloud</button><select aria-label="Narrator voice"><option value="female">Female narrator</option><option value="male">Male narrator</option></select><span>Listen to the complete policy.</span>';
   const button=bar.querySelector('button'),voice=bar.querySelector('select');
-  const finish=()=>{reading=false;button.classList.remove('playing');button.textContent='▶ Read this page aloud';bar.querySelector('span').textContent='Listen to the complete policy.'};
-  button.addEventListener('click',()=>{if(reading){stopLegal();finish();return}stopLegal();reading=true;button.classList.add('playing');button.textContent='■ Stop reading';const sentences=text.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[text],chunks=[];let chunk='';sentences.forEach(sentence=>{if((chunk+' '+sentence).length>1500&&chunk){chunks.push(chunk.trim());chunk=sentence}else chunk+=' '+sentence});if(chunk.trim())chunks.push(chunk.trim());let index=0;const next=()=>{if(!reading)return;if(index>=chunks.length){finish();return}bar.querySelector('span').textContent=`Reading section ${index+1} of ${chunks.length}…`;const part=chunks[index++];if(window.mixoFastNarration?.speak)window.mixoFastNarration.speak(part,voice.value,next);else if('speechSynthesis' in window){const utterance=new SpeechSynthesisUtterance(part);utterance.rate=.92;utterance.onend=next;utterance.onerror=finish;window.speechSynthesis.speak(utterance)}else finish()};next()});
+  const finish=(message='Listen to the complete policy.')=>{reading=false;button.classList.remove('playing');button.textContent='▶ Read this page aloud';bar.querySelector('span').textContent=message};
+  const tutorialVoice=document.getElementById('mixoVoiceSelect');if(tutorialVoice)voice.value=tutorialVoice.value||'female';voice.addEventListener('change',()=>{if(tutorialVoice)tutorialVoice.value=voice.value});
+  button.addEventListener('click',async()=>{if(reading){stopLegal();finish();return}stopLegal();reading=true;button.classList.add('playing');button.textContent='■ Stop reading';const sentences=text.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[text],chunks=[];let chunk='';sentences.forEach(sentence=>{if((chunk+' '+sentence).length>1100&&chunk){chunks.push(chunk.trim());chunk=sentence}else chunk+=' '+sentence});if(chunk.trim())chunks.push(chunk.trim());let index=0;const next=async()=>{if(!reading)return;if(index>=chunks.length){finish();return}bar.querySelector('span').textContent=`Natural narrator: section ${index+1} of ${chunks.length}…`;legalController=new AbortController;try{const response=await fetch('/api/narration',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:chunks[index++],voice:voice.value}),signal:legalController.signal});legalController=null;if(!reading)return;if(!response.ok)throw Error('Natural narrator unavailable');const blob=await response.blob();if(!blob.type.startsWith('audio/'))throw Error('Invalid narrator audio');legalAudio=new Audio(URL.createObjectURL(blob));legalAudio.volume=Number(document.getElementById('mixoVoiceVolume')?.value||1);legalAudio.onended=()=>{if(legalAudio){URL.revokeObjectURL(legalAudio.src);legalAudio=null}next()};legalAudio.onerror=()=>{stopLegal();finish('The natural narrator could not play. Please try again.')};await legalAudio.play()}catch(error){if(error.name==='AbortError')return;stopLegal();finish('The natural tutorial narrator is temporarily unavailable. Please try again.')}};next()});
   legalBody.prepend(bar);
  }
  const observer=new MutationObserver(()=>requestAnimationFrame(addNarrator));observer.observe(legalBody,{childList:true});
