@@ -19,7 +19,7 @@ const stripe=STRIPE_SECRET_KEY?new Stripe(STRIPE_SECRET_KEY):null;
 const r2Configured=()=>!!(R2_ACCOUNT_ID&&R2_ACCESS_KEY_ID&&R2_SECRET_ACCESS_KEY&&R2_BUCKET_NAME);
 const r2=r2Configured()?new S3Client({region:"auto",endpoint:`https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,credentials:{accessKeyId:R2_ACCESS_KEY_ID,secretAccessKey:R2_SECRET_ACCESS_KEY}}):null;
 const log=(level,event,details={})=>console[level](JSON.stringify({ts:new Date().toISOString(),level,event,...details}));
-async function alertOwner(event,details={}){log("warn",event,details);if(!ALERT_WEBHOOK_URL)return;try{await fetch(ALERT_WEBHOOK_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({source:"MixoLabs",event,details,at:new Date().toISOString()}),signal:AbortSignal.timeout(8000)})}catch(e){log("error","alert_delivery_failed",{event,message:e.message})}}
+async function alertOwner(event,details={}){log("warn",event,details);if(!ALERT_WEBHOOK_URL)return;try{const at=new Date().toISOString(),summary=`⚠️ MixoLabs alert: ${event}\nTime: ${at}\nDetails: ${JSON.stringify(details).slice(0,1500)}`,response=await fetch(ALERT_WEBHOOK_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content:summary,text:summary,username:"MixoLabs Alerts",source:"MixoLabs",event,details,at}),signal:AbortSignal.timeout(8000)});if(!response.ok)throw Error(`Alert webhook returned ${response.status}`)}catch(e){log("error","alert_delivery_failed",{event,message:e.message})}}
 const BILLING={
  creator:{kind:"subscription",credits:100,priceId:process.env.STRIPE_PRICE_CREATOR_MONTHLY},
  pro:{kind:"subscription",credits:230,priceId:process.env.STRIPE_PRICE_PRO_MONTHLY},
