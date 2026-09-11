@@ -19,7 +19,7 @@ LOCAL SERVER:
 3. Run START-WINDOWS.bat.
 4. Open http://localhost:3000.
 
-For a real public community launch, add authentication, a proper database/cloud image storage, moderation/reporting, anti-spam/rate limiting, backups, HTTPS, and privacy/terms controls.
+The production service includes authenticated accounts, PostgreSQL records, private Cloudflare R2 image storage, Stripe credit accounting, moderation and reporting, rate limiting, durable generation records, failure refunds, operational status endpoints, and privacy/terms controls. Hosting-level database backups and alert delivery must remain enabled in the production accounts.
 
 
 NEW IN V5 — CREATIVE SAFETY + ORIGINALITY GUARD
@@ -45,28 +45,7 @@ NOTE:
 No finite software can mathematically promise that two ideas will never be semantically similar forever, but this build prevents exact stored repeats and makes repeated descriptions extremely unlikely.
 
 
-V7 FIXES
-- The old "6 Strict 3D Angle Views" button is removed from the selected-image screen.
-- Users now choose Front / Left / Right / Back / Top / Bottom BEFORE any angle API calls happen.
-- Any combination from 1 to 6 angles is supported.
-- No hidden helper angle generations are made, so selected angle count equals angle-generation count.
-- Left/right prompts now explicitly enforce exact ±90° orthographic yaw and physical side orientation.
-- Unselected angle cards stay hidden.
-- Community now includes both the inspiration feed and a real Socket.IO live chat.
-- Chat messages are persisted in data/community-chat.json for this MVP.
-
-ACCURACY NOTE
-AI image models can still occasionally fail perfect geometric consistency. V7 makes the prompts and cross-view references substantially stricter, but it cannot mathematically guarantee CAD-grade orthographic accuracy from a generative image model.
-
-
-V8: Generated and angle images can now be clicked to open a full-screen zoomable viewer. Press Escape to close.
-
-CURRENT ANGLE-SHEET WORKFLOW
-- Users select any combination of Front, Left, Right, Back, Top and Bottom.
-- The selected views are generated together as one Gemini angle-sheet image.
-- No 3D-generation service or 3D-model charge is included.
-
-V10 ANGLE PROGRESS COUNTER
-- The loading panel now always shows selected-angle progress as X of N.
-- Examples: 1 of 2, 2 of 2; 1 of 4, 2 of 4, 3 of 4, 4 of 4.
-- The selected views are produced together in the angle sheet.
+CURRENT MULTI-VIEW POSITION
+- The dedicated angle-sheet and 3D-model workflows are retired and cannot charge credits.
+- Customers may request multi-view artwork through the ordinary prompt box for the normal displayed image cost.
+- Multi-view output is artistic and may omit, reverse, duplicate or mislabel views; it is not a CAD or engineering service.

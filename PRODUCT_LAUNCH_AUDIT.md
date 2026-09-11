@@ -1,4 +1,4 @@
-# StyleMaster V8 — Product & Launch Audit
+# MixoLabs — Production Launch Audit
 
 ## Already strong
 - Gemini image generation with prompt controls, references, colour families, 1–6 variations and high-resolution options.
@@ -8,15 +8,25 @@
 - Community inspiration feed, prompt reuse, likes and real-time chat.
 - Full-screen click-to-enlarge image viewer.
 
-## Critical before a public paid launch
-1. Move Gemini image-generation API calls behind the secure server. Browser-side API credentials must never be exposed.
-2. Add authentication/user accounts.
-3. Replace local JSON/community uploads with a production database + cloud object storage/CDN.
-4. Add server-side credit accounting, subscriptions and idempotent billing logic.
-5. Add server-side moderation, report/block tools, upload scanning, rate limiting and anti-spam.
-6. Add durable generation jobs: retry, timeout handling, status polling, cancellation and recovery after refresh.
-7. Add monitoring: structured logs, crash/error reporting, API cost tracking and abuse alerts.
-8. Add Terms, Privacy, community rules, copyright/IP reporting and deletion/export controls.
+## Production foundations completed in this build
+
+1. Gemini calls and credentials are server-side.
+2. Authentication and PostgreSQL-backed sessions are enabled.
+3. PostgreSQL stores account and community records; Cloudflare R2 stores private and published images.
+4. Credits, subscriptions, payments, refunds and Stripe events are handled server-side with idempotency.
+5. Prompts, reference images and public content are screened; reports, owner review and rate limits are present.
+6. Generation jobs are durable, successful results can be recovered after refresh, and interrupted jobs are refunded automatically.
+7. JSON operational logs, owner alerts, health reporting and an owner-only operational summary are available.
+8. Terms, Privacy, community rules, safety rules, IP reporting and customer support disclosures are published.
+9. The website AI support assistant is present. A guarded email assistant can be activated with the documented mailbox provider settings.
+
+## Provider-account controls to keep enabled
+
+- Render PostgreSQL backups/recovery and service monitoring.
+- Gemini spend limits and billing alerts.
+- Stripe live webhook delivery, dispute alerts and customer portal configuration.
+- A verified support sender/inbound route and an alert webhook.
+- Periodic professional review of legal wording and actual business practices.
 
 ## Highest-value growth features
 1. Remix attribution: every public creation gets a Remix button and keeps a link back to the original creator.
