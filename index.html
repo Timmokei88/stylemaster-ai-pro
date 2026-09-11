@@ -655,9 +655,12 @@ function openPage(which){
  }
 }
 document.querySelectorAll("[data-legal-open]").forEach(b=>b.addEventListener("click",()=>openPage(b.dataset.legalOpen)));
-close.addEventListener("click",()=>{stopFaqSpeech();overlay.classList.add("hidden")});
-overlay.addEventListener("click",e=>{if(e.target===overlay){stopFaqSpeech();overlay.classList.add("hidden")}});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.classList.contains("hidden")){stopFaqSpeech();overlay.classList.add("hidden")}});
+const directLegalPage={"/privacy":"privacy","/terms":"terms","/support":"support","/faq":"faq"}[location.pathname.replace(/\/$/,"")||"/"];
+if(directLegalPage)openPage(directLegalPage);
+function closeLegalPage(){stopFaqSpeech();overlay.classList.add("hidden");if(directLegalPage)history.replaceState({},"","/")}
+close.addEventListener("click",closeLegalPage);
+overlay.addEventListener("click",e=>{if(e.target===overlay)closeLegalPage()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.classList.contains("hidden"))closeLegalPage()});
 })();
 </script>
 
