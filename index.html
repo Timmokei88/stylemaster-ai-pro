@@ -847,7 +847,8 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay&&!overlay.c
    socket.on("connect",()=>{online.textContent="Live";});
    socket.on("disconnect",()=>{online.textContent="Reconnecting…";});
    socket.on("community:online",n=>{online.textContent=Number(n||0)+" online";});
-   socket.on("community:chat-message",add);
+   socket.on("community:chat-message",m=>{add(m);if(m?.isOwner)status.textContent="Message sent to the live community."});
+   socket.on("community:error",e=>{status.textContent=e?.error||"Your message could not be sent.";status.style.color="#ff8096";setTimeout(()=>{status.style.color=""},5000)});
    socket.on("community:content-hidden",x=>{const id=CSS.escape(String(x.contentId||"")),button=list.querySelector(`[data-community-report="${id}"],[data-community-delete="${id}"]`);button?.closest(".mixo-chat-msg")?.remove()});
  }
  function profileName(){return window.mixoUser?.displayName||""}
@@ -874,7 +875,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay&&!overlay.c
    connect();
    if(!socket?.connected){status.textContent="Chat is reconnecting. Try again in a moment.";return}
    socket.emit("community:chat-send",{name:n,message:msg});
-   message.value=""; status.textContent="Message sent to the live community.";
+   message.value=""; status.style.color=""; status.textContent="Checking message safety…";
  }
  uploadButton.addEventListener("click",()=>fileInput.click());
  fileInput.addEventListener("change",()=>{
