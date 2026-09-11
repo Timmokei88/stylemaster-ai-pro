@@ -1472,4 +1472,10 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
  requestAnimationFrame(addNarrator);
 })();
 </script>
+<style id="mixo-guided-panel-exit-v60-style">
+#mixoTutorialQuickExit{display:none!important}#mixoGuidedPanelExit{grid-column:1/-1;border:2px solid #62dcff;border-radius:9px;background:linear-gradient(90deg,#7d245d,#762cbb);color:#fff;padding:10px 14px;font-size:14px;font-weight:900;cursor:pointer}#mixoGuidedPanelExit:hover,#mixoGuidedPanelExit:focus-visible{filter:brightness(1.16);outline:3px solid rgba(98,220,255,.35);outline-offset:2px}
+</style>
+<script id="mixo-guided-panel-exit-v60">
+(()=>{const controls=document.querySelector('.mixo-watch-controls');if(!controls||document.getElementById('mixoGuidedPanelExit'))return;const exit=document.createElement('button');exit.id='mixoGuidedPanelExit';exit.type='button';exit.textContent='✕ Exit Tutorial';exit.setAttribute('aria-label','Exit the guided tutorial');exit.addEventListener('click',()=>{if(typeof window.mixoTutorialExit==='function')window.mixoTutorialExit();else document.getElementById('mixoTutorialQuickExit')?.click()});controls.appendChild(exit)})();
+</script>
 </body></html>
