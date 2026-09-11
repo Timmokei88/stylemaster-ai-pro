@@ -49,8 +49,6 @@ window.addEventListener("load",()=>{
 });
 
 window.addEventListener("load",()=>{
- const angleButton=document.getElementById("generateChosenAnglesBtn");
- if(angleButton)angleButton.closest("div[style*='margin-top:13px']")?.remove();
  const retiredAngleArea=document.getElementById("angleArea");
  if(retiredAngleArea){retiredAngleArea.classList.add("hidden");retiredAngleArea.style.display="none"}
  document.querySelectorAll(".credit-rate").forEach(item=>{if(/angle sheet/i.test(item.textContent))item.remove()});

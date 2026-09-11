@@ -2,8 +2,7 @@
 
 ## Already strong
 - Gemini image generation with prompt controls, references, colour families, 1–6 variations and high-resolution options.
-- Pre-selected 1–6 orthographic angle workflow with stricter left/right side locking.
-- Selectable Gemini angle-sheet workflow.
+- Standard image generation supports free-text requests for composite or multi-view imagery without promising geometric accuracy.
 - Never-repeat random prompt engine.
 - Creative safety/originality guard.
 - Community inspiration feed, prompt reuse, likes and real-time chat.
@@ -31,9 +30,5 @@
 9. Prompt recipe cards showing prompt + aspect ratio + quality + colours + references + settings.
 10. Private-by-default option for generations; explicit opt-in before community publishing.
 
-## Important truth about angle accuracy
-The current V7/V8 prompt locking substantially constrains left/right views, but generative image models cannot guarantee CAD-grade projection. If exact engineering orthographic geometry becomes a core selling point, generate/reconstruct a true 3D model first and render the six views from the 3D camera. That is the reliable architecture for exact angles.
-
-
-## V9 angle architecture correction
-The current angle system generates the selected views together in one Gemini angle-sheet image. This keeps the workflow simple and avoids a separate 3D service, although generative views cannot guarantee CAD-grade geometric consistency.
+## Retired angle-sheet feature
+The dedicated angle-sheet workflow was removed because generative image models cannot guarantee accurate left and right geometry. Historical charges are refunded automatically and old angle-sheet API requests are rejected without charge.
