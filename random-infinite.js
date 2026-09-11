@@ -51,7 +51,8 @@ window.addEventListener("load",()=>{
 window.addEventListener("load",()=>{
  const angleButton=document.getElementById("generateChosenAnglesBtn");
  if(angleButton)angleButton.closest("div[style*='margin-top:13px']")?.remove();
- document.getElementById("angleArea")?.remove();
+ const retiredAngleArea=document.getElementById("angleArea");
+ if(retiredAngleArea){retiredAngleArea.classList.add("hidden");retiredAngleArea.style.display="none"}
  document.querySelectorAll(".credit-rate").forEach(item=>{if(/angle sheet/i.test(item.textContent))item.remove()});
  const scrub=()=>{
   document.querySelectorAll("[data-support-question]").forEach(item=>{if(/angle[ -]?sheet/i.test(item.textContent+" "+item.dataset.supportQuestion))item.remove()});
