@@ -25,13 +25,9 @@ Run one smallest live purchase, confirm credits are added once, issue a refund i
 
 ## Automated support email
 
-The on-site AI support assistant works with the Gemini key. Automated email replies additionally require a verified `support@mixolabs.art` sender, `RESEND_API_KEY` and a long random `SUPPORT_EMAIL_WEBHOOK_SECRET`.
+The on-site AI support assistant works with the Gemini key. Automated email replies additionally require a verified `support@mixolabs.art` sender, a full-access `RESEND_API_KEY`, and the Resend webhook signing secret (beginning `whsec_`) in `SUPPORT_EMAIL_WEBHOOK_SECRET`.
 
-The inbound mail provider must POST this shape to `/api/support/email/inbound` with the header `X-MixoLabs-Email-Secret`:
-
-```json
-{"messageId":"provider-message-id","from":"customer@example.com","subject":"Question","text":"Message body"}
-```
+Create a Resend webhook for the `email.received` event at `https://mixolabs.art/api/support/email/inbound`. The endpoint verifies Resend's signature from the untouched request body, rejects stale or forged requests, retrieves the full message through the Receiving API, ignores automated replies, and prevents duplicate responses.
 
 Ordinary product questions may receive an AI response. Billing disputes, refunds, missing credits, account access, privacy requests, legal/IP issues and safety cases are acknowledged and marked for human review. The bot cannot alter accounts, credits, payments or legal decisions.
 
