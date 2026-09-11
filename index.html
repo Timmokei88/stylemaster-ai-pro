@@ -463,7 +463,8 @@ $("loading").classList.add("hidden");
 };
 
 function clearTemporaryCreations(){activeSelectedImage="";$('grid').innerHTML="";$('grid').classList.add('hidden');$('activeArea').classList.add('hidden');$('angleArea').classList.add('hidden');$('placeholder').classList.remove('hidden');if(saveImageStatus)saveImageStatus.textContent=""}
-window.addEventListener('mixo:auth-changed',clearTemporaryCreations);
+let temporaryCreationUserId=null;
+window.addEventListener('mixo:auth-changed',event=>{const nextUserId=event.detail?.id||null;if(temporaryCreationUserId!==null&&nextUserId!==temporaryCreationUserId)clearTemporaryCreations();temporaryCreationUserId=nextUserId});
 
 function selectImage(url){activeSelectedImage=url;$("outputImage").src=url;$("grid").classList.add("hidden");$("activeArea").classList.remove("hidden");$("angleArea").classList.add("hidden");$("activeArea").scrollIntoView({behavior:"smooth",block:"start"});}
 $("backBtn").onclick=()=>{$("activeArea").classList.add("hidden");$("angleArea").classList.add("hidden");$("grid").classList.remove("hidden");};
