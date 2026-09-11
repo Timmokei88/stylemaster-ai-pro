@@ -473,9 +473,10 @@ function download(url,name){const a=document.createElement("a");a.href=url;a.dow
 const saveImageStatus=$("saveImageStatus");
 async function saveAccountImage(kind){
   if(!activeSelectedImage)return;
-  if(!String(activeSelectedImage).startsWith("data:image/")){saveImageStatus.textContent="This image cannot be copied into account storage.";return}
+  const source=String(activeSelectedImage),generationMatch=source.match(/\/api\/generations\/([0-9a-f-]{36})\/content(?:[?#].*)?$/i);
+  if(!source.startsWith("data:image/")&&!generationMatch){saveImageStatus.textContent="This image source cannot be saved to account storage.";return}
   saveImageStatus.textContent="Saving securely to your account…";
-  try{const r=await fetch("/api/library/images",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({kind,imageData:activeSelectedImage,prompt:$("prompt")?.value||""})}),d=await r.json();if(!r.ok)throw Error(d.error||"The image could not be saved.");saveImageStatus.textContent=d.alreadySaved?(kind==="gallery"?"Already saved to My Gallery.":"Already in My Favourites."):(kind==="gallery"?"✓ Saved permanently to My Gallery.":"♥ Added permanently to My Favourites.");window.dispatchEvent(new Event("mixo:library-changed"))}catch(e){saveImageStatus.textContent=e.message}
+  try{const endpoint=generationMatch?`/api/library/generations/${encodeURIComponent(generationMatch[1])}`:"/api/library/images",payload=generationMatch?{kind,prompt:$("prompt")?.value||""}:{kind,imageData:activeSelectedImage,prompt:$("prompt")?.value||""},r=await fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}),d=await r.json();if(!r.ok)throw Error(d.error||"The image could not be saved.");saveImageStatus.textContent=d.alreadySaved?(kind==="gallery"?"Already saved to My Gallery.":"Already in My Favourites."):(kind==="gallery"?"✓ Saved permanently to My Gallery.":"♥ Added permanently to My Favourites.");window.dispatchEvent(new Event("mixo:library-changed"))}catch(e){saveImageStatus.textContent=e.message}
 }
 $("saveToGalleryBtn").onclick=()=>saveAccountImage("gallery");
 $("saveToFavoritesBtn").onclick=()=>saveAccountImage("favorites");
