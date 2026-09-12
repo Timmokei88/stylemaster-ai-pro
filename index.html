@@ -12,6 +12,7 @@
 @media(max-width:1280px){.mixo-topbar,.mixo-studio{width:min(1080px,calc(100vw - 220px));min-width:720px}.mixo-nav{gap:18px}.mixo-workspace{grid-template-columns:330px minmax(0,1fr)}}@media(max-width:980px){body{overflow:auto}.mixo-page{height:auto;min-height:100vh;display:block;padding:10px}#skinBackdrop{position:fixed}.mixo-topbar,.mixo-studio{width:100%;min-width:0}.mixo-topbar{grid-template-columns:1fr auto;padding:0 4px;height:66px}.mixo-nav{display:none}.mixo-cta{display:none}.mixo-studio{height:auto;max-height:none;overflow:visible!important;margin-top:4px}.mixo-workspace{grid-template-columns:1fr}.mixo-right{position:static}.mixo-features{grid-template-columns:1fr}.mixo-footer{grid-template-columns:1fr;gap:6px;text-align:center;padding:14px 6px}.mixo-footer .social{justify-content:center}.promo-copy{width:72%}}@media(max-width:620px){.mixo-brand-logo{width:200px}.mixo-studio-inner{padding:12px}.two{grid-template-columns:1fr}#grid{grid-template-columns:1fr}.mixo-promo{min-height:230px;background-size:88% 100%}.promo-copy{width:80%;padding:18px}.promo-copy h3{font-size:24px}.creation-head{align-items:start;flex-direction:column}}
 
 /* V77: independently scrollable desktop settings column. */
+.mixo-cad-tools{margin-top:10px;border:1px solid rgba(46,218,255,.42);border-radius:10px;background:linear-gradient(180deg,rgba(6,32,58,.82),rgba(3,15,35,.9));overflow:hidden}.mixo-cad-tools>summary{list-style:none;padding:12px;cursor:pointer;font-size:12px;font-weight:900;color:#bdf5ff;display:flex;justify-content:space-between;align-items:center}.mixo-cad-tools>summary::-webkit-details-marker{display:none}.mixo-cad-tools>summary:after{content:"⌄";font-size:16px;color:#c7d1e5}.mixo-cad-tools[open]>summary:after{content:"⌃"}.mixo-cad-body{padding:10px 12px 12px;border-top:1px solid rgba(46,218,255,.18)}.mixo-cad-body textarea{min-height:110px!important;max-height:260px!important;resize:vertical!important;overflow-y:auto!important}.mixo-cad-notice{margin:5px 0 0;padding:9px;border-left:3px solid #f0b84b;background:rgba(91,63,8,.2);color:#dfc98f;font-size:10px;line-height:1.5}
 @media(min-width:981px){
  .mixo-settings{max-height:calc(100vh - 142px);overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;scrollbar-width:auto;scrollbar-color:#7c5cff rgba(5,15,36,.96)}
  .mixo-settings::-webkit-scrollbar{width:12px}
@@ -344,7 +345,8 @@ const STYLES = {
 "Design & Graphics":["Logo Concept","Poster Design","Album Cover","Book Cover","T-Shirt Graphic","Sticker Design","Tattoo Design","Pattern Design","Infographic Illustration","Editorial Illustration","Minimal Vector","Line Art","Paper Cut"],
 "Architecture & Interiors":["Modern Architecture","Luxury Interior","Scandinavian Interior","Japandi","Brutalist Architecture","Art Deco Interior","Gothic Architecture","Futuristic Interior","Tiny House","Retail Interior","Restaurant Interior","Garden Design"],
 "Fantasy & Sci-Fi":["High Fantasy","Dark Fantasy","Fairy Tale","Mythological","Steampunk","Dieselpunk","Solarpunk","Space Opera","Retro Futurism","Alien World","Magical Realism","Epic Adventure"],
-"Abstract & Experimental":["Geometric Abstract","Fluid Art","Ink in Water","Kaleidoscopic","Psychedelic","Glitch Art","Fractal","Gradient Art","Textural Abstract","Surreal Collage","Dreamlike Abstract"]
+"Abstract & Experimental":["Geometric Abstract","Fluid Art","Ink in Water","Kaleidoscopic","Psychedelic","Glitch Art","Fractal","Gradient Art","Textural Abstract","Surreal Collage","Dreamlike Abstract"],
+"CAD & Technical Design":["3D CAD Concept","Engineering Blueprint","Exploded Assembly View","Orthographic Drawing","Cutaway Diagram","Patent-style Drawing","Product Schematics","Mechanical Concept","Marine Design Concept","Architectural Technical Drawing"]
 };
 
 const THEMES = [
@@ -374,6 +376,33 @@ let uploadedImages=[], activeSelectedColor="", activeSelectedImage="";
 const $=id=>document.getElementById(id);
 const categorySelect=$("categorySelect"), styleSelect=$("styleSelect"), themeSelect=$("themeSelect");
 
+const cadTools=document.createElement("details");
+cadTools.className="mixo-cad-tools";
+cadTools.innerHTML=`<summary>📐 &nbsp; CAD &amp; Blueprint Tools</summary><div class="mixo-cad-body"><div class="field"><label for="technicalModeSelect">Technical output</label><select id="technicalModeSelect"><option value="auto">Auto-detect from prompt</option><option value="cad-render">3D CAD concept</option><option value="blueprint">Measured blueprint sheet</option><option value="exploded">Exploded assembly view</option><option value="orthographic">Orthographic multi-view drawing</option><option value="cutaway">Cutaway technical diagram</option><option value="patent">Patent-style line drawing</option></select></div><div class="two"><div class="field"><label for="technicalUnitsSelect">Measurement units</label><select id="technicalUnitsSelect"><option value="mm">Millimetres (mm)</option><option value="cm">Centimetres (cm)</option><option value="m">Metres (m)</option><option value="in">Inches (in)</option><option value="ft">Feet (ft)</option></select></div><div class="field"><label for="technicalAccuracySelect">Dimension handling</label><select id="technicalAccuracySelect"><option value="provided">Use only my measurements</option><option value="conceptual">Allow conceptual estimates</option></select></div></div><div class="field"><label for="technicalDimensions">Measurements, parts and assembly notes (Optional)</label><textarea id="technicalDimensions" maxlength="1800" placeholder="Example: overall length 7.5 m; beam 2.4 m; hull height 1.2 m; list any known parts, materials or assembly requirements..."></textarea></div><p class="mixo-cad-notice">AI technical images are visual concepts, not certified engineering drawings. Supplied measurements are preserved in the prompt, but every dimension, structure and assembly must be checked by a qualified person before construction, manufacture or safety-critical use.</p></div>`;
+document.querySelector(".mixo-advanced")?.before(cadTools);
+const technicalModeSelect=$("technicalModeSelect"),technicalUnitsSelect=$("technicalUnitsSelect"),technicalAccuracySelect=$("technicalAccuracySelect"),technicalDimensions=$("technicalDimensions");
+
+function detectTechnicalMode(promptText){
+ const text=String(promptText||"").toLowerCase();
+ if(/exploded|assembly breakdown|parts breakdown/.test(text))return "exploded";
+ if(/orthographic|front view|side view|top view/.test(text))return "orthographic";
+ if(/cutaway|cross[- ]section|sectional/.test(text))return "cutaway";
+ if(/patent drawing|patent-style/.test(text))return "patent";
+ if(/blueprint|schematic|technical drawing/.test(text))return "blueprint";
+ if(/\bcad\b|3d model|engineering concept/.test(text))return "cad-render";
+ return "";
+}
+
+function technicalPromptBlock(promptText){
+ const selected=technicalModeSelect?.value||"auto",mode=selected==="auto"?detectTechnicalMode(promptText):selected;
+ if(!mode&&categorySelect.value!=="CAD & Technical Design")return "";
+ const effective=mode||"cad-render",units=technicalUnitsSelect?.value||"mm",dimensions=technicalDimensions?.value.trim()||"",allowEstimates=technicalAccuracySelect?.value==="conceptual";
+ const directions={"cad-render":"a clean 3D CAD-style design concept with controlled perspective, readable component separation and professional neutral materials","blueprint":"a professional blueprint presentation with plan, elevation and sectional information where useful","exploded":"an exploded assembly diagram with components separated in logical assembly order, leader lines and a numbered parts key","orthographic":"an orthographic technical sheet with clearly labelled front, rear, side and top views aligned consistently","cutaway":"a cutaway technical diagram showing the major internal systems and how they relate spatially","patent":"a monochrome patent-style line drawing with numbered callouts and multiple relevant views"};
+ const measurementRule=dimensions?`Authoritative user-supplied specifications (${units} unless another unit is written): ${dimensions}. Reproduce these values exactly. Do not alter them or invent any missing measurement; mark missing values as \"NOT SPECIFIED\".`:allowEstimates?`No verified measurements were supplied. You may show plausible conceptual proportions in ${units}, but every dimension must be visibly marked \"ESTIMATED — VERIFY\" and the sheet must say \"CONCEPT ONLY — NOT FOR FABRICATION\".`:`No measurements were supplied. Do not invent numerical dimensions. Use proportional callouts only and visibly state \"DIMENSIONS REQUIRED — CONCEPT ONLY\".`;
+ return `TECHNICAL DESIGN MODE: Create ${directions[effective]}. ${measurementRule} Use legible labels, consistent callouts, a scale/reference note, a revision box and an uncluttered technical layout. Show only components that are supported by the request or common high-level design logic. Do not claim structural validation, regulatory compliance, seaworthiness, load capacity, tolerances or manufacturing readiness. This is a visual concept requiring professional CAD and engineering verification.`;
+}
+technicalModeSelect?.addEventListener("change",()=>{if(technicalModeSelect.value!=="auto"&&categorySelect.value!=="CAD & Technical Design"){categorySelect.value="CAD & Technical Design";categorySelect.dispatchEvent(new Event("change"));const preferred={"cad-render":"3D CAD Concept","blueprint":"Engineering Blueprint","exploded":"Exploded Assembly View","orthographic":"Orthographic Drawing","cutaway":"Cutaway Diagram","patent":"Patent-style Drawing"}[technicalModeSelect.value];if(preferred)styleSelect.value=preferred;}});
+
 function initSelectors(){
 categorySelect.innerHTML='<option value="">Select Category (Optional)...</option>';
 Object.keys(STYLES).forEach(c=>categorySelect.add(new Option(c,c)));
@@ -384,7 +413,9 @@ styleSelect.innerHTML='<option value="">Select Style (Optional)...</option>';
 categorySelect.addEventListener("change",()=>{
 styleSelect.innerHTML='<option value="">Select Style (Optional)...</option>';
 (STYLES[categorySelect.value]||[]).forEach(s=>styleSelect.add(new Option(s,s)));
+if(categorySelect.value==="CAD & Technical Design")cadTools.open=true;
 });
+$("prompt")?.addEventListener("input",()=>{if(detectTechnicalMode($("prompt").value))cadTools.open=true;});
 
 function initColors(){
 const host=$("families"); host.innerHTML="";
@@ -452,6 +483,7 @@ return `${p}
 ${categorySelect.value?`Category: ${categorySelect.value}.`:""}
 ${styleSelect.value?`Visual style: ${styleSelect.value}.`:""}
 ${themeSelect.value?`Theme/atmosphere: ${themeSelect.value}.`:""}
+${technicalPromptBlock(p)}
 ${activeSelectedColor?`Primary colour direction: ${activeSelectedColor}. Preserve the intended material/metallic appearance when relevant.`:""}
 Background direction: ${bg}.
 ${exact?`EXACT VISIBLE TEXT: "${exact}". Render this wording exactly, with no spelling changes.`:""}
@@ -588,6 +620,7 @@ faq:`<input id="mixoFaqSearch" class="mixo-faq-search" type="search" placeholder
 <details class="mixo-faq-item"><summary>What does aspect ratio change?</summary><div>Aspect ratio changes the shape of the image. For example, 1:1 is square, 9:16 is portrait and 16:9 is landscape.</div></details>
 <details class="mixo-faq-item"><summary>How do reference images work?</summary><div>Open Advanced Options and select Add Photos. You may upload lawful images of adults, people and places that you have permission or another lawful basis to use. References guide the generation but do not guarantee an identical result.</div></details>
 <details class="mixo-faq-item"><summary>How do category, style and theme work?</summary><div>These optional controls add structured guidance to your prompt. You can use any combination or leave them blank.</div></details>
+<details class="mixo-faq-item"><summary>Can MixoLabs create CAD models, blueprints or measured assembly drawings?</summary><div>MixoLabs can generate visual CAD concepts, blueprint-style sheets, exploded assemblies, orthographic views, cutaways and patent-style illustrations. Enter known measurements in CAD &amp; Blueprint Tools and choose Use only my measurements. AI images are not editable CAD files or certified engineering drawings, and their dimensions, geometry, structure and assembly must be independently checked before manufacture or construction.</div></details>
 <details class="mixo-faq-item"><summary>How do colours and shades work?</summary><div>Select a colour family and then a shade. MixoLabs adds that colour choice to the generation instructions; lighting and surrounding colours can still affect its appearance in the final image.</div></details>
 <h3 class="mixo-faq-group">Results and files</h3>
 <details class="mixo-faq-item"><summary>How do I see a generated image in detail?</summary><div>Select the image you want from the results. MixoLabs opens the larger Active Masterpiece view with download, fullscreen, gallery and favourite controls.</div></details>
@@ -1246,6 +1279,7 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
   ['#imageSizeSelect','Image Quality','Choose the output resolution and quality level. Higher settings can cost more credits, so check the displayed total before generating.'],
   ['#aspectRatioSelect','Aspect Ratio','Choose the shape of the final image, such as square, portrait or landscape, to suit where it will be used.'],
   ['#backgroundSelect','Background','Choose how the subject background should be treated, including contextual scenes, studio treatments, solid colours or isolation where available.'],
+  ['.mixo-cad-tools','CAD and Blueprint Tools','Create visual CAD concepts, blueprints, exploded assemblies, orthographic sheets, cutaways or patent-style drawings. Add known measurements and choose whether missing dimensions must remain unspecified or may be shown as clearly labelled conceptual estimates. These images require professional verification before fabrication.'],
   ['#addPhotos','Reference Images','Upload reference images to guide identity, materials, composition or design. Only upload images you have permission to use.'],
   ['#categorySelect','Category','Category sets the broad type of creation and changes the related style choices available below it.'],
   ['#styleSelect','Style','Style controls the visual treatment within the selected category, such as photographic, illustrated or design-led approaches.'],
