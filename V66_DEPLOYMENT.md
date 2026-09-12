@@ -5,7 +5,7 @@
 - Limits new registration to ten single-use Early Access invitations.
 - Existing accounts continue to log in normally.
 - Adds a waiting list and Discord alerts for new waiting-list entries, new invited accounts, and invitation capacity at 5, 2 and 0 places remaining.
-- Limits both adjustable purchase types to £1.99–£10 during Early Access.
+- Limits both adjustable purchase types to £1.99–£15 during Early Access.
 - Uses a conservative 5p internal allowance per 1K image when calculating sale credits.
 - Gives monthly plans 20% more credits, rounded up.
 
@@ -31,7 +31,7 @@ Keep the invitation-code line private. Give each tester only one code. Each code
    - `early_access_enabled` is `true`
    - `early_access_codes_configured` is `10`
 5. In a private/incognito window, open Create Account. Confirm that an invitation-code box and Join Waiting List button appear.
-6. Confirm Plans & Credits only accepts £1.99–£10 and initially shows 24 one-time credits or 29 monthly credits at £1.99.
+6. Confirm Plans & Credits only accepts £1.99–£15 and initially shows 24 one-time credits or 29 monthly credits at £1.99.
 
 ## Invitation handling
 
@@ -48,5 +48,6 @@ To stop issuing places, keep any remaining codes private and direct visitors to 
 | £5.00 | 66 | 80 |
 | £7.00 | 94 | 113 |
 | £10.00 | 137 | 165 |
+| £15.00 | 207 | 249 |
 
 These figures use the existing reserve formula for Stripe costs, a 28% operating/profit reserve, and a conservative 5p internal image-cost allowance. Actual provider charges can vary, so keep Google billing alerts and a hard spending limit in place.
