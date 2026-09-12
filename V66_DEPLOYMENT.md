@@ -31,7 +31,7 @@ Keep the invitation-code line private. Give each tester only one code. Each code
    - `early_access_enabled` is `true`
    - `early_access_codes_configured` is `10`
 5. In a private/incognito window, open Create Account. Confirm that an invitation-code box and Join Waiting List button appear.
-6. Confirm Plans & Credits only accepts £1.99–£15 and initially shows 24 one-time credits or 29 monthly credits at £1.99.
+6. Confirm Plans & Credits only accepts £1.99–£15 and initially shows 25 one-time credits or 30 monthly credits at £1.99.
 
 ## Invitation handling
 
@@ -43,11 +43,11 @@ To stop issuing places, keep any remaining codes private and direct visitors to 
 
 | Payment | One-time credits | Monthly credits |
 |---:|---:|---:|
-| £1.99 | 24 | 29 |
-| £3.50 | 45 | 54 |
-| £5.00 | 66 | 80 |
-| £7.00 | 94 | 113 |
+| £1.99 | 25 | 30 |
+| £3.50 | 46 | 56 |
+| £5.00 | 67 | 81 |
+| £7.00 | 95 | 114 |
 | £10.00 | 137 | 165 |
-| £15.00 | 207 | 249 |
+| £15.00 | 208 | 250 |
 
 These figures use the existing reserve formula for Stripe costs, a 28% operating/profit reserve, and a conservative 5p internal image-cost allowance. Actual provider charges can vary, so keep Google billing alerts and a hard spending limit in place.
