@@ -1652,26 +1652,26 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
  settings.addEventListener('wheel',event=>controlledWheel(settings,event),{passive:false});studio.addEventListener('wheel',event=>controlledWheel(studio,event),{passive:false});
 })();
 </script>
-<style id="mixo-arrow-scroll-v90-style">
+<style id="mixo-arrow-scroll-v91-style">
 @media(min-width:981px){
  .mixo-workspace{position:relative}
  .mixo-settings{scrollbar-width:none!important;-ms-overflow-style:none;padding-right:30px}
  .mixo-settings::-webkit-scrollbar{display:none!important;width:0!important}
- .mixo-fine-scroll{position:absolute;z-index:30;width:24px;border-radius:12px;background:rgba(5,15,36,.98);border:1px solid rgba(54,146,211,.45);touch-action:none;user-select:none;overflow:hidden}
- .mixo-scroll-arrow{position:absolute;left:0;width:100%;height:28px;border:0;background:#102a4b;color:#70e7ff;font-size:17px;font-weight:900;line-height:28px;padding:0;cursor:pointer;z-index:2}
+ .mixo-fine-scroll{position:fixed;z-index:700;width:26px;border-radius:12px;background:rgba(5,15,36,.98);border:1px solid rgba(54,146,211,.65);touch-action:none;user-select:none;overflow:hidden;box-shadow:0 0 10px rgba(46,218,255,.2)}
+ .mixo-scroll-arrow{position:absolute;left:0;width:100%;height:32px;border:0;background:#164774;color:#fff;font-size:18px;font-weight:900;line-height:32px;padding:0;cursor:pointer;z-index:3}
  .mixo-scroll-arrow:hover,.mixo-scroll-arrow:focus-visible{background:#19446e;color:#fff;outline:1px solid #69e8ff;outline-offset:-2px}.mixo-scroll-up{top:0}.mixo-scroll-down{bottom:0}
- .mixo-fine-scroll-track{position:absolute;left:3px;right:3px;top:31px;bottom:31px;border-radius:9px;background:rgba(4,12,29,.96);cursor:pointer}
+ .mixo-fine-scroll-track{position:absolute;left:3px;right:3px;top:35px;bottom:35px;border-radius:9px;background:rgba(4,12,29,.96);cursor:pointer}
  .mixo-fine-scroll-thumb{position:absolute;left:1px;right:1px;top:0;min-height:42px;border-radius:10px;background:linear-gradient(180deg,#2edaff,#7c5cff 58%,#e447ff);box-shadow:0 0 9px rgba(46,218,255,.35);cursor:grab;touch-action:none}
  .mixo-fine-scroll-thumb:active{cursor:grabbing;filter:brightness(1.15)}
 }
 @media(max-width:980px){.mixo-fine-scroll{display:none!important}}
 </style>
-<script id="mixo-arrow-scroll-v90">
+<script id="mixo-arrow-scroll-v91">
 (()=>{
  const settings=document.querySelector('.mixo-settings'),workspace=document.querySelector('.mixo-workspace');if(!settings||!workspace)return;
  const rail=document.createElement('div'),up=document.createElement('button'),track=document.createElement('div'),thumb=document.createElement('div'),down=document.createElement('button');rail.className='mixo-fine-scroll';rail.setAttribute('aria-label','Generator settings scroll controls');up.type='button';up.className='mixo-scroll-arrow mixo-scroll-up';up.textContent='▲';up.setAttribute('aria-label','Scroll generator settings up');down.type='button';down.className='mixo-scroll-arrow mixo-scroll-down';down.textContent='▼';down.setAttribute('aria-label','Scroll generator settings down');track.className='mixo-fine-scroll-track';thumb.className='mixo-fine-scroll-thumb';track.appendChild(thumb);rail.append(up,track,down);workspace.appendChild(rail);
  const desktop=()=>window.matchMedia('(min-width:981px)').matches,maxScroll=()=>Math.max(0,settings.scrollHeight-settings.clientHeight);
- function layout(){if(!desktop())return;rail.style.top=`${settings.offsetTop+5}px`;rail.style.left=`${settings.offsetLeft+settings.offsetWidth-28}px`;rail.style.height=`${Math.max(110,settings.clientHeight-10)}px`;sync()}
+ function layout(){if(!desktop())return;const rect=settings.getBoundingClientRect(),top=Math.max(8,rect.top+5),available=Math.max(120,window.innerHeight-top-8),visibleHeight=Math.min(Math.max(120,rect.height-10),available);rail.style.top=`${top}px`;rail.style.left=`${Math.min(window.innerWidth-34,rect.right-30)}px`;rail.style.height=`${visibleHeight}px`;sync()}
  function metrics(){const trackHeight=track.clientHeight,ratio=Math.min(1,settings.clientHeight/settings.scrollHeight),thumbHeight=Math.max(42,trackHeight*ratio),travel=Math.max(1,trackHeight-thumbHeight);thumb.style.height=`${thumbHeight}px`;return{travel}}
  function sync(){if(!desktop())return;const {travel}=metrics(),maximum=maxScroll(),position=maximum?settings.scrollTop/maximum*travel:0;thumb.style.transform=`translateY(${position}px)`}
  let dragging=false,startY=0,startScroll=0,repeatTimer=0;
@@ -1683,7 +1683,7 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
  function startRepeat(direction,event){nudge(direction);clearTimeout(repeatTimer);repeatTimer=setTimeout(()=>{repeatTimer=setInterval(()=>nudge(direction),70)},320);event.preventDefault()}
  function stopRepeat(){clearTimeout(repeatTimer);clearInterval(repeatTimer);repeatTimer=0}
  up.addEventListener('pointerdown',event=>startRepeat(-1,event));down.addEventListener('pointerdown',event=>startRepeat(1,event));window.addEventListener('pointerup',stopRepeat);window.addEventListener('pointercancel',stopRepeat);up.addEventListener('click',event=>event.preventDefault());down.addEventListener('click',event=>event.preventDefault());
- settings.addEventListener('scroll',sync,{passive:true});window.addEventListener('resize',layout,{passive:true});new ResizeObserver(layout).observe(settings);layout();
+ settings.addEventListener('scroll',sync,{passive:true});window.addEventListener('resize',layout,{passive:true});window.addEventListener('scroll',layout,{passive:true,capture:true});new ResizeObserver(layout).observe(settings);layout();
 })();
 </script>
 </body></html>

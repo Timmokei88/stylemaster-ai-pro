@@ -1,10 +1,13 @@
 const fs=require('fs'),path=require('path'),vm=require('vm');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const checks=[
- [html.includes('mixo-arrow-scroll-v90'), 'V90 arrow scrollbar is installed'],
+ [html.includes('mixo-arrow-scroll-v91'), 'V91 viewport-contained arrow scrollbar is installed'],
  [html.includes('panels are intentionally independent'), 'obsolete linked-panel scrolling is disabled'],
  [html.includes('scrollbar-width:none!important'), 'uncontrolled native left scrollbar is hidden'],
  [html.includes('mixo-scroll-up')&&html.includes('mixo-scroll-down'), 'fixed up and down controls are present'],
+ [html.includes('position:fixed;z-index:700'), 'scrollbar remains fixed inside the visible viewport'],
+ [html.includes('window.innerHeight-top-8'), 'rail height reserves visible space for the bottom arrow'],
+ [html.includes('window.addEventListener(\'scroll\',layout'), 'rail position refreshes when surrounding content moves'],
  [html.includes("startScroll+naturalMovement"), 'thumb dragging directly follows the pointer without reduced-sensitivity drift'],
  [html.includes("direction*55"), 'arrow presses use small precise steps'],
  [html.includes("setInterval(()=>nudge(direction),70)"), 'holding an arrow scrolls continuously'],
