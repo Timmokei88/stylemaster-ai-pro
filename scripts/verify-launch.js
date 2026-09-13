@@ -14,6 +14,8 @@ const checks=[
  ["health endpoint",server.includes('/api/health')],
  ["reference-image moderation",server.includes('stage:"reference_upload"')],
  ["benign child toy transformations",server.includes("turn my son into a toy")&&server.includes("toy|toy figure|toy character")],
+ ["benign historical child portraits",server.includes("BENIGN_CHILD_HISTORY")&&server.includes("historically accurate, wholesome period portrait")],
+ ["benign generation default allow",server.includes('stage==="generation"||stage==="reference_upload"&&inconclusive')],
  ["provider safety refunds",server.includes('providerSafety?"PROVIDER_SAFETY"')&&server.includes("credits were automatically returned")],
  ["one-credit Flash Lite generation",server.includes('const COSTS={"1K":1}')&&server.includes('GENERATION_MODEL="gemini-3.1-flash-lite-image"')&&!server.includes('HIGH_RES_IMAGE_MODEL=')],
  ["free local enhancer",html.includes('mixo-free-enhancer-v106')&&html.includes('2× / 4× Enhance')&&html.includes('300 DPI')],
