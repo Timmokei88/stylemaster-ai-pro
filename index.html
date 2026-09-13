@@ -1632,4 +1632,16 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
 <script id="mixo-contextual-cad-v84">
 (()=>{const category=document.getElementById('categorySelect'),style=document.getElementById('styleSelect'),cad=document.querySelector('.mixo-cad-tools');if(!category||!style||!cad)return;const categoryLabel=document.querySelector('label[for="categorySelect"]'),styleLabel=document.querySelector('label[for="styleSelect"]');if(categoryLabel)categoryLabel.textContent='Genre';if(styleLabel)styleLabel.textContent='Sub-genre / Style';category.options[0].textContent='Select Genre (Optional)…';style.options[0].textContent='Select Sub-genre or Style (Optional)…';const update=()=>{const active=category.value==='CAD & Technical Design';cad.classList.toggle('mixo-cad-hidden',!active);cad.open=active};category.addEventListener('change',update);update()})();
 </script>
+<style id="mixo-controlled-scroll-v85-style">@media(min-width:981px){.mixo-settings,.mixo-studio{scroll-behavior:auto!important}}</style>
+<script id="mixo-controlled-scroll-v85">
+(()=>{
+ const studio=document.querySelector('.mixo-studio'),settings=document.querySelector('.mixo-settings'),variations=document.getElementById('variationCountSelect');
+ if(variations){variations.value='1';variations.dispatchEvent(new Event('change',{bubbles:true}))}
+ if(!studio||!settings)return;
+ const desktop=()=>window.matchMedia('(min-width:981px)').matches,reduced=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches,max=element=>Math.max(0,element.scrollHeight-element.clientHeight),destinations=new WeakMap(),frames=new WeakMap();
+ function animate(element){if(frames.has(element))return;const step=()=>{const destination=destinations.get(element)??element.scrollTop,difference=destination-element.scrollTop;if(Math.abs(difference)<.35){element.scrollTop=destination;frames.delete(element);return}element.scrollTop+=difference*.11;frames.set(element,requestAnimationFrame(step))};frames.set(element,requestAnimationFrame(step))}
+ function controlledWheel(element,event){if(!desktop()||event.ctrlKey||!event.deltaY)return;if(element===studio&&event.target.closest('.mixo-settings'))return;event.preventDefault();const unit=event.deltaMode===1?16:event.deltaMode===2?element.clientHeight:1,raw=event.deltaY*unit,limited=Math.max(-42,Math.min(42,raw*.22)),origin=destinations.has(element)?destinations.get(element):element.scrollTop,destination=Math.max(0,Math.min(max(element),origin+limited));destinations.set(element,destination);if(reduced()){element.scrollTop=destination;return}animate(element)}
+ settings.addEventListener('wheel',event=>controlledWheel(settings,event),{passive:false});studio.addEventListener('wheel',event=>controlledWheel(studio,event),{passive:false});
+})();
+</script>
 </body></html>

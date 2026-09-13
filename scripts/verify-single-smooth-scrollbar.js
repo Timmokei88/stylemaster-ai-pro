@@ -10,7 +10,7 @@ const checks=[
  [html.includes('difference*.10'), 'movement uses gentler eased gliding'],
  [html.includes('requestAnimationFrame(step)'), 'gliding runs at display refresh rate'],
  [html.includes("matchMedia('(prefers-reduced-motion: reduce)')"), 'reduced-motion users get immediate movement'],
- [!html.includes("addEventListener('wheel'"), 'native wheel and trackpad scrolling are not intercepted'],
+ [html.includes("addEventListener('wheel'")&&html.includes('{passive:false}'), 'wheel and trackpad movement is deliberately controlled'],
 ];
 for(const [ok,name] of checks){if(!ok)throw Error(`FAILED: ${name}`);console.log(`PASS: ${name}`)}
 let parsed=0;for(const match of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)){const source=match[1];if(!source.trim()||/application\/ld\+json/.test(match[0]))continue;new vm.Script(source,{filename:`inline-${++parsed}.js`});}
