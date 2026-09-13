@@ -13,6 +13,8 @@ const checks=[
  ["operations status",server.includes('/api/ops/status')],
  ["health endpoint",server.includes('/api/health')],
  ["reference-image moderation",server.includes('stage:"reference_upload"')],
+ ["benign child toy transformations",server.includes("turn my son into a toy")&&server.includes("toy|toy figure|toy character")],
+ ["provider safety refunds",server.includes('providerSafety?"PROVIDER_SAFETY"')&&server.includes("credits were automatically returned")],
  ["retired angle API blocked",server.includes("Angle sheets have been retired")],
  ["3D provider removed",!server.includes("MESHY_API_KEY")&&!html.includes("Create 3D Model")],
  ["terms include multi-view limitation",html.includes("does not guarantee that front, back, left, right")],
