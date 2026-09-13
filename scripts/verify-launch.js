@@ -15,6 +15,8 @@ const checks=[
  ["reference-image moderation",server.includes('stage:"reference_upload"')],
  ["benign child toy transformations",server.includes("turn my son into a toy")&&server.includes("toy|toy figure|toy character")],
  ["provider safety refunds",server.includes('providerSafety?"PROVIDER_SAFETY"')&&server.includes("credits were automatically returned")],
+ ["protected prompt normalization",server.includes("providerCompatiblePrompt")&&server.includes("cinematic 3D family-animation toy")],
+ ["obsolete scroll controllers disabled",html.includes("V102: obsolete synchronised animation disabled")&&html.includes("V102: obsolete wheel interception caused slow and jumping")],
  ["retired angle API blocked",server.includes("Angle sheets have been retired")],
  ["3D provider removed",!server.includes("MESHY_API_KEY")&&!html.includes("Create 3D Model")],
  ["terms include multi-view limitation",html.includes("does not guarantee that front, back, left, right")],

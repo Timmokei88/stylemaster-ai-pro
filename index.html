@@ -1579,6 +1579,7 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
 </style>
 <script id="mixo-single-scrollbar-v81">
 (()=>{
+ return; // V102: obsolete synchronised animation disabled; native main scrolling owns the page.
  const studio=document.querySelector('.mixo-studio'),settings=document.querySelector('.mixo-settings');
  if(!studio||!settings)return;
  const enabled=()=>window.matchMedia('(min-width:981px)').matches;
@@ -1644,6 +1645,7 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
 <style id="mixo-controlled-scroll-v86-style">@media(min-width:981px){.mixo-settings,.mixo-studio{scroll-behavior:auto!important}}</style>
 <script id="mixo-controlled-scroll-v86">
 (()=>{
+ return; // V102: obsolete wheel interception caused slow and jumping desktop scrolling.
  const studio=document.querySelector('.mixo-studio'),settings=document.querySelector('.mixo-settings'),variations=document.getElementById('variationCountSelect');
  if(variations){variations.value='1';variations.dispatchEvent(new Event('change',{bubbles:true}))}
  if(!studio||!settings)return;
