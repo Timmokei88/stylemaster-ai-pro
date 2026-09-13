@@ -1652,7 +1652,7 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
  settings.addEventListener('wheel',event=>controlledWheel(settings,event),{passive:false});studio.addEventListener('wheel',event=>controlledWheel(studio,event),{passive:false});
 })();
 </script>
-<style id="mixo-fine-drag-scroll-v87-style">
+<style id="mixo-balanced-drag-scroll-v88-style">
 @media(min-width:981px){
  .mixo-workspace{position:relative}
  .mixo-settings{scrollbar-width:none!important;-ms-overflow-style:none;padding-right:25px}
@@ -1663,19 +1663,19 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
 }
 @media(max-width:980px){.mixo-fine-scroll{display:none!important}}
 </style>
-<script id="mixo-fine-drag-scroll-v87">
+<script id="mixo-balanced-drag-scroll-v88">
 (()=>{
  const settings=document.querySelector('.mixo-settings'),workspace=document.querySelector('.mixo-workspace');if(!settings||!workspace)return;
- const rail=document.createElement('div'),thumb=document.createElement('div');rail.className='mixo-fine-scroll';rail.setAttribute('aria-label','Fine scroll control — 22% drag sensitivity');thumb.className='mixo-fine-scroll-thumb';rail.appendChild(thumb);workspace.appendChild(rail);
+ const rail=document.createElement('div'),thumb=document.createElement('div');rail.className='mixo-fine-scroll';rail.setAttribute('aria-label','Controlled scroll handle — 50% drag sensitivity');thumb.className='mixo-fine-scroll-thumb';rail.appendChild(thumb);workspace.appendChild(rail);
  const desktop=()=>window.matchMedia('(min-width:981px)').matches,maxScroll=()=>Math.max(0,settings.scrollHeight-settings.clientHeight);
  function layout(){if(!desktop())return;rail.style.top=`${settings.offsetTop+5}px`;rail.style.left=`${settings.offsetLeft+settings.offsetWidth-19}px`;rail.style.height=`${Math.max(80,settings.clientHeight-10)}px`;sync()}
  function metrics(){const railHeight=rail.clientHeight,ratio=Math.min(1,settings.clientHeight/settings.scrollHeight),thumbHeight=Math.max(42,railHeight*ratio),travel=Math.max(1,railHeight-thumbHeight);thumb.style.height=`${thumbHeight}px`;return{travel}}
  function sync(){if(!desktop())return;const {travel}=metrics(),maximum=maxScroll(),position=maximum?settings.scrollTop/maximum*travel:0;thumb.style.transform=`translateY(${position}px)`}
  let dragging=false,startY=0,startScroll=0;
  thumb.addEventListener('pointerdown',event=>{if(!desktop())return;dragging=true;startY=event.clientY;startScroll=settings.scrollTop;thumb.setPointerCapture(event.pointerId);event.preventDefault()});
- thumb.addEventListener('pointermove',event=>{if(!dragging)return;const {travel}=metrics(),maximum=maxScroll(),naturalMovement=(event.clientY-startY)*(maximum/travel),destination=Math.max(0,Math.min(maximum,startScroll+(naturalMovement*.22)));settings.scrollTop=destination;event.preventDefault()});
+ thumb.addEventListener('pointermove',event=>{if(!dragging)return;const {travel}=metrics(),maximum=maxScroll(),naturalMovement=(event.clientY-startY)*(maximum/travel),destination=Math.max(0,Math.min(maximum,startScroll+(naturalMovement*.50)));settings.scrollTop=destination;event.preventDefault()});
  const stop=()=>{dragging=false};thumb.addEventListener('pointerup',stop);thumb.addEventListener('pointercancel',stop);
- rail.addEventListener('pointerdown',event=>{if(event.target===thumb)return;const direction=event.clientY<thumb.getBoundingClientRect().top?-1:1;settings.scrollBy({top:direction*settings.clientHeight*.22,behavior:'smooth'});event.preventDefault()});
+ rail.addEventListener('pointerdown',event=>{if(event.target===thumb)return;const direction=event.clientY<thumb.getBoundingClientRect().top?-1:1;settings.scrollBy({top:direction*settings.clientHeight*.50,behavior:'smooth'});event.preventDefault()});
  settings.addEventListener('scroll',sync,{passive:true});window.addEventListener('resize',layout,{passive:true});new ResizeObserver(layout).observe(settings);layout();
 })();
 </script>
