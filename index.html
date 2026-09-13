@@ -1716,4 +1716,33 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
  requestAnimationFrame(fitVisibleHeight);
 })();
 </script>
+<style id="mixo-complete-scroll-and-results-v95-style">
+/* V95: both desktop columns must remain reachable from top to bottom. */
+@media(min-width:981px){
+ .mixo-studio{overflow-y:scroll!important;scrollbar-width:auto!important;scrollbar-color:#b7c5db rgba(7,15,33,.94)!important;scrollbar-gutter:stable!important}
+ .mixo-studio::-webkit-scrollbar{display:block!important;width:13px!important}
+ .mixo-studio::-webkit-scrollbar-track{background:rgba(7,15,33,.94)!important;border-radius:0 20px 20px 0!important}
+ .mixo-studio::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#d6dfec,#8193b6)!important;border:3px solid rgba(7,15,33,.94)!important;border-radius:12px!important}
+ .mixo-right{position:static!important}
+ .mixo-settings{overscroll-behavior:auto!important}
+}
+.mixo-generation-card{min-height:0!important;justify-content:flex-start!important}
+.mixo-generation-card img{width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;object-fit:contain!important}
+#outputImage{display:block!important;width:auto!important;height:auto!important;min-height:0!important;max-height:none!important;max-width:100%!important;object-fit:contain!important}
+#grid,#activeArea,.creation{overflow:visible!important}
+</style>
+<script id="mixo-complete-scroll-and-results-v95-script">
+(()=>{
+ const settings=document.querySelector('.mixo-settings');
+ if(!settings)return;
+ // Let native wheel/touch scrolling own the settings pane. The older throttled
+ // listener is bypassed by handling the input before it reaches that listener.
+ settings.addEventListener('wheel',event=>{
+  if(!window.matchMedia('(min-width:981px)').matches||event.ctrlKey||!event.deltaY)return;
+  event.preventDefault();
+  const unit=event.deltaMode===1?16:event.deltaMode===2?settings.clientHeight:1;
+  settings.scrollTop+=event.deltaY*unit;
+ },{passive:false,capture:true});
+})();
+</script>
 </body></html>
