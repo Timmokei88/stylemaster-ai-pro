@@ -1733,6 +1733,7 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
 </style>
 <script id="mixo-complete-scroll-and-results-v95-script">
 (()=>{
+ return; // V96: the settings column now follows the single main scrollbar.
  const settings=document.querySelector('.mixo-settings');
  if(!settings)return;
  // Let native wheel/touch scrolling own the settings pane. The older throttled
@@ -1745,4 +1746,12 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
  },{passive:false,capture:true});
 })();
 </script>
+<style id="mixo-single-right-scrollbar-v96-style">
+/* V96: one scrollbar only—the main workspace scrollbar at the far right. */
+@media(min-width:981px){
+ .mixo-settings{max-height:none!important;overflow:visible!important;overscroll-behavior:auto!important;scrollbar-width:none!important;scrollbar-gutter:auto!important;padding-right:15px!important}
+ .mixo-settings::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+ .mixo-settings::-webkit-scrollbar-track,.mixo-settings::-webkit-scrollbar-thumb,.mixo-settings::-webkit-scrollbar-button{display:none!important}
+}
+</style>
 </body></html>
