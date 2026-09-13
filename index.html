@@ -1652,7 +1652,7 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
  settings.addEventListener('wheel',event=>controlledWheel(settings,event),{passive:false});studio.addEventListener('wheel',event=>controlledWheel(studio,event),{passive:false});
 })();
 </script>
-<style id="mixo-arrow-scroll-v91-style">
+<style id="mixo-arrow-scroll-v92-style">
 @media(min-width:981px){
  .mixo-workspace{position:relative}
  .mixo-settings{scrollbar-width:none!important;-ms-overflow-style:none;padding-right:30px}
@@ -1666,12 +1666,12 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
 }
 @media(max-width:980px){.mixo-fine-scroll{display:none!important}}
 </style>
-<script id="mixo-arrow-scroll-v91">
+<script id="mixo-arrow-scroll-v92">
 (()=>{
  const settings=document.querySelector('.mixo-settings'),workspace=document.querySelector('.mixo-workspace');if(!settings||!workspace)return;
  const rail=document.createElement('div'),up=document.createElement('button'),track=document.createElement('div'),thumb=document.createElement('div'),down=document.createElement('button');rail.className='mixo-fine-scroll';rail.setAttribute('aria-label','Generator settings scroll controls');up.type='button';up.className='mixo-scroll-arrow mixo-scroll-up';up.textContent='▲';up.setAttribute('aria-label','Scroll generator settings up');down.type='button';down.className='mixo-scroll-arrow mixo-scroll-down';down.textContent='▼';down.setAttribute('aria-label','Scroll generator settings down');track.className='mixo-fine-scroll-track';thumb.className='mixo-fine-scroll-thumb';track.appendChild(thumb);rail.append(up,track,down);workspace.appendChild(rail);
  const desktop=()=>window.matchMedia('(min-width:981px)').matches,maxScroll=()=>Math.max(0,settings.scrollHeight-settings.clientHeight);
- function layout(){if(!desktop())return;const rect=settings.getBoundingClientRect(),top=Math.max(8,rect.top+5),available=Math.max(120,window.innerHeight-top-8),visibleHeight=Math.min(Math.max(120,rect.height-10),available);rail.style.top=`${top}px`;rail.style.left=`${Math.min(window.innerWidth-34,rect.right-30)}px`;rail.style.height=`${visibleHeight}px`;sync()}
+ function layout(){if(!desktop())return;const workspaceRect=workspace.getBoundingClientRect(),settingsRect=settings.getBoundingClientRect(),firstColumn=parseFloat(getComputedStyle(workspace).gridTemplateColumns.split(' ')[0])||settings.offsetWidth,top=Math.max(8,workspaceRect.top+5),visibleBottom=Math.min(window.innerHeight-8,workspaceRect.bottom-5,settingsRect.bottom-5),visibleHeight=Math.max(120,visibleBottom-top),left=Math.max(workspaceRect.left+4,Math.min(window.innerWidth-34,workspaceRect.left+firstColumn-28));rail.style.top=`${top}px`;rail.style.left=`${left}px`;rail.style.height=`${visibleHeight}px`;sync()}
  function metrics(){const trackHeight=track.clientHeight,ratio=Math.min(1,settings.clientHeight/settings.scrollHeight),thumbHeight=Math.max(42,trackHeight*ratio),travel=Math.max(1,trackHeight-thumbHeight);thumb.style.height=`${thumbHeight}px`;return{travel}}
  function sync(){if(!desktop())return;const {travel}=metrics(),maximum=maxScroll(),position=maximum?settings.scrollTop/maximum*travel:0;thumb.style.transform=`translateY(${position}px)`}
  let dragging=false,startY=0,startScroll=0,repeatTimer=0;
