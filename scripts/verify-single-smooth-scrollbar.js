@@ -7,7 +7,7 @@ const checks=[
  [html.includes('.mixo-studio::-webkit-scrollbar{display:none!important'), 'main scrollbar is hidden in Chromium and Safari'],
  [html.includes('.mixo-settings::-webkit-scrollbar'), 'left settings scrollbar remains styled and visible'],
  [html.includes('connect(studio,settings);connect(settings,studio)'), 'scrolling either panel drives the other'],
- [html.includes('difference*.24'), 'movement uses gentle eased gliding'],
+ [html.includes('difference*.10'), 'movement uses gentler eased gliding'],
  [html.includes('requestAnimationFrame(step)'), 'gliding runs at display refresh rate'],
  [html.includes("matchMedia('(prefers-reduced-motion: reduce)')"), 'reduced-motion users get immediate movement'],
  [!html.includes("addEventListener('wheel'"), 'native wheel and trackpad scrolling are not intercepted'],

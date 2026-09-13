@@ -4,7 +4,7 @@ const checks=[
  [html.includes('mixo-single-scrollbar-v81'), 'V81 scroll system is present'],
  [html.includes('connect(studio,settings);connect(settings,studio)'), 'left and right scrolling is connected both ways'],
  [html.includes('maximum(target)*ratio'), 'scroll positions are mapped proportionally'],
- [html.includes('difference*.24'), 'linked panel uses eased interpolation'],
+ [html.includes('difference*.10'), 'linked panel uses eased interpolation'],
  [html.includes('requestAnimationFrame(step)'), 'animation uses browser frames'],
  [html.includes("matchMedia('(min-width:981px)')"), 'nested synchronisation is desktop-only'],
  [html.includes('prefers-reduced-motion: reduce'), 'reduced-motion preference is respected'],
