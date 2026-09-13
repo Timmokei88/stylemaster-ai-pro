@@ -18,7 +18,7 @@ const checks=[
  ["benign generation default allow",server.includes('stage==="generation"||stage==="reference_upload"&&inconclusive')],
  ["provider safety refunds",server.includes('providerSafety?"PROVIDER_SAFETY"')&&server.includes("credits were automatically returned")],
  ["one-credit Flash Lite generation",server.includes('const COSTS={"1K":1}')&&server.includes('GENERATION_MODEL="gemini-3.1-flash-lite-image"')&&!server.includes('HIGH_RES_IMAGE_MODEL=')],
- ["free local enhancer",html.includes('mixo-free-enhancer-v106')&&html.includes('2× / 4× Enhance')&&html.includes('300 DPI')],
+ ["free local enhancer",html.includes('mixo-free-enhancer-v106')&&html.includes('2K / 4K / 8K Enhance')&&html.includes('300 DPI')],
  ["lighting and shadow coherence",html.includes('cast-shadow direction, length, softness, contact shadows')],
  ["protected prompt normalization",server.includes("providerCompatiblePrompt")&&server.includes("cinematic 3D family-animation toy")],
  ["obsolete scroll controllers disabled",html.includes("V102: obsolete synchronised animation disabled")&&html.includes("V102: obsolete wheel interception caused slow and jumping")],
