@@ -1686,4 +1686,17 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
  settings.addEventListener('scroll',sync,{passive:true});window.addEventListener('resize',layout,{passive:true});window.addEventListener('scroll',layout,{passive:true,capture:true});new ResizeObserver(layout).observe(settings);layout();
 })();
 </script>
+<style id="mixo-native-scrollbar-v93-style">
+@media(min-width:981px){
+ .mixo-fine-scroll{display:none!important}
+ .mixo-settings{padding-right:15px!important;scrollbar-width:auto!important;scrollbar-color:#735cff rgba(5,15,36,.96)!important;scrollbar-gutter:stable!important}
+ .mixo-settings::-webkit-scrollbar{display:block!important;width:18px!important;height:auto!important}
+ .mixo-settings::-webkit-scrollbar-track{background:rgba(5,15,36,.98)!important;border-radius:10px!important}
+ .mixo-settings::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#2edaff,#735cff 58%,#e447ff)!important;border:3px solid rgba(5,15,36,.98)!important;border-radius:10px!important;min-height:44px!important}
+ .mixo-settings::-webkit-scrollbar-button:single-button{display:block!important;height:30px!important;min-height:30px!important;background-color:#164774!important;background-position:center!important;background-repeat:no-repeat!important;background-size:14px 14px!important;border:1px solid #54dfff!important}
+ .mixo-settings::-webkit-scrollbar-button:single-button:vertical:decrement{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='white' d='M10 4 3 14h14z'/%3E%3C/svg%3E")!important;border-radius:9px 9px 3px 3px!important}
+ .mixo-settings::-webkit-scrollbar-button:single-button:vertical:increment{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='white' d='m3 6 7 10 7-10z'/%3E%3C/svg%3E")!important;border-radius:3px 3px 9px 9px!important}
+ .mixo-settings::-webkit-scrollbar-button:single-button:hover{background-color:#2470a8!important}
+}
+</style>
 </body></html>
