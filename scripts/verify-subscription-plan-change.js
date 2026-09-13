@@ -9,6 +9,8 @@ const checks=[
  [server.includes('stripe.subscriptionItems.update(subscriptionItem.id'),'a Stripe-compatible subscription-item fallback is available'],
  [server.includes('proration_behavior:"none"'),'plan change avoids a surprise immediate charge'],
  [server.includes('subscription_change_failed'),'billing failures return a useful safe error code'],
+ [server.includes('$3::double precision'),'Stripe epoch timestamps are converted with the correct PostgreSQL type'],
+ [server.includes('reconciled:true'),'a prior partial Stripe success repairs the local account record'],
  [server.includes('subscription_amount_pence'),'selected monthly amount is retained'],
  [html.includes('Change Monthly Plan'),'the billing UI offers a real plan-change action'],
  [html.includes('changeMonthly(amountPence)'),'active subscribers use the plan-change flow'],
