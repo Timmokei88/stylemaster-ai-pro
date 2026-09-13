@@ -34,5 +34,11 @@ requireText("graphic violence", "graphic violence safety retained");
 requireText("clearly fictional fan-meeting scenes", "fictional meeting treatment");
 requireText("PROVIDER_SAFETY", "provider safety refusal is distinguished and refunded");
 requireText("automatically returned", "failed provider delivery confirms automatic credit return");
+requireText("safePrivateInconclusiveOverride", "private inconclusive classifier fallback");
+requireText("private_classifier_fallback", "private fallback is auditable");
+requireText("A realism fairy or a higher-resolution remake", "benign fantasy remake classifier guidance");
+requireText("PRIVATE_INCONCLUSIVE_RISK", "prohibited-content checks remain ahead of fallback");
+requireText("Number(moderation.confidence)<=0", "zero-confidence result is treated as inconclusive");
+requireText("automated safety review was inconclusive", "inconclusive default reason is recognised");
 
 console.log("\nReference-photo moderation checks passed.");
