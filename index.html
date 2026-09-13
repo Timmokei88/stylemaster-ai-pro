@@ -1668,6 +1668,7 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
 </style>
 <script id="mixo-arrow-scroll-v92">
 (()=>{
+ return; // V94: obsolete custom scrollbar fully disabled; native panel scrolling is used.
  const settings=document.querySelector('.mixo-settings'),workspace=document.querySelector('.mixo-workspace');if(!settings||!workspace)return;
  const rail=document.createElement('div'),up=document.createElement('button'),track=document.createElement('div'),thumb=document.createElement('div'),down=document.createElement('button');rail.className='mixo-fine-scroll';rail.setAttribute('aria-label','Generator settings scroll controls');up.type='button';up.className='mixo-scroll-arrow mixo-scroll-up';up.textContent='▲';up.setAttribute('aria-label','Scroll generator settings up');down.type='button';down.className='mixo-scroll-arrow mixo-scroll-down';down.textContent='▼';down.setAttribute('aria-label','Scroll generator settings down');track.className='mixo-fine-scroll-track';thumb.className='mixo-fine-scroll-thumb';track.appendChild(thumb);rail.append(up,track,down);workspace.appendChild(rail);
  const desktop=()=>window.matchMedia('(min-width:981px)').matches,maxScroll=()=>Math.max(0,settings.scrollHeight-settings.clientHeight);
@@ -1699,4 +1700,20 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
  .mixo-settings::-webkit-scrollbar-button:single-button:hover{background-color:#2470a8!important}
 }
 </style>
+<script id="mixo-visible-settings-height-v94">
+(()=>{
+ const settings=document.querySelector('.mixo-settings');if(!settings)return;
+ const desktop=()=>window.matchMedia('(min-width:981px)').matches;
+ function fitVisibleHeight(){
+  if(!desktop()){settings.style.removeProperty('max-height');return}
+  const top=settings.getBoundingClientRect().top;
+  const available=Math.max(300,window.innerHeight-top-16);
+  settings.style.maxHeight=`${available}px`;
+ }
+ window.addEventListener('resize',fitVisibleHeight,{passive:true});
+ window.addEventListener('scroll',fitVisibleHeight,{passive:true,capture:true});
+ new ResizeObserver(fitVisibleHeight).observe(document.querySelector('.mixo-features')||settings);
+ requestAnimationFrame(fitVisibleHeight);
+})();
+</script>
 </body></html>
