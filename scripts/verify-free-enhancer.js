@@ -7,7 +7,7 @@ const checks=[
  [html.includes("sizeSelect.innerHTML='<option value=\"1K\" selected>1K — Flash Lite • 1 credit/image</option>'"), 'quality selector is reduced to 1K at runtime'],
  [html.includes('mixo-free-enhancer-v106'), 'free enhancer is installed'],
  [html.includes('clipPath')&&html.includes('mixo-enhance-divider'), 'before/after split comparison is present'],
- [html.includes('sharpenSource')&&html.includes('getImageData'), 'real pixel-level edge enhancement is present'],
+ [html.includes('detailPass')&&html.includes('prepareSource')&&html.includes('getImageData'), 'multi-pass pixel-level detail enhancement is present'],
  [html.includes('setTimeout(enhance,80)')&&html.includes("onchange=()=>{clearTimeout(enhanceTimer)"), 'enhancement runs automatically on open and option changes'],
  [html.includes('Inspect at 200%'), 'magnified quality inspection is present'],
  [html.includes("a.download='mixolabs-enhanced.png'"), 'enhanced PNG download is present'],
