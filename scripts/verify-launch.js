@@ -17,6 +17,8 @@ const checks=[
  ["provider safety refunds",server.includes('providerSafety?"PROVIDER_SAFETY"')&&server.includes("credits were automatically returned")],
  ["protected prompt normalization",server.includes("providerCompatiblePrompt")&&server.includes("cinematic 3D family-animation toy")],
  ["obsolete scroll controllers disabled",html.includes("V102: obsolete synchronised animation disabled")&&html.includes("V102: obsolete wheel interception caused slow and jumping")],
+ ["one-image source default",html.includes('<option value="1" selected>1 Image</option>')&&!html.includes('<option value="6" selected>6 Images</option>')],
+ ["one-image startup default",html.includes('mixo-one-image-default-v103')&&html.includes("variations.value='1'")],
  ["retired angle API blocked",server.includes("Angle sheets have been retired")],
  ["3D provider removed",!server.includes("MESHY_API_KEY")&&!html.includes("Create 3D Model")],
  ["terms include multi-view limitation",html.includes("does not guarantee that front, back, left, right")],
