@@ -11,10 +11,10 @@ const checks=[
  [server.includes('sharp(image.buffer')&&server.includes('kernel:sharp.kernel.lanczos3'), 'server-side Lanczos enlargement is present'],
  [server.includes('.sharpen({sigma:settings.sigma')&&server.includes('.modulate({brightness:1.01'), 'real edge sharpening and clarity finishing are present'],
  [!html.includes('@tensorflow/tfjs@latest')&&!html.includes('upscaler.upscale'), 'freezing browser neural runtime is removed'],
- [html.includes('value="2048">2K Enhanced · Fast')&&html.includes('value="4096">4K Enhanced · Extra detail')&&html.includes('value="7680">8K Ultra · Maximum detail'), '2K, 4K, and 8K output targets are available'],
+ [html.includes('value="2048">2K Enhanced · Fast')&&!html.includes('value="4096">')&&!html.includes('value="7680">'), 'only the visible 2K output target remains'],
  [html.includes("fetch('/api/images/enhance'")&&html.includes('new FormData()')&&html.includes('sourceAsBlob')&&html.includes('await response.blob()'), 'direct binary enhancement runs away from the browser interface'],
  [server.includes('upload.single("image")')&&server.includes('quality:96')&&server.includes('chromaSubsampling:"4:4:4"'), 'fast upload and high-quality compact output path is present'],
- [server.includes('resolutionFinish={2048:')&&server.includes('4096:{detail:1.16')&&server.includes('7680:{detail:1.32')&&server.includes('.linear(settings.contrast'), '4K and 8K use progressively stronger detail, contrast, and colour finishing'],
+ [server.includes('targetEdge=2048')&&!server.includes('resolutionFinish=')&&server.includes('.linear(settings.contrast'), 'server is fixed to responsive 2K detail, contrast, and colour finishing'],
  [html.includes('mixo-enhancer-v111-fixed-viewport-style')&&html.includes('height:min(58vh,560px)'), 'comparison viewport remains fixed while zooming'],
  [html.includes('mixoEnhanceZoom')&&html.includes('max="400"'), 'independent 100 to 400 percent zoom is present'],
  [html.includes("compare.addEventListener('pointermove'")&&html.includes('--mixo-pan-x'), 'drag-to-pan works inside the fixed viewport'],
@@ -24,8 +24,8 @@ const checks=[
  [html.includes('requestAnimationFrame(()=>requestAnimationFrame(resolve))'), 'the modal receives two paint frames before heavy work'],
  [html.includes("range.value='0';range.oninput()")&&html.includes("range.value='50';range.oninput()"), 'comparison begins at Before and reveals the processed After image'],
  [html.includes("zoomRange.value='200'"), 'enhanced result opens at a useful inspection zoom'],
- [html.includes("downloadEnhanced('mixolabs-enhanced.jpg')"), 'enhanced JPEG download is present'],
- [html.includes("downloadEnhanced('mixolabs-enhanced-300dpi.jpg')"), '300 DPI print download is present'],
+ [html.includes("downloadEnhanced('mixolabs-2k-enhanced.jpg')"), 'enhanced JPEG download is present'],
+ [html.includes("downloadEnhanced('mixolabs-2k-enhanced-300dpi.jpg')"), '300 DPI print download is present'],
  [html.includes('cast-shadow direction, length, softness, contact shadows'), 'lighting consistency instruction is permanent'],
 ];
 let failed=0;for(const [ok,label] of checks){console.log(`${ok?'PASS':'FAIL'} ${label}`);if(!ok)failed++}if(failed)process.exit(1);
