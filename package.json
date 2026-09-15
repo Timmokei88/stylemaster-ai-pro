@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node server.js",
-    "check": "node --check server.js && node scripts/verify-launch.js"
+    "check": "node --check server.js && node scripts/verify-launch.js && node scripts/verify-v121-identity-realism-pricing.js"
   },
   "overrides": {
     "qs": "^6.15.4"

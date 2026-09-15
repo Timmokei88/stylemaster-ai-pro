@@ -1,5 +1,15 @@
 StyleMaster AI Pro V4
 
+V121 — IDENTITY, REALISM AND OWNER PRICING
+- Front/back, turnaround and model-sheet prompts automatically receive a strict same-design identity lock for every subject.
+- Photorealism and hyperrealism prompts automatically receive true-camera realism requirements.
+- The configured owner can open Settings > Owner Pricing Controls and change the base one-time credits and monthly bonus without editing code.
+- Example: £1.99, 30 base credits and a 20% monthly bonus gives 30 one-time credits or 36 monthly credits.
+- Pricing changes apply to new purchases and newly changed subscriptions. Existing subscriptions retain their recorded allowance until the customer changes plan or an intentional migration is performed.
+- MODERATOR_EMAILS must contain the owner's login email for these controls to appear.
+
+AI generation is probabilistic. The identity lock improves multi-view consistency but cannot guarantee pixel-identical geometry; exact production turnarounds require a dedicated 3D/CAD workflow.
+
 PRIVATE MODEL COMPARISON TEST:
 - Set MODEL_TESTER_EMAILS to the email address used by your MixoLabs owner account. Separate multiple addresses with commas.
 - After deployment, log in with that account and use the Private Model Test button at the lower-left of the generator.
