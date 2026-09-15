@@ -10,6 +10,13 @@ V121 — IDENTITY, REALISM AND OWNER PRICING
 
 AI generation is probabilistic. The identity lock improves multi-view consistency but cannot guarantee pixel-identical geometry; exact production turnarounds require a dedicated 3D/CAD workflow.
 
+V122 — SIMPLIFIED GLOBAL PRICING
+- The owner now edits one visible value: one-time credits provided for the fixed £1.99 baseline.
+- Press Enter or Save & Update All Offers to apply it.
+- Monthly credits are always calculated at 20% above the equivalent one-time offer.
+- Every manual amount and slider amount is recalculated proportionally and refreshed without a redeployment.
+- Owner inputs use a dark, high-contrast style so their values remain readable.
+
 PRIVATE MODEL COMPARISON TEST:
 - Set MODEL_TESTER_EMAILS to the email address used by your MixoLabs owner account. Separate multiple addresses with commas.
 - After deployment, log in with that account and use the Private Model Test button at the lower-left of the generator.
