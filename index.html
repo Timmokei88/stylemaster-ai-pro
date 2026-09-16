@@ -737,7 +737,7 @@ async function api(url,body){const r=await fetch(url,{method:"POST",headers:{"Co
 open.addEventListener("click",()=>{if(user){if(confirm("Log out of MixoLabs?"))api("/api/auth/logout",{}).then(()=>paint(null)).catch(e=>alert(e.message));return}overlay.classList.remove("hidden")});close.addEventListener("click",()=>overlay.classList.add("hidden"));overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.classList.add("hidden")});
 loginTab.addEventListener("click",()=>mode("login"));signupTab.addEventListener("click",()=>mode("signup"));
 login.addEventListener("submit",async e=>{e.preventDefault();status.textContent="Logging in…";try{const d=await api("/api/auth/login",{email:document.getElementById("mixoLoginEmail").value,password:document.getElementById("mixoLoginPassword").value});paint(d.user);status.textContent="✓ Logged in securely.";setTimeout(()=>overlay.classList.add("hidden"),500)}catch(x){status.textContent=x.message}});
-signup.addEventListener("submit",async e=>{e.preventDefault();status.textContent="Creating your account…";try{const d=await api("/api/auth/register",{displayName:document.getElementById("mixoSignupName").value,email:document.getElementById("mixoSignupEmail").value,password:document.getElementById("mixoSignupPassword").value,inviteCode:document.getElementById("mixoSignupInvite")?.value||""});paint(d.user);status.textContent="✓ Account created and logged in.";setTimeout(()=>overlay.classList.add("hidden"),500)}catch(x){status.textContent=x.message}});
+signup.addEventListener("submit",async e=>{e.preventDefault();status.textContent="Creating your account…";try{const d=await api("/api/auth/register",{displayName:document.getElementById("mixoSignupName").value,email:document.getElementById("mixoSignupEmail").value,password:document.getElementById("mixoSignupPassword").value,inviteCode:document.getElementById("mixoSignupInvite")?.value||""});paint(d.user);status.textContent=`✓ Account created with ${Number(d.user?.credits||0)} free trial credits.`;setTimeout(()=>overlay.classList.add("hidden"),1100)}catch(x){status.textContent=x.message}});
 document.getElementById("mixoWaitlistButton")?.addEventListener("click",async()=>{const email=document.getElementById("mixoSignupEmail").value;status.textContent="Joining the waiting list…";try{const d=await api("/api/early-access/waitlist",{email});status.textContent="✓ "+d.message}catch(x){status.textContent=x.message}});
 fetch("/api/early-access/status").then(r=>r.json()).then(d=>{const fields=document.getElementById("mixoEarlyAccessFields"),invite=document.getElementById("mixoSignupInvite");if(fields)fields.classList.toggle("hidden",!d.enabled);if(invite)invite.required=!!d.enabled}).catch(()=>{});
 document.querySelectorAll("[data-account-legal]").forEach(b=>b.addEventListener("click",()=>{overlay.classList.add("hidden");document.querySelector(`[data-legal-open="${b.dataset.accountLegal}"]`)?.click()}));
@@ -1827,6 +1827,23 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
  }
  function downloadEnhanced(filename){if(!enhancedBlob)return;const a=document.createElement('a');a.href=URL.createObjectURL(enhancedBlob);a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
  run.onclick=enhance;overlay.querySelector('#mixoEnhanceStrength').onchange=()=>{status.textContent='Detail strength changed. Click Run 2K Enhancement when ready.'};save.onclick=()=>downloadEnhanced('mixolabs-2k-enhanced.jpg');print.onclick=()=>downloadEnhanced('mixolabs-2k-enhanced-300dpi.jpg');
+})();
+</script>
+<style id="mixo-low-credit-offer-v124-style">
+.mixo-low-credit-offer{position:fixed;z-index:200400;left:50%;bottom:18px;transform:translateX(-50%);width:min(680px,calc(100vw - 28px));display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 16px;border:1px solid rgba(74,220,255,.72);border-radius:14px;background:linear-gradient(105deg,rgba(5,28,58,.98),rgba(41,20,83,.98));box-shadow:0 18px 60px rgba(0,0,0,.72),0 0 28px rgba(88,89,255,.28);color:#fff}.mixo-low-credit-offer-copy{min-width:0;font-size:13px;line-height:1.42}.mixo-low-credit-offer-copy b{display:block;margin-bottom:2px;color:#75eaff;font-size:14px}.mixo-low-credit-offer button{flex:0 0 auto;border:0;border-radius:10px;padding:11px 16px;background:linear-gradient(90deg,#16c4f5,#8160ff 55%,#dc38ef);color:#fff;font-weight:900;white-space:nowrap}.mixo-low-credit-offer[hidden]{display:none!important}@media(max-width:560px){.mixo-low-credit-offer{align-items:stretch;flex-direction:column}.mixo-low-credit-offer button{width:100%}}
+</style>
+<script id="mixo-low-credit-offer-v124">
+(()=>{
+ const offer=document.createElement('aside');offer.id='mixoLowCreditOffer';offer.className='mixo-low-credit-offer';offer.hidden=true;offer.setAttribute('role','status');offer.setAttribute('aria-live','polite');offer.innerHTML='<div class="mixo-low-credit-offer-copy"><b id="mixoLowCreditTitle">Credits running low</b><span id="mixoLowCreditMessage"></span></div><button type="button">View credits</button>';document.body.appendChild(offer);
+ const title=offer.querySelector('#mixoLowCreditTitle'),message=offer.querySelector('#mixoLowCreditMessage'),button=offer.querySelector('button');let user=window.mixoUser||null,config={baseAmountPence:199,baseCredits:25};
+ const pounds=pence=>'£'+(Number(pence||199)/100).toFixed(2);
+ function render(){const credits=Number(user?.credits);if(!user||user.isOwner||!Number.isFinite(credits)||credits>2){offer.hidden=true;return}title.textContent=credits===0?'Ready to create more?':credits===1?'Only 1 credit remaining':'Only 2 credits remaining';message.textContent=`Continue creating with ${Number(config.baseCredits)} credits for ${pounds(config.baseAmountPence)}.`;offer.hidden=false}
+ async function refreshPricing(){try{const response=await fetch('/api/billing/config',{cache:'no-store'}),next=await response.json();if(response.ok)config={...config,...next}}catch(_){}render()}
+ button.addEventListener('click',()=>{offer.hidden=true;const opener=document.querySelector('[data-open-billing]');if(opener)opener.click()});
+ window.addEventListener('mixo:auth-changed',event=>{user=event.detail||null;render()});
+ window.addEventListener('mixo:credits-changed',event=>{if(user)user={...user,credits:Number(event.detail)};render()});
+ window.addEventListener('mixo:pricing-changed',refreshPricing);
+ refreshPricing();
 })();
 </script>
 </body></html>

@@ -1,0 +1,13 @@
+const fs=require('fs'),assert=require('assert');
+const source=fs.readFileSync(require('path').join(__dirname,'..','server.js'),'utf8');
+const privateCodes=fs.readFileSync(require('path').join(__dirname,'..','PRIVATE-50-INVITATION-CODES.txt'),'utf8');
+const list=(privateCodes.match(/^\d{2}\. (MIXO-[A-F0-9]{6}-[A-F0-9]{6})$/gm)||[]).map(x=>x.slice(4));
+assert.strictEqual(list.length,50,'expected exactly 50 invitation codes');
+assert.strictEqual(new Set(list).size,50,'invitation codes must be unique');
+assert(source.includes('const INVITE_TRIAL_CREDITS=10;'),'ten invitation credits must be fixed on the server');
+assert(source.includes('const trialCredits=inviteHash?INVITE_TRIAL_CREDITS:0'),'only invited registrations receive trial credits');
+assert(source.includes("'starter_credit','invite-trial-v3'"),'trial grant must be ledger recorded');
+assert(!source.includes('remove-starter-credits-v1'),'old starter-credit removal must be absent');
+assert(source.includes('DELETE FROM early_access_invites WHERE used_by IS NULL'),'obsolete unused invitations must be retired');
+assert(source.includes('baseAmountPence:199'),'£1.99 base price must remain unchanged');
+console.log('PASS V125: 50 unique invitations, ten auditable trial credits, £1.99 minimum retained');
