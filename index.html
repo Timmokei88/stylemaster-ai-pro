@@ -642,7 +642,7 @@ faq:`<input id="mixoFaqSearch" class="mixo-faq-search" type="search" placeholder
 <details class="mixo-faq-item"><summary>Can I generate more than one image?</summary><div>Yes. Choose between one and six variations. Every generated image uses the number of credits displayed before you press Generate.</div></details>
 <details class="mixo-faq-item"><summary>What are 1K, 2K and 4K quality?</summary><div>They are output-quality choices. Higher quality costs more credits because it requires more processing. The exact cost appears in Credit Cost Preview before generation.</div></details>
 <details class="mixo-faq-item"><summary>What does aspect ratio change?</summary><div>Aspect ratio changes the shape of the image. For example, 1:1 is square, 9:16 is portrait and 16:9 is landscape.</div></details>
-<details class="mixo-faq-item"><summary>How do reference images work?</summary><div>Open Advanced Options and select Add Photos. You may upload lawful images of adults, people and places that you have permission or another lawful basis to use. References guide the generation but do not guarantee an identical result.</div></details>
+<details class="mixo-faq-item"><summary>How do reference images work?</summary><div>Open Advanced Options and select Add Photos. You may upload lawful images of adults, people and places that you have permission or another lawful basis to use. When a reference contains a person, MixoLabs instructs the model to preserve that person’s recognisable facial identity by default while allowing requested changes to the scene, outfit, pose, era or style. Explicitly request a facial change only when you want one. Generative models can still vary, so an identical result cannot be guaranteed.</div></details>
 <details class="mixo-faq-item"><summary>How do category, style and theme work?</summary><div>These optional controls add structured guidance to your prompt. You can use any combination or leave them blank.</div></details>
 <details class="mixo-faq-item"><summary>Can MixoLabs create CAD models, blueprints or measured assembly drawings?</summary><div>MixoLabs can generate visual CAD concepts, blueprint-style sheets, exploded assemblies, orthographic views, cutaways and patent-style illustrations. Choose Manual to use only measurements you provide, Automatic to estimate a complete conceptual measurement set from the description and selected object type, or Proportions Only for no numerical dimensions. Automatic values are visibly marked as AI estimates. Images are not editable CAD files or certified engineering drawings; all dimensions, geometry, structure and assembly must be professionally checked before manufacture or construction.</div></details>
 <details class="mixo-faq-item"><summary>How do colours and shades work?</summary><div>Select a colour family and then a shade. MixoLabs adds that colour choice to the generation instructions; lighting and surrounding colours can still affect its appearance in the final image.</div></details>
@@ -1142,7 +1142,7 @@ const steps=[
 ["#aspectRatioSelect","Aspect ratio","Choose the shape of the image, including square, portrait, landscape and ultrawide formats."],
 ["#backgroundSelect","Background","Choose a contextual environment, isolated clean background, solid black/white or studio gradient."],
 [".mixo-advanced","Advanced Options","Open Advanced Options for references, categories, styles, themes, colours and the resin calculator."],
-["#addPhotos","Reference images","Upload up to 10 reference images to guide identity, design, materials or visual direction."],
+["#addPhotos","Reference images","Upload up to 10 reference images. When a reference contains a person, MixoLabs locks their recognisable facial identity by default while allowing requested scene, outfit, pose and style changes. Only an explicit facial-change request overrides the specified trait."],
 ["#categorySelect","Category","Choose the broad creative category for the image."],
 ["#styleSelect","Style","Choose a style available for the selected category."],
 ["#themeSelect","Theme / Atmosphere","Set the mood, environment or atmosphere."],
@@ -1193,7 +1193,7 @@ const scenes=[
 ["Exact Text","Use Exact Text when your image needs specific visible lettering. Enter the wording you want the image model to render.","#exactTextInput"],
 ["Variations & Quality","Choose from one to six image variations, then select 1K Standard, 2K High Quality or 4K Maximum. The credit preview updates before you generate.","#variationCountSelect"],
 ["Aspect Ratio & Background","Choose the image shape with Aspect Ratio, then select a contextual, isolated, solid or studio-style background.","#aspectRatioSelect"],
-["Reference Images","Open Advanced Options and use Add Photos to upload up to ten reference images. References can help guide identity, design, materials and visual direction.","#addPhotos"],
+["Reference Images","Open Advanced Options and use Add Photos to upload up to ten reference images. A referenced person keeps the same recognisable face by default, even when you change the scene, outfit, pose, era or style. Explicitly describe a facial change only when you want one.","#addPhotos"],
 ["Category, Style & Theme","Category sets the broad creative direction. Style gives you choices within that category, while Theme or Atmosphere controls the mood and environment.","#categorySelect"],
 ["Colour System","Choose a colour family, then select from two hundred accurately matched shades. Grey, black and white remain neutral; coloured and metallic families stay within their named hue. The selected colour and its exact hex value become part of the generation direction.","#families"],
 ["Resin Calculator","For physical resin projects, enter a total amount and mixing ratio. The Resin Mixing Calculator works out the component quantities for you.",".resin-box"],
@@ -1332,7 +1332,7 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
   ['#aspectRatioSelect','Aspect Ratio','Choose the shape of the final image, such as square, portrait or landscape, to suit where it will be used.'],
   ['#backgroundSelect','Background','Choose how the subject background should be treated, including contextual scenes, studio treatments, solid colours or isolation where available.'],
   ['.mixo-cad-tools','CAD and Blueprint Tools','Create visual CAD concepts, blueprints, exploded assemblies, orthographic sheets, cutaways or patent-style drawings. Select an object type and units, then use Manual measurements, Automatic conceptual measurements derived from the description, or Proportions Only. Every automatic value is marked as estimated and requires professional verification before fabrication.'],
-  ['#addPhotos','Reference Images','Upload reference images to guide identity, materials, composition or design. Only upload images you have permission to use.'],
+  ['#addPhotos','Reference Images','Upload reference images to guide identity, materials, composition or design. A person’s recognisable face is identity-locked unless you explicitly request a facial change. Only upload images you have permission to use.'],
   ['#categorySelect','Category','Category sets the broad type of creation and changes the related style choices available below it.'],
   ['#styleSelect','Style','Style controls the visual treatment within the selected category, such as photographic, illustrated or design-led approaches.'],
   ['#themeSelect','Theme or Atmosphere','Theme controls mood and environmental direction, including lighting, energy and overall emotional character.'],
@@ -1891,5 +1891,9 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
  window.addEventListener('mixo:pricing-changed',refreshPricing);
  refreshPricing();
 })();
+</script>
+<style id="mixo-reference-identity-v128-style">.mixo-reference-lock-note{margin:8px 0 2px;padding:8px 10px;border:1px solid rgba(69,214,255,.35);border-radius:8px;background:rgba(7,29,57,.72);color:#a8eaff;font-size:10px;line-height:1.45}</style>
+<script id="mixo-reference-identity-v128">
+(()=>{const add=document.getElementById('addPhotos');if(!add)return;const row=add.closest('.ref-row');if(!row||row.parentElement.querySelector('.mixo-reference-lock-note'))return;const note=document.createElement('p');note.className='mixo-reference-lock-note';note.textContent='🔒 People are identity-locked by default. Change the scene, outfit, pose or style while keeping the face recognisably the same; explicitly request any facial change you do want.';row.insertAdjacentElement('afterend',note)})();
 </script>
 </body></html>
