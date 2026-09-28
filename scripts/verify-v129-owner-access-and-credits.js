@@ -1,0 +1,25 @@
+const fs=require('fs');
+const server=fs.readFileSync('server.js','utf8');
+const html=fs.readFileSync('index.html','utf8');
+function assert(value,message){if(!value)throw new Error(message)}
+assert(server.includes('let earlyAccessConfig={enabled:EARLY_ACCESS_ENABLED}'),'runtime Early Access configuration is missing');
+assert(server.includes("platform_settings WHERE key='early_access'"),'persisted Early Access setting is not loaded');
+assert(server.includes('await loadEarlyAccessConfig();const enabled=earlyAccessEnabled()'),'public access status does not refresh the saved cross-instance setting');
+assert(server.includes('app.get("/api/owner/early-access",requireModerator'),'owner Early Access status is not protected');
+assert(server.includes('app.put("/api/owner/early-access",requireModerator,billingLimit'),'owner Early Access toggle is not protected and rate-limited');
+assert(server.includes('if(!earlyAccessEnabled())return res.status(409)'),'waiting-list endpoint does not respect open registration');
+assert(server.includes('if(earlyAccessEnabled()){'),'registration does not use the runtime toggle');
+assert(server.includes('const trialCredits=INVITE_TRIAL_CREDITS'),'open and invited registrations do not share the promised starter allowance');
+assert(server.includes("'open-signup-trial-v1'"),'open-registration starter credit is not ledger-recorded');
+assert(server.includes('app.get("/api/owner/customers",requireModerator'),'customer emails are not protected by owner authentication');
+assert(server.includes('app.post("/api/owner/customers/:id/credits",requireModerator,billingLimit'),'goodwill credit endpoint is not protected and rate-limited');
+assert(server.includes('"owner_goodwill"'),'goodwill grants are not separately auditable');
+assert(server.includes('ON CONFLICT(user_id,idempotency_key) DO NOTHING'),'duplicate credit protection is missing');
+assert(!server.includes('express.static(__dirname'),'the complete private project directory is still publicly served');
+assert(server.includes('const PUBLIC_ASSETS=new Map'),'public browser assets are not explicitly allowlisted');
+assert(html.includes('mixo-owner-access-v129'),'owner access and customer controls are missing');
+assert(html.includes('Invitation and waiting-list fields are hidden'),'owner toggle does not explain its public effect');
+assert(html.includes('Search registered accounts by email or display name'),'owner customer search is missing');
+assert(html.includes('Grant Credits Once'),'single-action goodwill grant control is missing');
+assert(html.includes('This creates a permanent audit record.'),'credit grant confirmation is missing');
+console.log('PASS V129: owner-only invitation toggle, customer email directory and audited goodwill credit grants verified');
