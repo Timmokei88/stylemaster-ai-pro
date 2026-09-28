@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node server.js",
-    "check": "node --check server.js && node scripts/verify-launch.js && node scripts/verify-v121-identity-realism-pricing.js && node scripts/verify-v124-dynamic-low-credit-offer.js && node scripts/verify-v125-fixed-invite-credits.js && node scripts/verify-v126-complete-narrated-tutorial.js && node scripts/verify-v127-mobile-checkout-navigation.js && node scripts/verify-v128-reference-identity-lock.js && node scripts/verify-v129-owner-access-and-credits.js && node scripts/verify-v130-high-value-billing-rollover.js && node scripts/verify-v131-music-and-complete-billing-narration.js && node scripts/verify-v133-clean-1k-free-2k.js && node scripts/verify-v134-audio-title-analysis.js"
+    "check": "node --check server.js && node scripts/verify-launch.js && node scripts/verify-v121-identity-realism-pricing.js && node scripts/verify-v124-dynamic-low-credit-offer.js && node scripts/verify-v125-fixed-invite-credits.js && node scripts/verify-v126-complete-narrated-tutorial.js && node scripts/verify-v127-mobile-checkout-navigation.js && node scripts/verify-v128-reference-identity-lock.js && node scripts/verify-v129-owner-access-and-credits.js && node scripts/verify-v130-high-value-billing-rollover.js && node scripts/verify-v131-music-and-complete-billing-narration.js && node scripts/verify-v133-clean-1k-free-2k.js && node scripts/verify-v134-audio-title-analysis.js && node scripts/verify-v135-text-and-filenames.js"
   },
   "overrides": {
     "qs": "^6.15.4"

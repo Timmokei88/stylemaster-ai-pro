@@ -496,6 +496,24 @@ if(!image)throw new Error("Gemini did not return an image.");
 return `data:${image.mimeType};base64,${image.data}`;
 }
 
+const generatedImageMeta=new Map();
+let activeSelectedMeta=null;
+function cleanDownloadWords(value){
+ const stop=new Set(['a','an','and','as','at','be','by','create','for','from','have','i','image','in','into','it','like','make','my','of','on','or','please','show','that','the','this','to','view','with']);
+ return String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9\s-]/g,' ').split(/\s+/).filter(word=>word.length>1&&!stop.has(word)).slice(0,10);
+}
+function descriptiveDownloadName(kind='original',extension='png'){
+ const source=activeSelectedMeta?.prompt||$('prompt')?.value||'';
+ const words=cleanDownloadWords(source);
+ const subject=(words.length?words.join('-'):'original-ai-artwork').slice(0,78).replace(/-+$/,'');
+ const variation=activeSelectedMeta?.variation>1?`-variation-${activeSelectedMeta.variation}`:'';
+ const finish=kind==='enhanced'?'-2k-enhanced':kind==='print'?'-2k-enhanced-300dpi':'';
+ return `mixolabs-${subject}${variation}${finish}.${extension}`;
+}
+function letteringPromptBlock(exact){
+ if(exact)return `EXACT VISIBLE TEXT: "${exact}". Render only this requested wording, spelled exactly as supplied. Do not add any other letters, words, numbers, signatures, captions, labels, logos, watermarks or pseudo-text anywhere in the image.`;
+ return 'No visible writing: do not generate letters, words, numbers, captions, shop signs, labels, logos, signatures, watermarks, typographic marks or pseudo-text. Where a real scene would normally contain signage, keep it blank, turn it away, crop it out, obscure it naturally with depth of field, or use non-letter decorative shapes.';
+}
 function buildPrompt(variation){
 const p=$("prompt").value.trim()||"Create an original, visually compelling subject.";
 const exact=$("exactTextInput").value.trim();
@@ -510,7 +528,7 @@ ${realismPromptBlock(p)}
 ${anatomyQualityPromptBlock()}
 ${activeSelectedColor?`Primary colour direction: ${activeSelectedColor}. Preserve the intended material/metallic appearance when relevant.`:""}
 Background direction: ${bg}.
-${exact?`EXACT VISIBLE TEXT: "${exact}". Render this wording exactly, with no spelling changes.`:""}
+${letteringPromptBlock(exact)}
 Variation ${variation}. Preserve reference-image identity/details when references are supplied.
 Create an original composition with strong detail and professional finish. Use physically coherent scene lighting: ensure cast-shadow direction, length, softness, contact shadows, ambient occlusion, reflections and subject grounding all agree with the visible light sources, surfaces and depth. Avoid floating subjects, conflicting shadows and arbitrary dark patches.`;
 }
@@ -522,19 +540,19 @@ $("placeholder").classList.add("hidden");$("activeArea").classList.add("hidden")
 $("loading").classList.remove("hidden");$("loadingText").textContent=`Generating ${count} variation${count===1?"":"s"}...`;
 for(let i=1;i<=count;i++){
 const card=document.createElement("div");card.className="mixo-generation-card";card.innerHTML=`<div class="mixo-generation-error" style="color:#8fa0bd">Generating variation ${i}...</div>`;$("grid").appendChild(card);
-try{const url=await callGemini(buildPrompt(i),uploadedImages);card.innerHTML=`<img src="${url}" alt="Generated variation ${i}" title="Open variation ${i}"><div class="mixo-generation-hint">Variation ${i} • Click the image to open all actions</div>`;card.querySelector("img").onclick=()=>selectImage(url);}
+try{const generationPrompt=$('prompt').value.trim()||'Original AI artwork';const url=await callGemini(buildPrompt(i),uploadedImages);generatedImageMeta.set(url,{prompt:generationPrompt,variation:i});card.innerHTML=`<img src="${url}" alt="Generated variation ${i}" title="Open variation ${i}"><div class="mixo-generation-hint">Variation ${i} • Click the image to open all actions</div>`;card.querySelector("img").onclick=()=>selectImage(url);}
 catch(e){card.innerHTML=`<div class="mixo-generation-error">Variation ${i} failed<br>${escapeHtml(e.message)}</div>`;}
 }
 $("loading").classList.add("hidden");
 };
 
-function clearTemporaryCreations(){activeSelectedImage="";$('grid').innerHTML="";$('grid').classList.add('hidden');$('activeArea').classList.add('hidden');$('angleArea').classList.add('hidden');$('placeholder').classList.remove('hidden');if(saveImageStatus)saveImageStatus.textContent=""}
+function clearTemporaryCreations(){activeSelectedImage="";activeSelectedMeta=null;generatedImageMeta.clear();$('grid').innerHTML="";$('grid').classList.add('hidden');$('activeArea').classList.add('hidden');$('angleArea').classList.add('hidden');$('placeholder').classList.remove('hidden');if(saveImageStatus)saveImageStatus.textContent=""}
 let temporaryCreationUserId=null;
 window.addEventListener('mixo:auth-changed',event=>{const nextUserId=event.detail?.id||null;if(temporaryCreationUserId!==null&&nextUserId!==temporaryCreationUserId)clearTemporaryCreations();temporaryCreationUserId=nextUserId});
 
-function selectImage(url){activeSelectedImage=url;$("outputImage").src=url;$("grid").classList.add("hidden");$("activeArea").classList.remove("hidden");$("angleArea").classList.add("hidden");$("activeArea").scrollIntoView({behavior:"smooth",block:"start"});}
+function selectImage(url){activeSelectedImage=url;activeSelectedMeta=generatedImageMeta.get(url)||{prompt:$("prompt")?.value.trim()||"Original AI artwork",variation:1};$("outputImage").src=url;$("grid").classList.add("hidden");$("activeArea").classList.remove("hidden");$("angleArea").classList.add("hidden");$("activeArea").scrollIntoView({behavior:"smooth",block:"start"});}
 $("backBtn").onclick=()=>{$("activeArea").classList.add("hidden");$("angleArea").classList.add("hidden");$("grid").classList.remove("hidden");};
-$("downloadBtn").onclick=()=>activeSelectedImage&&download(activeSelectedImage,"mixolabs-masterpiece.png");
+$("downloadBtn").onclick=()=>activeSelectedImage&&download(activeSelectedImage,descriptiveDownloadName('original','png'));
 function download(url,name){const a=document.createElement("a");a.href=url;a.download=name;a.click();}
 
 const saveImageStatus=$("saveImageStatus");
@@ -1871,7 +1889,7 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
   }finally{clearInterval(elapsedTimer);enhancementRunning=false;run.disabled=false;run.textContent='Run 2K Enhancement'}
  }
  function downloadEnhanced(filename){if(!enhancedBlob)return;const a=document.createElement('a');a.href=URL.createObjectURL(enhancedBlob);a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
- run.onclick=enhance;overlay.querySelector('#mixoEnhanceStrength').onchange=()=>{status.textContent='Detail strength changed. Click Run 2K Enhancement when ready.'};save.onclick=()=>downloadEnhanced('mixolabs-2k-enhanced.jpg');print.onclick=()=>downloadEnhanced('mixolabs-2k-enhanced-300dpi.jpg');
+ run.onclick=enhance;overlay.querySelector('#mixoEnhanceStrength').onchange=()=>{status.textContent='Detail strength changed. Click Run 2K Enhancement when ready.'};save.onclick=()=>downloadEnhanced(descriptiveDownloadName('enhanced','jpg'));print.onclick=()=>downloadEnhanced(descriptiveDownloadName('print','jpg'));
 })();
 </script>
 <style id="mixo-complete-feature-tutorial-v126-style">
