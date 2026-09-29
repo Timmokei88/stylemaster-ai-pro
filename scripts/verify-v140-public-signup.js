@@ -1,0 +1,11 @@
+const fs=require('fs'),assert=require('assert');
+const html=fs.readFileSync('index.html','utf8'),server=fs.readFileSync('server.js','utf8');
+assert(html.includes('Create Free Account — Get 10 Credits'));
+assert(html.includes('No card required'));
+assert(html.includes("document.getElementById(which==='signup'?'mixoSignupTab':'mixoLoginTab')"));
+assert(html.includes('mixolabs.attribution'));
+assert(server.includes('acquisition_source'));
+assert(server.includes('open-signup-trial-v1'));
+assert(server.includes('const INVITE_TRIAL_CREDITS=10'));
+assert(server.includes('earlyAccessEnabled()'));
+console.log('V140 public signup landing verification passed.');

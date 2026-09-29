@@ -85,6 +85,9 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS legal_accepted_at TIMESTAMPTZ;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS terms_version TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS privacy_version TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS age_policy_version TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS acquisition_source VARCHAR(80);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS acquisition_campaign VARCHAR(160);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS acquisition_ad VARCHAR(160);
 CREATE TABLE IF NOT EXISTS credit_ledger(id UUID PRIMARY KEY,user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,delta INTEGER NOT NULL,bucket TEXT NOT NULL CHECK(bucket IN('purchased','subscription')),reason TEXT NOT NULL,idempotency_key TEXT NOT NULL,metadata JSONB NOT NULL DEFAULT '{}'::jsonb,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),UNIQUE(user_id,idempotency_key));
 CREATE TABLE IF NOT EXISTS stripe_events(event_id TEXT PRIMARY KEY,event_type TEXT NOT NULL,processed_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
 CREATE TABLE IF NOT EXISTS community_posts(id UUID PRIMARY KEY,user_id UUID REFERENCES users(id) ON DELETE SET NULL,display_name VARCHAR(40) NOT NULL,prompt VARCHAR(1200) NOT NULL DEFAULT '',image_url TEXT,likes INTEGER NOT NULL DEFAULT 0,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
@@ -134,6 +137,7 @@ app.post("/api/early-access/waitlist",authLimit,async(req,res,next)=>{try{await 
 app.post("/api/auth/register",authLimit,async(req,res,next)=>{try{
  await loadEarlyAccessConfig();
  const displayName=String(req.body.displayName||"").trim().slice(0,40),email=cleanEmail(req.body.email),password=String(req.body.password||""),inviteCode=String(req.body.inviteCode||"").trim().toUpperCase();
+ const attribution=req.body.attribution&&typeof req.body.attribution==="object"?req.body.attribution:{},acquisitionSource=String(attribution.source||"").trim().slice(0,80)||null,acquisitionCampaign=String(attribution.campaign||"").trim().slice(0,160)||null,acquisitionAd=String(attribution.ad||"").trim().slice(0,160)||null;
  if(displayName.length<2)return res.status(400).json({error:"Display name must be at least 2 characters."});
  if(!validEmail(email))return res.status(400).json({error:"Enter a valid email address."});
  if(password.length<10||password.length>128)return res.status(400).json({error:"Password must be 10 to 128 characters."});
@@ -146,7 +150,7 @@ app.post("/api/auth/register",authLimit,async(req,res,next)=>{try{
    if(!invite||invite.used_by)throw Object.assign(Error("That invitation code is invalid or has already been used."),{status:403});
   }
   const trialCredits=INVITE_TRIAL_CREDITS;
-  const u=(await c.query("INSERT INTO users(id,email,display_name,password_hash,purchased_credits,legal_accepted_at,terms_version,privacy_version,age_policy_version) VALUES($1,$2,$3,$4,$5,NOW(),$6,$7,$8) RETURNING *",[id,email,displayName,hash,trialCredits,TERMS_VERSION,PRIVACY_VERSION,AGE_POLICY_VERSION])).rows[0];
+  const u=(await c.query("INSERT INTO users(id,email,display_name,password_hash,purchased_credits,legal_accepted_at,terms_version,privacy_version,age_policy_version,acquisition_source,acquisition_campaign,acquisition_ad) VALUES($1,$2,$3,$4,$5,NOW(),$6,$7,$8,$9,$10,$11) RETURNING *",[id,email,displayName,hash,trialCredits,TERMS_VERSION,PRIVACY_VERSION,AGE_POLICY_VERSION,acquisitionSource,acquisitionCampaign,acquisitionAd])).rows[0];
   if(inviteHash){
    await c.query("UPDATE early_access_invites SET used_by=$1,used_at=NOW() WHERE code_hash=$2",[id,inviteHash]);
    await c.query("INSERT INTO credit_ledger(id,user_id,delta,bucket,reason,idempotency_key,metadata) VALUES($1,$2,$3,'purchased','starter_credit','invite-trial-v3',$4)",[crypto.randomUUID(),id,trialCredits,{source:"early_access_invite",inviteCodeHash:inviteHash,fixedAllowance:10}]);
@@ -155,7 +159,7 @@ app.post("/api/auth/register",authLimit,async(req,res,next)=>{try{
    await c.query("INSERT INTO credit_ledger(id,user_id,delta,bucket,reason,idempotency_key,metadata) VALUES($1,$2,$3,'purchased','starter_credit','open-signup-trial-v1',$4)",[crypto.randomUUID(),id,trialCredits,{source:"open_registration",fixedAllowance:10}]);
   }
   await c.query("COMMIT");
-  alertOwner(inviteHash?"early_access_account_created":"open_registration_account_created",{email,displayName,remaining,trialCredits});if(inviteHash&&[10,5,2,0].includes(remaining))alertOwner("early_access_capacity_warning",{remaining});
+  alertOwner(inviteHash?"early_access_account_created":"open_registration_account_created",{email,displayName,remaining,trialCredits,acquisitionSource,acquisitionCampaign,acquisitionAd});if(inviteHash&&[10,5,2,0].includes(remaining))alertOwner("early_access_capacity_warning",{remaining});
   req.session.userId=id;req.session.save(e=>e?next(e):res.status(201).json({user:expose(u)}));
  }catch(e){await c.query("ROLLBACK");if(e.code==="23505")return res.status(409).json({error:"An account with that email already exists."});if(e.status)return res.status(e.status).json({error:e.message});throw e}finally{c.release()}
 }catch(e){next(e)}});
