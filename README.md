@@ -1,5 +1,12 @@
 StyleMaster AI Pro V4
 
+V137 — CUSTOMER ONBOARDING AND CLEAR-TO-TOP
+- Adds a narrated five-step Quick Start while preserving the complete platform tutorial.
+- Corrects outdated quality instructions: generation is 1K for one credit and the selected result can be enhanced to 2K without another generation credit.
+- Reassures new customers that short prompts work and marks Advanced Options as optional.
+- Makes the pricing shortcut explicit and visually separates the secondary Advanced Options generation button.
+- Clear now empties the prompt, recalculates the prompt layout, immediately returns the page to the top and focuses the prompt without causing another scroll jump.
+
 V121 — IDENTITY, REALISM AND OWNER PRICING
 - Front/back, turnaround and model-sheet prompts automatically receive a strict same-design identity lock for every subject.
 - Photorealism and hyperrealism prompts automatically receive true-camera realism requirements.
