@@ -7,6 +7,11 @@ V137 — CUSTOMER ONBOARDING AND CLEAR-TO-TOP
 - Makes the pricing shortcut explicit and visually separates the secondary Advanced Options generation button.
 - Clear now empties the prompt, recalculates the prompt layout, immediately returns the page to the top and focuses the prompt without causing another scroll jump.
 
+V138 — ORIGINAL NATURAL NARRATORS RESTORED
+- Quick Start now uses the same original MixoLabs natural female or male narrator selected in the complete tutorial.
+- The Quick Start no longer invokes a separate basic browser voice.
+- Existing voice selection and narration volume continue to control all tutorial narration.
+
 V121 — IDENTITY, REALISM AND OWNER PRICING
 - Front/back, turnaround and model-sheet prompts automatically receive a strict same-design identity lock for every subject.
 - Photorealism and hyperrealism prompts automatically receive true-camera realism requirements.

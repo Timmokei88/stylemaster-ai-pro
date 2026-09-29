@@ -13,7 +13,7 @@ const checks=[
  ['clear input event',html.includes("prompt.dispatchEvent(new Event('input',{bubbles:true}))")],
  ['plans CTA',html.includes("replacement.textContent='View Plans & Credit Packs'")],
  ['secondary generate label',html.includes('Generate with these settings')],
- ['quick narration',html.includes('SpeechSynthesisUtterance')],
+ ['quick narration uses original natural narrator',html.includes("narrate=window.mixoTutorialLaunchContext")&&html.includes("narrate(step.title,`${step.text} ${step.example}`,step.target)")],
  ['quick progress',html.includes('mixo-quick-progress')]
 ];
 const failed=checks.filter(([,ok])=>!ok);if(failed.length){console.error('V137 verification failed:',failed.map(x=>x[0]).join(', '));process.exit(1)}
