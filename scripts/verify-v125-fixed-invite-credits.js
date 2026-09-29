@@ -6,5 +6,5 @@ assert(server.includes("'starter_credit','invite-trial-v3'"),'new invitation gra
 assert(server.includes("'repair',TRUE,'fixedAllowance',10"),'previous zero-credit invited accounts must be repaired idempotently');
 assert(server.includes('purchased_credits=purchased_credits+r.delta'),'repair must update the spendable purchased-credit balance');
 assert(server.includes('trialCredits:INVITE_TRIAL_CREDITS'),'early-access status must advertise the live trial allowance');
-assert(html.includes('free trial credits.'),'successful signup must confirm the credited balance');
+assert(html.includes('one-time welcome credits.'),'successful signup must confirm the credited balance and one-time nature');
 console.log('PASS V125: every redeemed invitation grants exactly ten credits and zero-credit invite accounts are repaired');

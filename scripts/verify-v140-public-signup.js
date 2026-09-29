@@ -1,7 +1,9 @@
 const fs=require('fs'),assert=require('assert');
 const html=fs.readFileSync('index.html','utf8'),server=fs.readFileSync('server.js','utf8');
-assert(html.includes('Create Free Account — Get 10 Credits'));
-assert(html.includes('No card required'));
+assert(html.includes('Create Account — Claim 10 Welcome Credits'));
+assert(html.includes('10 one-time welcome credits'));
+assert(html.includes('No card needed to claim them'));
+assert(html.includes('purchase a pay-as-you-go pack or monthly plan to continue generating'));
 assert(html.includes("document.getElementById(which==='signup'?'mixoSignupTab':'mixoLoginTab')"));
 assert(html.includes('mixolabs.attribution'));
 assert(server.includes('acquisition_source'));
