@@ -1,5 +1,11 @@
 StyleMaster AI Pro V4
 
+V139 — ACCURACY-FIRST PREMIUM ART DIRECTION
+- Adds genre-aware professional art direction to every provider request while keeping every requested subject, count, viewpoint, material, action, colour and exact-text requirement authoritative.
+- Photographic prompts receive a high-end cinematic finish; stylised artwork receives polished medium-appropriate depth; logos and technical layouts stay clean and geometrically precise.
+- Clear now resets the browser, generator workspace and internal settings column before focusing the empty Prompt / Idea box.
+- Includes an automated V139 regression check and preserves all prior pricing, invitation, tutorial, narration, enhancement and credit behaviour.
+
 V137 — CUSTOMER ONBOARDING AND CLEAR-TO-TOP
 - Adds a narrated five-step Quick Start while preserving the complete platform tutorial.
 - Corrects outdated quality instructions: generation is 1K for one credit and the selected result can be enhanced to 2K without another generation credit.
