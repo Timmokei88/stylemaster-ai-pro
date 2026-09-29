@@ -4,6 +4,7 @@ assert(html.includes('Create Account — Claim 10 Welcome Credits'));
 assert(html.includes('10 one-time welcome credits'));
 assert(html.includes('No card needed to claim them'));
 assert(html.includes('purchase a pay-as-you-go pack or monthly plan to continue generating'));
+assert(html.includes('Your imagination sets the direction, not the limit.'));
 assert(html.includes("document.getElementById(which==='signup'?'mixoSignupTab':'mixoLoginTab')"));
 assert(html.includes('mixolabs.attribution'));
 assert(server.includes('acquisition_source'));
