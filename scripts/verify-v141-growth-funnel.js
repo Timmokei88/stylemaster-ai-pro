@@ -11,6 +11,7 @@ const checks=[
  ['first image tracking',html.includes("track('first_generation')")],
  ['checkout tracking',html.includes("track('checkout_clicked')")],
  ['owner funnel dashboard',html.includes('Customer Acquisition Funnel')],
+ ['owner dashboard loads after early auth event',html.includes("if(window.mixoUser)buildOwner(window.mixoUser)")],
  ['ten-credit offer retained',html.includes('Claim 10 Welcome Credits')&&html.includes('10 one-time welcome credits')]
 ];
 const failed=checks.filter(([,ok])=>!ok);if(failed.length){console.error('V141 verification failed:',failed.map(([name])=>name).join(', '));process.exit(1)}
