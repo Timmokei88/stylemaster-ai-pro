@@ -4,13 +4,13 @@ const html=fs.readFileSync('index.html','utf8');
 function assert(value,message){if(!value)throw new Error(message)}
 assert(server.includes('let earlyAccessConfig={enabled:EARLY_ACCESS_ENABLED}'),'runtime Early Access configuration is missing');
 assert(server.includes("platform_settings WHERE key='early_access'"),'persisted Early Access setting is not loaded');
-assert(server.includes('await loadEarlyAccessConfig();const enabled=earlyAccessEnabled()'),'public access status does not refresh the saved cross-instance setting');
+assert(server.includes('await Promise.all([loadEarlyAccessConfig(),loadWelcomeCreditsConfig()]);const enabled=earlyAccessEnabled()'),'public access status does not refresh the saved cross-instance settings');
 assert(server.includes('app.get("/api/owner/early-access",requireModerator'),'owner Early Access status is not protected');
 assert(server.includes('app.put("/api/owner/early-access",requireModerator,billingLimit'),'owner Early Access toggle is not protected and rate-limited');
 assert(server.includes('if(!earlyAccessEnabled())return res.status(409)'),'waiting-list endpoint does not respect open registration');
 assert(server.includes('if(earlyAccessEnabled()){'),'registration does not use the runtime toggle');
-assert(server.includes('const trialCredits=INVITE_TRIAL_CREDITS'),'open and invited registrations do not share the promised starter allowance');
-assert(server.includes("'open-signup-trial-v1'"),'open-registration starter credit is not ledger-recorded');
+assert(server.includes('const trialCredits=welcomeCredits()'),'open and invited registrations do not share the configured starter allowance');
+assert(server.includes("'starter_credit','welcome-credit-v1'"),'open-registration starter credit is not ledger-recorded');
 assert(server.includes('app.get("/api/owner/customers",requireModerator'),'customer emails are not protected by owner authentication');
 assert(server.includes('app.post("/api/owner/customers/:id/credits",requireModerator,billingLimit'),'goodwill credit endpoint is not protected and rate-limited');
 assert(server.includes('"owner_goodwill"'),'goodwill grants are not separately auditable');
