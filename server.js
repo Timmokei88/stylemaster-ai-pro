@@ -74,6 +74,8 @@ const PUBLIC_ASSETS=new Map([
  ["/mixolabs-logo.png","mixolabs-logo.png"],
  ["/mixolabs-default-skin.jpg","mixolabs-default-skin.jpg"],
  ["/mixolabs-promo-art.jpg","mixolabs-promo-art.jpg"],
+ ["/mixolabs-landing-demo.mp4","mixolabs-landing-demo.mp4"],
+ ["/mixolabs-landing-demo-poster.jpg","mixolabs-landing-demo-poster.jpg"],
  ["/random-infinite.js","random-infinite.js"]
 ]);
 for(const [route,file] of PUBLIC_ASSETS)app.get(route,(_req,res)=>res.sendFile(path.join(__dirname,file)));
