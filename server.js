@@ -259,7 +259,7 @@ const EXPLICIT_SEXUAL=/\b(porn(?:ography|ographic)?|hentai|rule\s*34|explicit se
 const ARTISTIC_NUDITY=/\b(artistic nudity|artistic nude|fine[- ]art nude|life drawing|nude portrait|nude|naked|topless|bare breasts?|exposed breasts?)\b/i;
 const VISIBLE_GENITAL_DETAIL=/\b(visible genitals?|genital detail|exposed genitals?|vulva|vagina|labia|penis|testicles?|scrotum|full[- ]frontal nudity|spread[- ]leg(?:ged)? nude)\b/i;
 const SEXUAL_ACT=/\b(sex acts?|sexual intercourse|oral sex|anal sex|masturbat(?:e|ion)|penetration|orgasm|ejaculat(?:e|ion)|cumshot|genital contact|fondling genitals?)\b/i;
-const ARTISTIC_NUDITY_RULE="18+ ARTISTIC NUDITY MODE: Depict only unmistakably adult, wholly fictional subjects. Non-explicit fine-art nudity, including bare breasts, may be depicted only when accepted by the image provider. Do not show visible genital detail, sexual acts, fetish-focused sexual content, minors, youthful-looking subjects, real people, celebrities or reference-photo sexualisation. Use a respectful fine-art, editorial or classical composition rather than pornographic framing.";
+const ARTISTIC_NUDITY_RULE="18+ ARTISTIC NUDITY MODE: Interpret short wording such as 'nude lady' as an unmistakably adult (age 25+), wholly fictional woman in a tasteful, non-explicit fine-art portrait. Bare breasts may be visible. The pubic and genital region must be fully obscured by pose, drapery, framing or shadow. Do not show visible genital detail, sexual acts, arousal, fetish-focused sexual content, minors, youthful-looking subjects, real people, celebrities or reference-photo sexualisation. Use respectful classical, editorial or gallery-style composition rather than pornographic framing.";
 function artisticNudityMode(req){return req.get("X-MixoLabs-Artistic-Nudity")==="true"}
 const OPERATIONAL_CRIME=/\b(?:how to|instructions? (?:for|to)|step[- ]by[- ]step|best way to|help me)\b[\s\S]{0,90}\b(?:hack|steal|rob|blackmail|kidnap|traffic drugs|make (?:a )?bomb|bypass security|commit fraud|launder money|poison|disable cameras?|break into)\b|\b(?:phishing kit|credential stealer|ransomware|bank fraud instructions?|bomb-making instructions?|terrorist recruitment|terrorist propaganda)\b/i;
 const TARGETED_BULLYING=/\b(?:humiliate|bully|degrade|harass|shame)\b[\s\S]{0,100}\b(?:this person|that person|my (?:classmate|colleague|teacher|ex)|the person in (?:this|the) (?:photo|image)|him|her|them)\b|\b(?:this person|that person|my (?:classmate|colleague|teacher|ex)|the person in (?:this|the) (?:photo|image))\b[\s\S]{0,100}\b(?:humiliat|bully|degrad|harass|sham)/i;
@@ -307,6 +307,7 @@ const providerPayloadBase=providerPayload;
 providerPayload=function(body,text){
  const copy=providerPayloadBase(body,text),enabled=body?._mixoArtisticMode===true;delete copy._mixoArtisticMode;
  if(!enabled)return copy;
+ copy.safetySettings=[...(copy.safetySettings||[]).filter(x=>x?.category!=="HARM_CATEGORY_SEXUALLY_EXPLICIT"),{category:"HARM_CATEGORY_SEXUALLY_EXPLICIT",threshold:"BLOCK_ONLY_HIGH"}];
  for(const content of copy.contents||[])for(const part of content.parts||[])if(typeof part.text==="string"){part.text+=`\n${ARTISTIC_NUDITY_RULE}`;return copy}
  return copy;
 };

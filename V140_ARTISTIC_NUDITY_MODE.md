@@ -2,6 +2,8 @@
 
 This release adds an optional, off-by-default mode for non-explicit fine-art nudity involving unmistakably adult fictional subjects.
 
+Short prompts such as “nude lady” are expanded server-side into an adult (age 25+), fictional, gallery-style request with the genital region fully obscured. In this mode only, the Gemini sexually-explicit safety category uses Google's documented `BLOCK_ONLY_HIGH` threshold. MixoLabs' stricter server-side boundaries continue to run before the provider call.
+
 ## Allowed scope
 
 - Text-to-image fictional adults only.
