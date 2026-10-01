@@ -8,11 +8,14 @@ for(const marker of [
   'ARTISTIC_NUDITY_RULE',
   'VISIBLE_GENITAL_DETAIL',
   'SEXUAL_ACT',
+  'NONDETAILED_GENITAL_CONTEXT',
+  'artistic_mode_inconclusive_override',
+  '[MIXOLABS_ARTISTIC_MODE=true]',
   'Artistic Nudity Mode is limited to text-to-image fictional adults',
   'providerPayloadBase'
 ])assert(server.includes(marker),`Missing server protection: ${marker}`);
 assert(server.includes('HARM_CATEGORY_SEXUALLY_EXPLICIT')&&server.includes('BLOCK_ONLY_HIGH'),'Artistic mode must use the documented configurable provider threshold.');
-assert(server.includes('age 25+')&&server.includes('pubic and genital region must be fully obscured'),'Short artistic prompts must be normalised into a clear adult, non-explicit request.');
+assert(server.includes('age 25+')&&server.includes('Genital anatomy may appear only incidentally'),'Short artistic prompts must be normalised into a clear adult, non-explicit request.');
 
 for(const marker of [
   '18+ Artistic Nudity Mode',
