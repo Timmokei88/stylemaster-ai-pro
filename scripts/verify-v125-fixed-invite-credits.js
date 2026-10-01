@@ -1,10 +1,10 @@
 const fs=require('fs'),path=require('path'),assert=require('assert');
 const root=path.join(__dirname,'..'),server=fs.readFileSync(path.join(root,'server.js'),'utf8'),html=fs.readFileSync(path.join(root,'index.html'),'utf8');
-assert(server.includes("VALUES('welcome_credits','{\"credits\":10}'::jsonb)"),'new installations must default to ten welcome credits');
-assert(!server.includes('process.env.INVITE_TRIAL_CREDITS'),'an environment variable must not bypass the owner-controlled allowance');
-assert(server.includes("'starter_credit','welcome-credit-v1'"),'new-account welcome grant must be auditable');
+assert(server.includes('const INVITE_TRIAL_CREDITS=10;'),'ten invitation credits must be server-enforced');
+assert(!server.includes('process.env.INVITE_TRIAL_CREDITS'),'an environment variable must not override the fixed invitation grant');
+assert(server.includes("'starter_credit','invite-trial-v3'"),'new invitation grant must be auditable');
 assert(server.includes("'repair',TRUE,'fixedAllowance',10"),'previous zero-credit invited accounts must be repaired idempotently');
 assert(server.includes('purchased_credits=purchased_credits+r.delta'),'repair must update the spendable purchased-credit balance');
-assert(server.includes('trialCredits:welcomeCredits()'),'early-access status must advertise the live configured allowance');
+assert(server.includes('trialCredits:INVITE_TRIAL_CREDITS'),'early-access status must advertise the live trial allowance');
 assert(html.includes('free trial credits.'),'successful signup must confirm the credited balance');
-console.log('PASS V125: configurable welcome grants are audited and legacy zero-credit invite accounts are repaired');
+console.log('PASS V125: every redeemed invitation grants exactly ten credits and zero-credit invite accounts are repaired');
