@@ -1,22 +1,5 @@
 StyleMaster AI Pro V4
 
-V141 — OWNER-CONTROLLED WELCOME CREDITS
-- Adds an owner-only control under Settings > Owner Early Access & Customer Credits.
-- Choose any whole-number one-time signup allowance from 0 to 100 credits and save it without editing code or redeploying.
-- The saved allowance applies to future successful registrations in both invitation-only and open-registration modes.
-- Existing customer balances are never changed when the allowance is updated.
-- Every granted signup allowance is recorded in the credit ledger, and allowance changes create an owner audit event.
-- New installations default to 10 welcome credits.
-
-V140 — SECURE ACCOUNT RECOVERY
-- Adds Forgot password? to the login screen.
-- Emails a cryptographically random, single-use reset link that expires after 30 minutes.
-- Stores only a SHA-256 hash of the reset token and invalidates existing sessions after a successful password change.
-- Uses the same generic response for registered and unregistered addresses to prevent account enumeration.
-- Adds Forgot which email you used? as a support route; MixoLabs signs in with email and does not have a separate login username.
-- Requires APP_ORIGIN=https://mixolabs.art, RESEND_API_KEY and a verified PUBLIC_SUPPORT_EMAIL in production.
-- After deployment, confirm /api/health reports password_recovery_configured: true before advertising recovery as available.
-
 V139 — ACCURACY-FIRST PREMIUM ART DIRECTION
 - Adds genre-aware professional art direction to every provider request while keeping every requested subject, count, viewpoint, material, action, colour and exact-text requirement authoritative.
 - Photographic prompts receive a high-end cinematic finish; stylised artwork receives polished medium-appropriate depth; logos and technical layouts stay clean and geometrically precise.

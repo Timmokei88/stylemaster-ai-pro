@@ -1,0 +1,10 @@
+const fs=require('fs'),assert=require('assert');
+const server=fs.readFileSync('server.js','utf8'),html=fs.readFileSync('index.html','utf8');
+assert(server.includes('const INVITE_TRIAL_CREDITS=20;'),'new accounts must receive twenty credits');
+assert(server.includes("'starter_credit','invite-trial-v4'"),'invited launch credits must be auditable');
+assert(server.includes("'starter_credit','open-signup-trial-v2'"),'open-registration launch credits must be auditable');
+assert(server.includes('oneTime:true'),'starter-credit metadata must identify the one-time grant');
+assert(html.includes('20 free generation credits — one time only'),'the launch offer must be unambiguous');
+assert(html.includes('This is not a daily or monthly allowance'),'signup must explain the one-time limit');
+assert(html.includes('No card is required to begin'),'signup must explain the trial entry requirement');
+console.log('V143 twenty-credit launch offer checks passed.');

@@ -11,7 +11,7 @@ for(const marker of [
   "window.addEventListener('mixo:pricing-changed'",
   "user.isOwner"
 ])assert(html.includes(marker),`Missing dynamic low-credit marker: ${marker}`);
-assert(server.includes('const welcomeCredits=()=>welcomeCreditsConfig.credits;'),'signup allowance must come from the live owner configuration');
+assert(server.includes('const INVITE_TRIAL_CREDITS=20;'),'new users must receive exactly twenty one-time trial credits');
 assert(server.includes('app.get("/api/billing/config",(_req,res)=>res.json(publicPricingConfig()))'),'live public pricing endpoint must remain available');
 assert(!html.includes('Only 2 credits remaining. Continue creating with 25 credits'),'low-credit copy must not hard-code 25 credits');
-console.log('PASS V124: two-credit trigger, live owner offer, owner exclusion and configurable welcome credits verified');
+console.log('PASS V124: two-credit trigger, live owner offer, owner exclusion and ten-credit invitations verified');
