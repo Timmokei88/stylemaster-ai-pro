@@ -1,0 +1,11 @@
+const fs=require('fs'),assert=require('assert');
+const html=fs.readFileSync('index.html','utf8');
+assert(html.includes('id="mixoPublicLanding"'),'public landing page must exist');
+assert(html.includes('id="mixoLandingDemo"'),'full six-image demo must be on the landing page');
+assert(html.indexOf('id="mixoLandingDemo"')<html.indexOf('<div class="mixo-page">'),'full demo must be outside and before the authenticated generator');
+assert(html.includes('id=\'mixoGeneratorDemoButton\''),'generator must use a compact demo launcher');
+assert(html.includes('id=\'mixoGeneratorDemoModal\''),'generator launcher must open the demo modal');
+assert(html.includes('document.body.classList.toggle("mixo-authenticated",!!user)'),'authentication must switch from landing to generator');
+assert(html.includes('.mixo-auth-pending .mixo-page,.mixo-guest .mixo-page{visibility:hidden}'),'generator must not flash before the public landing page');
+assert(html.includes('data-landing-signup'),'landing demo must include a signup action');
+console.log('V148 landing video placement checks passed.');
