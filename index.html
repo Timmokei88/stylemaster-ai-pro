@@ -2135,6 +2135,7 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
  window.addEventListener('mixo:auth-changed',e=>ownerLoad(e.detail));load();ownerLoad(window.mixoUser);
 })();
 </script>
+<script>window.mixoVideoVoicePayload=window.mixoVideoVoicePayload||(()=>({voiceStyle:'',voiceData:null,voiceConsent:false}));</script>
 <script id="mixo-v154-direct-mode">
 (()=>{
  const prompt=document.getElementById('prompt'),generate=document.getElementById('generateBtn');if(!prompt||!generate)return;
