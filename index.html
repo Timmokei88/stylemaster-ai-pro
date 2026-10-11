@@ -650,6 +650,7 @@ $("randomBtn").onclick=()=>{const base=$("prompt").value.trim();const idea=`${ra
 $("clearBtn").onclick=()=>{$("prompt").value="";};
 
 (()=>{
+ const musicFeatureStyle=document.createElement('style');musicFeatureStyle.textContent='.mixo-music-player.mixo-music-feature-off{display:none!important}';document.head.appendChild(musicFeatureStyle);
  const prompt=$("prompt"),actions=document.querySelector(".prompt-actions"),clear=$("clearBtn");if(!prompt||!actions||!clear)return;
  const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition,button=document.createElement("button"),status=document.createElement("div");
  button.id="voicePromptBtn";button.type="button";button.textContent="🎙 Dictate";button.setAttribute("aria-pressed","false");
@@ -832,7 +833,7 @@ document.getElementById("mixoWaitlistButton")?.addEventListener("click",async()=
 fetch("/api/early-access/status").then(r=>r.json()).then(d=>{const fields=document.getElementById("mixoEarlyAccessFields"),invite=document.getElementById("mixoSignupInvite");if(fields)fields.classList.toggle("hidden",!d.enabled);if(invite)invite.required=!!d.enabled}).catch(()=>{});
 document.querySelectorAll("[data-account-legal]").forEach(b=>b.addEventListener("click",()=>{overlay.classList.add("hidden");document.querySelector(`[data-legal-open="${b.dataset.accountLegal}"]`)?.click()}));
 fetch("/api/auth/me").then(r=>r.json()).then(d=>paint(d.user)).catch(()=>paint(null));
-window.addEventListener("mixo:credits-changed",e=>{if(user)paint({...user,credits:Number(e.detail)})});
+window.addEventListener("mixo:credits-changed",e=>{const credits=Number(e.detail);if(user&&Number.isFinite(credits))paint({...user,credits})});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.classList.contains("hidden"))overlay.classList.add("hidden")});
 })();
 </script>
@@ -2029,7 +2030,7 @@ window.mixoTutorialLaunchContext=(title,text,target)=>{pause();contextualScene=[
  async function refreshPricing(){try{const response=await fetch('/api/billing/config',{cache:'no-store'}),next=await response.json();if(response.ok)config={...config,...next}}catch(_){}render()}
  button.addEventListener('click',()=>{offer.hidden=true;const opener=document.querySelector('[data-open-billing]');if(opener)opener.click()});
  window.addEventListener('mixo:auth-changed',event=>{user=event.detail||null;render()});
- window.addEventListener('mixo:credits-changed',event=>{if(user)user={...user,credits:Number(event.detail)};render()});
+ window.addEventListener('mixo:credits-changed',event=>{const credits=Number(event.detail);if(user&&Number.isFinite(credits))user={...user,credits};render()});
  window.addEventListener('mixo:pricing-changed',refreshPricing);
  refreshPricing();
 })();
