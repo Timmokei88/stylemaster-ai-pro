@@ -1,6 +1,6 @@
 const fs=require('fs'),path=require('path'),root=path.join(__dirname,'..');
 const server=fs.readFileSync(path.join(root,'server.js'),'utf8');
-const required=['async function generateOmniImageVideo','/v1beta/interactions?key=','type:"image"','mime_type:mimeType','response_format:{type:"video",aspect_ratio:providerRatio','resolution:"720p"','background:false','stream:false','data?.steps','generateOmniImageVideo({prompt,dialogue,voiceStyle'];
+const required=['async function generateOmniImageVideo','/v1beta/interactions?key=','type:"image"','mime_type:mimeType','response_format:{type:"video",aspect_ratio:aspectRatio,resolution:"720p"}','background:false,store:false,stream:false','data?.steps','generateOmniImageVideo({prompt,dialogue,imageData:match[2]'];
 const forbidden=['responseModalities:["VIDEO"],videoConfig','GEMINI_VIDEO_MODEL)}:generateContent?key='];
 const missing=required.filter(value=>!server.includes(value));
 const present=forbidden.filter(value=>server.includes(value));
