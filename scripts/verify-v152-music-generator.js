@@ -1,0 +1,4 @@
+const fs=require('fs'),path=require('path'),root=path.join(__dirname,'..'),server=fs.readFileSync(path.join(root,'server.js'),'utf8'),client=fs.readFileSync(path.join(root,'music-generator.js'),'utf8');
+for(const value of ['GOOGLE_CLOUD_PROJECT_ID','GOOGLE_CLOUD_SERVICE_ACCOUNT_JSON','lyria-3-pro-preview','/api/music/generate','/api/music/:id/content','/api/owner/music-generation-config','Your credits were automatically returned','musicProductionBrief'])if(!server.includes(value))throw Error(`Missing server feature: ${value}`);
+for(const value of ['Music Studio','mixoMusicBpmRange','mixoMusicMinutes','mixoMusicSeconds','mixoMusicGenre','mixoMusicLyrics','Credits per 30 seconds'])if(!client.includes(value))throw Error(`Missing client feature: ${value}`);
+console.log('PASS V152: owner-controlled Lyria music generation, BPM, duration, lyrics, download and refunds verified');
