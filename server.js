@@ -3,6 +3,9 @@ const express = require("express"),
   cors = require("cors"),
   path = require("path"),
   fs = require("fs"),
+  os = require("os"),
+  { spawn } = require("child_process"),
+  ffmpegPath = require("ffmpeg-static"),
   crypto = require("crypto"),
   multer = require("multer"),
   http = require("http"),
@@ -354,39 +357,7 @@ app.use(
 );
 app.use("/api/videos/generate", (req, res, next) => {
   if (req.method !== "POST") return next();
-  const voiceScript = String(req.body?.voiceScript || "")
-    .trim()
-    .slice(0, 1200);
-  const onScreenText = String(req.body?.onScreenText || "")
-    .trim()
-    .replace(/\s+/g, " ")
-    .slice(0, 180);
-  const autoProductCopy = req.body?.autoProductCopy === true;
-  const productName = String(req.body?.productName || "")
-    .trim()
-    .replace(/\s+/g, " ")
-    .slice(0, 100);
-  if (voiceScript) {
-    req.body.prompt =
-      `${String(req.body.prompt || "")}\nMULTI-VOICE PERFORMANCE (mandatory):\n${videoPerformanceScript(voiceScript)}\nEach numbered voice cue applies only to its own quoted line. Change the voice immediately between cues; never carry over the previous pitch, emotion, creature quality or acoustic treatment. Preserve the character identity when that character changes voice.`.slice(
-        0,
-        1200,
-      );
-    req.body.dialogue = "";
-    req.body.voiceStyle = "Follow every line-specific voice cue exactly.";
-  }
-  if (onScreenText)
-    req.body.prompt =
-      `${String(req.body.prompt || "")}\nEXACT ON-SCREEN WRITING: Render exactly “${onScreenText}” once, clearly and professionally, with identical spelling and punctuation. Never duplicate, paraphrase or add words.`.slice(
-        0,
-        1200,
-      );
-  else if (autoProductCopy)
-    req.body.prompt =
-      `${String(req.body.prompt || "")}\nPRODUCT AD WRITING: Create and display one accurate 2-to-6-word advertising headline for ${productName ? `“${productName}”` : "the featured product"}. Make no unsupported claim and show it once.`.slice(
-        0,
-        1200,
-      );
+  req.body = req.body || {};
   next();
 });
 const sessionMiddleware = session({
@@ -3703,7 +3674,7 @@ function videoPerformanceScript(value) {
     })
     .join("\n");
 }
-async function generateOmniImageVideo({
+async function generateOmniImageVideoSegment({
   prompt,
   dialogue,
   voiceStyle,
@@ -3729,7 +3700,7 @@ async function generateOmniImageVideo({
     ? `Perform this chronological multi-voice script exactly:\n${scripted}\nEach bracketed cue controls only its own line. Switch pitch, register, character, emotion and acoustic treatment immediately at the next cue; never carry the previous line's voice into the next line and never blend the two performances. When the same character changes emotion, preserve that character's identity while making the requested vocal change unmistakable. Speak every line once with no additions, omissions, paraphrasing or repetition. ${voiceReference} Synchronise the visible speaker's mouth, expression and reaction to each line. Do not add subtitles unless requested separately.`
     : dialogue
       ? `One appropriate visible subject must speak these exact words once, with accurate pronunciation and no additions, omissions, paraphrasing or repetition: “${dialogue}” ${voiceDirection} ${voiceReference} Synchronise mouth shapes, breathing, expression, pauses and voice precisely to the speaker. Do not add other speech or narration.`
-      : "No character may speak. Generate no dialogue, narration, vocalisation or lip movement suggesting speech.";
+      : "If the main description contains quoted speech, dialogue, narration or an explicit instruction for a character to say something, perform those exact described words with the described voice and synchronise the visible speaker. Otherwise generate no speech or narration. The optional exact-dialogue field is a precision lock, not a requirement for speech.";
   const writingDirection = onScreenText
     ? `Render this exact on-screen writing clearly and legibly, with identical spelling, punctuation and word order: “${onScreenText}”. Show it as professionally designed advertising typography inside the safe area. Do not duplicate, paraphrase, misspell or add words.`
     : autoProductCopy
@@ -3856,6 +3827,117 @@ async function generateOmniImageVideo({
     mime:
       download.headers.get("content-type") || video.mime_type || "video/mp4",
   };
+}
+function runFfmpeg(args) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(ffmpegPath, args, { windowsHide: true });
+    let errorText = "";
+    child.stderr.on("data", (chunk) => {
+      errorText += chunk.toString().slice(-8000);
+    });
+    child.once("error", reject);
+    child.once("close", (code) =>
+      code === 0
+        ? resolve()
+        : reject(
+            Object.assign(
+              Error(
+                `Video segments could not be joined. ${errorText.slice(-900)}`,
+              ),
+              { status: 502 },
+            ),
+          ),
+    );
+  });
+}
+async function joinVideoSegments(segments) {
+  const folder = await fs.promises.mkdtemp(
+    path.join(os.tmpdir(), "mixolabs-video-"),
+  );
+  try {
+    const files = [];
+    for (let index = 0; index < segments.length; index++) {
+      const file = path.join(folder, `segment-${index}.mp4`);
+      await fs.promises.writeFile(file, segments[index]);
+      files.push(file);
+    }
+    const list = path.join(folder, "segments.txt"),
+      output = path.join(folder, "complete.mp4");
+    await fs.promises.writeFile(
+      list,
+      files.map((file) => `file '${file.replace(/'/g, "'\\''")}'`).join("\n"),
+    );
+    try {
+      await runFfmpeg([
+        "-y",
+        "-f",
+        "concat",
+        "-safe",
+        "0",
+        "-i",
+        list,
+        "-c",
+        "copy",
+        "-movflags",
+        "+faststart",
+        output,
+      ]);
+    } catch (_) {
+      await runFfmpeg([
+        "-y",
+        "-f",
+        "concat",
+        "-safe",
+        "0",
+        "-i",
+        list,
+        "-c:v",
+        "libx264",
+        "-preset",
+        "veryfast",
+        "-crf",
+        "20",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "192k",
+        "-movflags",
+        "+faststart",
+        output,
+      ]);
+    }
+    return await fs.promises.readFile(output);
+  } finally {
+    await fs.promises
+      .rm(folder, { recursive: true, force: true })
+      .catch(() => {});
+  }
+}
+async function generateOmniImageVideo(options) {
+  if (options.duration <= 10) return generateOmniImageVideoSegment(options);
+  const count = Math.ceil(options.duration / 10),
+    base = Math.floor(options.duration / count),
+    remainder = options.duration % count,
+    segments = [];
+  for (let index = 0; index < count; index++) {
+    const segmentDuration = base + (index < remainder ? 1 : 0);
+    const continuation =
+      index === 0
+        ? "This is the opening segment."
+        : `This is continuation segment ${index + 1} of ${count}. Continue the same scene and identities naturally. Do not restart the story or repeat dialogue/actions already completed.`;
+    segments.push(
+      (
+        await generateOmniImageVideoSegment({
+          ...options,
+          duration: segmentDuration,
+          prompt: `${options.prompt}\n${continuation}`,
+          dialogue: index === 0 ? options.dialogue : "",
+          voiceScript: index === 0 ? options.voiceScript : "",
+        })
+      ).buffer,
+    );
+  }
+  return { buffer: await joinVideoSegments(segments), mime: "video/mp4" };
 }
 let googleMusicToken = { value: "", expires: 0 };
 const b64url = (value) => Buffer.from(value).toString("base64url");
@@ -4221,6 +4303,18 @@ app.post(
         .trim()
         .replace(/\s+/g, " ")
         .slice(0, 500),
+      voiceScript = String(req.body.voiceScript || "")
+        .trim()
+        .slice(0, 1200),
+      onScreenText = String(req.body.onScreenText || "")
+        .trim()
+        .replace(/\s+/g, " ")
+        .slice(0, 180),
+      autoProductCopy = req.body.autoProductCopy === true,
+      productName = String(req.body.productName || "")
+        .trim()
+        .replace(/\s+/g, " ")
+        .slice(0, 100),
       voiceConsent = req.body.voiceConsent === true,
       voiceMatch = String(req.body.voiceData || "").match(
         /^data:(audio\/(?:webm|ogg|wav|mpeg|mp4));base64,([A-Za-z0-9+/=]+)$/,
@@ -4314,6 +4408,10 @@ app.post(
           prompt,
           dialogue,
           voiceStyle,
+          voiceScript,
+          onScreenText,
+          autoProductCopy,
+          productName,
           audioData: voiceMatch?.[2] || null,
           audioMime: voiceMatch?.[1] || null,
           imageData: match?.[2] || null,

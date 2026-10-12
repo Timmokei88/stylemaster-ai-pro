@@ -8,17 +8,15 @@ assert(
   "missing structured multi-voice parser",
 );
 assert(
-  server.includes(
-    "Each numbered voice cue applies only to its own quoted line",
-  ),
+  server.includes("Each bracketed cue controls only its own line"),
   "missing per-line voice isolation",
 );
 assert(
-  server.includes("EXACT ON-SCREEN WRITING"),
+  server.includes("Render this exact on-screen writing"),
   "missing exact writing instruction",
 );
 assert(
-  server.includes("PRODUCT AD WRITING"),
+  server.includes("Create one concise professional advertising headline"),
   "missing automatic product-copy instruction",
 );
 assert(html.includes("mixoOnScreenText-"), "missing on-screen writing control");
@@ -47,6 +45,18 @@ assert(
   server.includes("safeSlapstickComedyOverride"),
   "missing safe comedy override",
 );
+assert(
+  server.includes("generateOmniImageVideoSegment"),
+  "missing provider-safe segmented generation",
+);
+assert(
+  server.includes("joinVideoSegments"),
+  "missing 11–30 second video joining",
+);
+assert(
+  server.includes("optional exact-dialogue field is a precision lock"),
+  "main-description speech must remain enabled",
+);
 console.log(
-  "V165 video writing, product copy, 30-second range, multi-voice controls and benign-comedy handling verified.",
+  "V165 video writing, product copy, true segmented 30-second generation, description speech, multi-voice controls and benign-comedy handling verified.",
 );
