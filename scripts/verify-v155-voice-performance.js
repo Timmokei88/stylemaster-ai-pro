@@ -1,4 +1,4 @@
 const fs=require('fs'),server=fs.readFileSync('server.js','utf8'),html=fs.readFileSync('index.html','utf8');
-const serverChecks=['voiceStyle','voiceConsent','voiceMatch','type:"audio"','underwater muffling','A zombie, monster, robot, animal or fantasy character','voice recording is yours or that you have permission','voiceBuffer.length>8*1024*1024'];
+const serverChecks=['voiceStyle','voiceConsent','voiceMatch','type:"audio"','underwater muffling','deep, zombie, vampire, monster or creature','voice recording is yours or that you have permission','voiceBuffer.length>8*1024*1024'];
 const clientChecks=['mixo-v155-voice-reference','Record Voice','Voice performance — optional','navigator.mediaDevices.getUserMedia','MediaRecorder','mixoVideoVoicePayload','I confirm this is my voice'];
 const missing=[...serverChecks.filter(x=>!server.includes(x)),...clientChecks.filter(x=>!html.includes(x))];if(missing.length){console.error('V155 verification failed:',missing);process.exit(1)}console.log('PASS V155: described character voices, consented voice recording, preview/removal and server validation verified');

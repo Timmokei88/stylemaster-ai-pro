@@ -6,7 +6,7 @@ assert(!server.includes('["/music-generator.js","music-generator.js"]'),'generat
 assert(!server.includes('<script src="/music-generator.js"></script>'),'generated-music bundle must not load');
 assert(server.includes('Music Studio has been removed. No credits were used.'),'removed generation endpoint must be safely blocked');
 assert(html.includes('data-mode="image"')&&html.includes('data-mode="video"'),'AI Image and AI Video selector is required');
-assert(html.includes('min="5" max="60" step="1"'),'video duration must support every second from 5 to 60');
+assert(html.includes('min="5" max="15" step="1"'),'video duration must support every second from 5 to 15');
 assert(html.includes('Voice performance — optional'),'voice direction is required');
 assert(html.includes('Record Voice'),'consented microphone reference is required');
 assert(html.includes('face and character identity reference'),'reference identity guidance is required');
