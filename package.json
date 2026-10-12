@@ -1,10 +1,10 @@
 {
   "name": "mixolabs",
-  "version": "1.0.162",
+  "version": "1.0.159",
   "private": true,
   "scripts": {
     "start": "node server.js",
-    "check": "node --check server.js && node scripts/verify-launch.js && node scripts/verify-v149-video-generator.js && node scripts/verify-v150-video-api-fix.js && node scripts/verify-v151-accurate-video-audio.js && node scripts/verify-v153-video-formats-dialogue.js && node scripts/verify-v155-voice-performance.js && node scripts/verify-v157-live-provider-contract.js && node scripts/verify-v159-no-music-studio.js && node scripts/verify-v160-video-quality-gate.js && node scripts/verify-v161-fifteen-second-video.js && node scripts/verify-v162-extension-identity-voice.js"
+    "check": "node --check server.js && node scripts/verify-launch.js && node scripts/verify-v149-video-generator.js && node scripts/verify-v150-video-api-fix.js && node scripts/verify-v151-accurate-video-audio.js && node scripts/verify-v153-video-formats-dialogue.js && node scripts/verify-v155-voice-performance.js && node scripts/verify-v157-live-provider-contract.js && node scripts/verify-v159-no-music-studio.js"
   },
   "overrides": {"qs": "^6.15.4"},
   "dependencies": {
@@ -16,7 +16,6 @@
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.1",
     "express-session": "^1.18.1",
-    "ffmpeg-static": "^5.2.0",
     "helmet": "^8.1.0",
     "multer": "^2.0.2",
     "pg": "^8.13.1",
