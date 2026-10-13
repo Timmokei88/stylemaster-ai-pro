@@ -15769,7 +15769,7 @@ Original creation description for context: ${original}`;
             download.download = `mixolabs-${aspectRatio.replace(":", "x")}-${seconds}-second-video.mp4`;
             download.textContent = "Download MP4";
             output.append(video, download);
-            status.textContent = `✓ Video complete. ${cost} credits used.${dialogue ? " Exact dialogue was requested." : " No dialogue was requested."}`;
+            status.textContent = `✓ Video complete. ${d.video.cost} credits used.${dialogue ? " Exact dialogue was requested." : " No dialogue was requested."}`;
             window.dispatchEvent(new Event("mixo:credits-changed"));
           } catch (e) {
             status.textContent = e.message;

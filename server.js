@@ -3921,7 +3921,7 @@ async function videoAccuracyJson(instruction, images, responseSchema) {
   const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODERATION_MODEL)}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`,{
     method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify({contents:[{role:"user",parts:[{text:instruction},...images.map(x=>({inlineData:{mimeType:x.mime,data:x.buffer.toString("base64")}}))]}],generationConfig:{responseMimeType:"application/json",responseSchema,temperature:0,maxOutputTokens:3000}}),
-    signal:AbortSignal.timeout(90000)
+    signal:AbortSignal.timeout(20000)
   });
   const data=await r.json().catch(()=>({}));
   if(!r.ok)throw Object.assign(Error("Video accuracy checking is unavailable. Please try later."),{status:503});
@@ -3938,9 +3938,9 @@ async function sampledVideoFrames(buffer,duration) {
   const folder=await fs.promises.mkdtemp(path.join(os.tmpdir(),"mixo-review-"));
   try {
     const input=path.join(folder,"source.mp4");await fs.promises.writeFile(input,buffer);
-    await runFfmpeg(["-y","-i",input,"-vf","fps=2,scale=960:960:force_original_aspect_ratio=decrease","-frames:v","60",path.join(folder,"frame-%03d.jpg")]);
+    await runFfmpeg(["-y","-i",input,"-vf",`fps=${5/duration},scale=768:768:force_original_aspect_ratio=decrease`,"-frames:v","5",path.join(folder,"frame-%03d.jpg")]);
     const names=(await fs.promises.readdir(folder)).filter(x=>/^frame-\d+\.jpg$/.test(x)).sort();
-    if(names.length<Math.max(2,Math.floor(duration)))throw Object.assign(Error("Not enough video frames were available for accuracy review."),{status:422});
+    if(names.length<2)throw Object.assign(Error("Not enough video frames were available for accuracy review."),{status:422});
     const frames=[];for(const name of names)frames.push({buffer:await fs.promises.readFile(path.join(folder,name)),mime:"image/jpeg"});
     return frames;
   } finally {await fs.promises.rm(folder,{recursive:true,force:true});}
@@ -3952,9 +3952,10 @@ function assertVideoAccuracy(result,hasPeople) {
 }
 async function verifyReferenceVideo(image,mime,buffer,duration,prompt,analysis) {
   const frames=await sampledVideoFrames(buffer,duration);
-  const result=await videoAccuracyJson(`Review generated video accuracy conservatively. First image is the ORIGINAL reference, subsequent images are chronological frames sampled twice per second. User request (data): ${JSON.stringify(prompt)}. Reference observations: ${JSON.stringify(analysis)}.
+  const result=await videoAccuracyJson(`Review generated video accuracy conservatively. First image is the ORIGINAL reference, subsequent images are up to five chronological frames distributed across the clip. User request (data): ${JSON.stringify(prompt)}. Reference observations: ${JSON.stringify(analysis)}.
 Check that each original subject's observable face remains consistent whenever visible: no replacement actors, face swaps, age changes, different facial proportions or swapped left/right identities. Costume and motion changes do not authorise face changes. Check the same background/location remains unless the user explicitly requested another location; camera movement may reveal plausible new views but must not replace the woods, path, lighting or environment with unrelated scenery. Check requested actions visibly occur as described, including unmistakable superhuman movement if requested, not normal running. Track subjects from original positions, allowing them to move or cross. A face hidden by a mask, blur, distance or occlusion throughout cannot be verified: set facesVerifiable false. Brief correct faces do not excuse later visible drift. Missing evidence, ambiguity or uncertainty must be decision uncertain or fail, never pass. Do not infer sound correctness from still frames. Return booleans facesPreserved, facesVerifiable, backgroundPreserved, actionsAccurate, castPreserved plus decision pass/fail/uncertain and a reason. For no people set face booleans true.`,[{buffer:image,mime},...frames],{type:"OBJECT",properties:{decision:{type:"STRING",enum:["pass","fail","uncertain"]},facesPreserved:{type:"BOOLEAN"},facesVerifiable:{type:"BOOLEAN"},backgroundPreserved:{type:"BOOLEAN"},actionsAccurate:{type:"BOOLEAN"},castPreserved:{type:"BOOLEAN"},reason:{type:"STRING"}},required:["decision","facesPreserved","facesVerifiable","backgroundPreserved","actionsAccurate","castPreserved","reason"]});
-  assertVideoAccuracy(result,analysis.hasPeople);
+  try {assertVideoAccuracy(result,analysis.hasPeople);}
+  catch(e) {e.message="Visual review did not confirm this result: "+String(result?.reason || "Faces, scenery or requested action could not be verified.").slice(0,400);throw e;}
   return result;
 }
 const VIDEO_EXPORT_DIMENSIONS = {
@@ -4462,7 +4463,7 @@ app.post(
     try {
       const existing = (
         await pool.query(
-          "SELECT id,status,refunded,error_message AS \"errorMessage\",CASE WHEN object_key IS NOT NULL THEN '/api/videos/'||id||'/content' END AS url FROM video_jobs WHERE user_id=$1 AND idempotency_key=$2",
+          "SELECT id,status,refunded,CASE WHEN refunded THEN 0 ELSE credits END AS cost,error_message AS \"accuracyWarning\",CASE WHEN object_key IS NOT NULL THEN '/api/videos/'||id||'/content' END AS url FROM video_jobs WHERE user_id=$1 AND idempotency_key=$2",
           [req.session.userId, key],
         )
       ).rows[0];
@@ -4487,7 +4488,15 @@ app.post(
           .status(422)
           .json({ error: moderation.reason + " No credits were used." });
       const referenceMime=continuationFrame ? "image/png" : match?.[1];
-      const referenceAnalysis=image ? await analyseVideoReference(image,referenceMime,prompt) : null;
+      let referenceAnalysis=null,referenceAnalysisWarning="";
+      if(image) {
+        try {referenceAnalysis=await analyseVideoReference(image,referenceMime,prompt);}
+        catch(e) {
+          if(e.status===422)throw e;
+          referenceAnalysisWarning="Reference analysis was unavailable; the output will be marked unverified and its generation credits returned.";
+          referenceAnalysis={hasPeople:true,preservationPlan:"Preserve all original visible faces, ages, subject identities and left/right assignments. Keep the existing trees, path, ground and lighting. Change only the explicitly requested costume and action.",requestedActionPlan:prompt};
+        }
+      }
       const accuracyPrompt=referenceAnalysis ? `${prompt}\nREFERENCE PRESERVATION CONTRACT: ${referenceAnalysis.preservationPlan}\nREQUIRED ACTION: ${referenceAnalysis.requestedActionPlan}\nThe requested costume transformation changes clothing only. Keep original faces and existing scenery unchanged unless explicitly requested. Keep faces recognisable and visible enough to assess; do not hide identity drift behind masks or blur.` : prompt;
       await pool.query(
         "INSERT INTO video_jobs(id,user_id,idempotency_key,status,credits,duration,aspect_ratio,prompt_excerpt,model) VALUES($1,$2,$3,'pending',$4,$5,$6,$7,$8)",
@@ -4531,7 +4540,19 @@ app.post(
         throw Object.assign(Error("The provider returned an empty video."), {
           status: 422,
         });
-      const accuracyReview=referenceAnalysis ? await verifyReferenceVideo(image,referenceMime,buffer,duration,prompt,referenceAnalysis) : null;
+      let accuracyReview=null,accuracyWarning="",qualityRefunded=false;
+      if(referenceAnalysis) {
+        try {
+          accuracyReview=await verifyReferenceVideo(image,referenceMime,buffer,duration,prompt,referenceAnalysis);
+          if(referenceAnalysisWarning)accuracyWarning=referenceAnalysisWarning;
+        } catch(e) {
+          accuracyWarning=e.message || "The visual review could not verify this result.";
+        }
+        if(accuracyWarning) {
+          await refund(req.session.userId,cost,key,charge.metadata);
+          qualityRefunded=true;
+        }
+      }
       const objectKey = `videos/${req.session.userId}/${jobId}.mp4`;
       await r2.send(
         new PutObjectCommand({
@@ -4549,8 +4570,8 @@ app.post(
         }),
       );
       await pool.query(
-        "UPDATE video_jobs SET status='completed',object_key=$1,mime_type=$2,completed_at=NOW() WHERE id=$3",
-        [objectKey, mime, jobId],
+        "UPDATE video_jobs SET status='completed',object_key=$1,mime_type=$2,completed_at=NOW(),refunded=$4,error_message=$5 WHERE id=$3",
+        [objectKey, mime, jobId,qualityRefunded,accuracyWarning || null],
       );
       const user = await getUser(req.session.userId);
       res
@@ -4562,9 +4583,11 @@ app.post(
             url: `/api/videos/${jobId}/content`,
             duration,
             aspectRatio,
-            cost,
+            cost: qualityRefunded ? 0 : cost,
             hasDialogue: !!dialogue,
-            accuracyChecked: !!accuracyReview,
+            accuracyChecked: !!accuracyReview && !accuracyWarning,
+            accuracyWarning,
+            refunded: qualityRefunded,
           },
         });
     } catch (e) {
