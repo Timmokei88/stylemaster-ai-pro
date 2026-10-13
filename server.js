@@ -3667,10 +3667,12 @@ function videoPerformanceScript(value) {
     .filter(Boolean)
     .slice(0, 10)
     .map((line, index) => {
-      const match = line.match(/^\[([^\]]{2,80})\]\s*(.+)$/);
-      return match
-        ? `${index + 1}. Voice cue: ${match[1].trim()}. Speak exactly: “${match[2].trim()}”`
-        : `${index + 1}. Use the scene-appropriate voice. Speak exactly: “${line}”`;
+      const cues = Array.from(line.matchAll(/\[([^\]]*)\]/g)).map(x=>x[1].trim()).filter(Boolean);
+      const spoken = line.replace(/\[[^\]]*\]/g, "").trim();
+      if (!spoken) return "";
+      return cues.length
+        ? `${index + 1}. Voice cue: ${cues.join("; ")}. Never speak the voice cues. Speak exactly: “${spoken}”`
+        : `${index + 1}. Use the scene-appropriate voice. Speak exactly: “${spoken}”`;
     })
     .join("\n");
 }
@@ -4245,6 +4247,40 @@ app.post("/api/music/generate", requireAuth, genLimit, async (req, res) => {
     });
   }
 });
+// V167: only use completed clips belonging to the signed-in creator.
+async function ownedVideoBytes(userId, id) {
+  if (!/^[a-f0-9-]{36}$/i.test(String(id))) throw Object.assign(Error("Invalid video ID."), {status:400});
+  const row = (await pool.query("SELECT object_key,aspect_ratio FROM video_jobs WHERE id=$1 AND user_id=$2 AND status='completed'", [id,userId])).rows[0];
+  if (!row?.object_key) throw Object.assign(Error("Completed video not found."), {status:404});
+  const object = await r2.send(new GetObjectCommand({Bucket:R2_BUCKET_NAME,Key:row.object_key}));
+  return {row, buffer:Buffer.from(await object.Body.transformToByteArray())};
+}
+async function finalVideoFrame(buffer) {
+  const folder = await fs.promises.mkdtemp(path.join(os.tmpdir(), "mixo-frame-"));
+  try {
+    const input=path.join(folder,"input.mp4"), output=path.join(folder,"frame.png");
+    await fs.promises.writeFile(input,buffer);
+    await runFfmpeg(["-y","-sseof","-0.1","-i",input,"-frames:v","1",output]);
+    return await fs.promises.readFile(output);
+  } finally { await fs.promises.rm(folder,{recursive:true,force:true}); }
+}
+app.post("/api/videos/complete", requireAuth, genLimit, async(req,res,next)=>{
+  try {
+    const ids=req.body.videoIds;
+    if (!Array.isArray(ids)||ids.length<2||ids.length>10) return res.status(400).json({error:"Select 2–10 clips in order."});
+    const segments=[]; let ratio, total=0;
+    for(const id of ids) {
+      const clip=await ownedVideoBytes(req.session.userId,id);
+      ratio ||= clip.row.aspect_ratio;
+      if(ratio!==clip.row.aspect_ratio) return res.status(400).json({error:"All clips must use the same aspect ratio."});
+      total+=clip.buffer.length;
+      if(total>250*1024*1024) return res.status(413).json({error:"This sequence is too large. Combine fewer clips."});
+      segments.push(clip.buffer);
+    }
+    const buffer=await joinVideoSegments(segments);
+    res.type("video/mp4").set("Content-Disposition",'attachment; filename="mixolabs-complete-video.mp4"').send(buffer);
+  } catch(e) {next(e);}
+});
 app.get("/api/videos/:id/content", requireAuth, async (req, res, next) => {
   try {
     if (!r2Configured()) return res.status(503).end();
@@ -4295,7 +4331,7 @@ app.post(
       prompt = String(req.body.prompt || "")
         .trim()
         .slice(0, 1200),
-      dialogue = String(req.body.dialogue || "")
+      dialogue = String(req.body.dialogue || "").replace(/\[[^\]]*\]/g, "")
         .trim()
         .replace(/\s+/g, " ")
         .slice(0, 500),
@@ -4303,7 +4339,7 @@ app.post(
         .trim()
         .replace(/\s+/g, " ")
         .slice(0, 500),
-      voiceScript = String(req.body.voiceScript || "")
+      voiceScript = String(req.body.voiceScript || (/\[/.test(req.body.dialogue || "") ? req.body.dialogue : ""))
         .trim()
         .slice(0, 1200),
       onScreenText = String(req.body.onScreenText || "")
@@ -4355,7 +4391,8 @@ app.post(
         error:
           "The voice recording must be no larger than 8 MB. No credits were used.",
       });
-    const image = match ? Buffer.from(match[2], "base64") : null;
+    let image = match ? Buffer.from(match[2], "base64") : null;
+    let continuationFrame = null;
     if (image && (!image.length || image.length > 20 * 1024 * 1024))
       return res
         .status(413)
@@ -4373,10 +4410,16 @@ app.post(
         return res
           .status(existing.status === "completed" ? 200 : 409)
           .json({ video: existing, recovered: true });
+      if (req.body.continuationId) {
+        const prior = await ownedVideoBytes(req.session.userId, req.body.continuationId);
+        if (prior.row.aspect_ratio !== aspectRatio) throw Object.assign(Error("Keep the same aspect ratio when extending a video."), {status:400});
+        continuationFrame = await finalVideoFrame(prior.buffer);
+        image = continuationFrame;
+      }
       const moderation = await assessContent({
-        text: `${prompt}\n${dialogue}`,
+        text: `${prompt}\n${dialogue}\n${voiceScript}`,
         buffer: image,
-        mime: match?.[1],
+        mime: continuationFrame ? "image/png" : match?.[1],
         stage: "video_generation",
       });
       if (moderation.decision !== "allow")
@@ -4414,8 +4457,8 @@ app.post(
           productName,
           audioData: voiceMatch?.[2] || null,
           audioMime: voiceMatch?.[1] || null,
-          imageData: match?.[2] || null,
-          mimeType: match?.[1] || null,
+          imageData: continuationFrame ? continuationFrame.toString("base64") : match?.[2] || null,
+          mimeType: continuationFrame ? "image/png" : match?.[1] || null,
           duration,
           aspectRatio,
         }),
@@ -5711,6 +5754,8 @@ function publicHtml(pathname = "/") {
     .replaceAll("{{SUPPORT_EMAIL}}", escapeHtml(PUBLIC_SUPPORT_EMAIL))
     .replace("</body>", '<script src="/random-infinite.js"></script></body>');
 }
+app.get("/studio-v167.js", (req,res)=>res.sendFile(path.join(__dirname,"studio-v167.js")));
+app.get("/studio-v167.css", (req,res)=>res.sendFile(path.join(__dirname,"studio-v167.css")));
 app.get("/", (req, res) => res.type("html").send(publicHtml(req.path)));
 app.get("*", (req, res) => res.type("html").send(publicHtml(req.path)));
 app.use((e, req, res, next) => {

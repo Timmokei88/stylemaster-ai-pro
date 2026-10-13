@@ -1,6 +1,6 @@
 {
   "name": "mixolabs",
-  "version": "1.0.166",
+  "version": "1.0.167",
   "private": true,
   "scripts": {
     "start": "node server.js",
