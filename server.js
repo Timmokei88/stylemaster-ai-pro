@@ -2961,10 +2961,10 @@ async function geminiModeration({
             responseMimeType: "application/json",
             responseSchema,
             temperature: 0,
-            maxOutputTokens: 900,
+            maxOutputTokens: 1800,
           },
         }),
-        signal: AbortSignal.timeout(45000),
+        signal: AbortSignal.timeout(stage === "video_generation" ? 15000 : 45000),
       },
     ),
     data = await r.json().catch(() => ({}));
@@ -3074,8 +3074,8 @@ async function assessContent({
     };
   const supplied = images.length ? images : buffer ? [{ buffer, mime }] : [],
     referencePolicy =
-      stage === "reference_upload" && supplied.length
-        ? "REFERENCE-PHOTO POLICY: Allow benign private edits of adults and children, including transforming a family photo into a toy, doll, figurine, action figure, collectible, cartoon, 3D animation or family-film-style character. Also allow fairies, elves, angels, mermaids, magical creatures, photorealistic fantasy portraits, upscaling and higher-resolution remakes of a previously generated image. Also allow cheerful costumes or clowns, respectful caricatures, restoration, enhancement, background replacement, non-graphic fantasy or horror styling, commemorative composites, clearly fictional fan-meeting scenes, friendly character interactions, and ordinary non-explicit affection between adults such as kissing, embracing or holding hands in couple, engagement and wedding photographs. A child appearing in an ordinary family photo or a request such as 'turn my son into a toy' is benign by itself and must not be blocked or quarantined. A realism fairy or a higher-resolution remake of a benign generated fantasy image must be allowed. Do not classify ordinary adult affection as sexual content. A real person, named fictional character, public figure or uncertain age in an otherwise ordinary photograph is not by itself a reason to block or quarantine. Still block sexual content involving minors, intimate abuse, non-consensual sexualisation, bullying, humiliation, graphic violence, fraud, defamation, hateful degradation and illegal exploitation.\n\n"
+      ["reference_upload", "video_generation"].includes(stage) && supplied.length
+        ? "REFERENCE-PHOTO POLICY: Allow benign private edits of adults and children, including transforming a family photo into a toy, doll, figurine, action figure, collectible, cartoon, 3D animation or family-film-style character. Also allow fairies, elves, angels, mermaids, magical creatures, photorealistic fantasy portraits, upscaling and higher-resolution remakes of a previously generated image. Also allow cheerful costumes or clowns, respectful caricatures, restoration, enhancement, background replacement, non-graphic fantasy or horror styling, commemorative composites, clearly fictional fan-meeting scenes, friendly character interactions, and ordinary non-explicit affection between adults such as kissing, embracing or holding hands in couple, engagement and wedding photographs. For video, also allow children wearing fictional superhero costumes, preserving their original faces and ages, running, flying or racing through the original woods with non-graphic fantasy powers. A costume request is not a request to turn a child into an adult actor, and naming a fictional superhero is not by itself unsafe. Do not require estimating an exact age for an otherwise benign fully clothed family scene. A child appearing in an ordinary family photo or a request such as 'turn my son into a toy' is benign by itself and must not be blocked or quarantined. A realism fairy or a higher-resolution remake of a benign generated fantasy image must be allowed. Do not classify ordinary adult affection as sexual content. A real person, named fictional character, public figure or uncertain age in an otherwise ordinary photograph is not by itself a reason to block or quarantine. Still block sexual content involving minors, intimate abuse, non-consensual sexualisation, bullying, humiliation, graphic violence, fraud, defamation, hateful degradation and illegal exploitation.\n\n"
         : "";
   let ai;
   try {
@@ -3099,6 +3099,19 @@ async function assessContent({
       confidence: 1,
       raw: { source: "local_fallback", providerUnavailable: true },
     };
+  }
+  // One bounded safety re-review; never treat an inconclusive response as permission.
+  if (stage === "video_generation" && (ai.raw?.parseError ||
+      (ai.decision === "quarantine" && /review.*inconclusive/i.test(ai.reason)))) {
+    log("warn","video_safety_review_inconclusive",{parseError:!!ai.raw?.parseError,finishReason:ai.raw?.finishReason || "unknown"});
+    try {
+      ai=await geminiModeration({text:referencePolicy+text,images:supplied,stage});
+    } catch(error) {
+      throw Object.assign(Error("The video safety checker could not complete its review. Video generation has not started; no credits were used. Please try again later."),{status:503});
+    }
+    if(ai.raw?.parseError || (ai.decision === "quarantine" && /review.*inconclusive/i.test(ai.reason))) {
+      throw Object.assign(Error("The video safety checker returned no clear decision after a second review. Video generation has not started; no credits were used. Please contact support if this continues."),{status:503});
+    }
   }
   if (safePrivateInconclusiveOverride(text, stage, ai))
     return {
