@@ -18,6 +18,23 @@
   toolbar.querySelector('[data-tour]').onclick=()=>{const button=document.getElementById('mixoQuickStartLaunch')||document.getElementById('mixoTutorialButton');if(button)button.click();else explain('Create, extend and download','Choose AI Image or AI Video. Describe your idea, adjust the settings, and generate. Watch progress in Your Creation. For speech, use brackets for voice directions and write the spoken words after them. After a video finishes, choose Extend, describe what happens next, and generate again. Select clips in order and choose Complete video to download one joined MP4.',workspace);};
   setTimeout(installHelp,100);new MutationObserver(installHelp).observe(workspace,{childList:true,subtree:true});
   const creation=document.querySelector('.creation');
+  // Both generators share the visible preview, beside the description.
+  const preview=document.createElement('section');preview.id='studioVideoPreview';preview.setAttribute('aria-label','Generated video');creation.prepend(preview);
+  for(const id of ['mixoDirectVideoOutput','mixoVideoOutput']) {
+    const output=document.getElementById(id);if(output){const status=document.getElementById(id==='mixoDirectVideoOutput'?'mixoDirectVideoStatus':'mixoVideoStatus');if(status)preview.append(status);preview.append(output);}
+  }
+  const empty=document.querySelector('#placeholder');if(empty){const copy=empty.children[1];if(copy)copy.textContent='Your generated image or video will appear here.';}
+  function showVideoPreview(){
+    for(const id of ['placeholder','grid','activeArea','angleArea'])document.getElementById(id)?.classList.add('hidden');
+    preview.classList.remove('hidden');
+  }
+  document.querySelectorAll('[data-mode]').forEach(button=>button.addEventListener('click',()=>{
+    preview.classList.toggle('hidden',button.dataset.mode!=='video');
+    if(button.dataset.mode==='video'){
+      document.getElementById('grid')?.classList.add('hidden');document.getElementById('activeArea')?.classList.add('hidden');
+      empty?.classList.toggle('hidden',!!preview.querySelector('video'));
+    }
+  }));
   const busy=document.createElement('div');busy.className='studio-progress hidden';busy.setAttribute('role','status');busy.setAttribute('aria-live','polite');busy.innerHTML='<span class="studio-spinner"></span><h3>Creating your video…</h3><p>This can take several minutes. Keep this page open.</p><small>No extra paid retry will be started automatically.</small>';creation.prepend(busy);
   const sequences={direct:[],image:[]},pending={direct:null,image:null};let requestBusy=false;
   function renderSequence(kind){const output=document.getElementById(kind==='direct'?'mixoDirectVideoOutput':'mixoVideoOutput');output.querySelector('.studio-sequence')?.remove();const box=document.createElement('section');box.className='studio-sequence';const h=document.createElement('h3');h.textContent='Your video sequence';box.append(h);
@@ -28,6 +45,6 @@
   window.fetch=async(input,init)=>{if(input!=='/api/videos/generate')return originalFetch(input,init);if(requestBusy)throw Error('A video is already generating. Please wait for it to finish.');const payload=JSON.parse(init.body),kind=document.querySelector('[data-mode="video"].active')?'direct':'image';
     if(pending[kind]){payload.continuationId=pending[kind].id;payload.prompt='Continue naturally from this exact final frame, preserving cast, camera position and scene continuity. '+payload.prompt;}
     if(/\[/.test(payload.dialogue||'')){payload.voiceScript=payload.voiceScript||payload.dialogue;payload.dialogue=payload.dialogue.replace(/\[[^\]]*\]/g,'').trim();}
-    requestBusy=true;busy.classList.remove('hidden');creation.setAttribute('aria-busy','true');document.getElementById('loading')?.classList.add('hidden');busy.scrollIntoView({behavior:'smooth',block:'center'});
-    try{const response=await originalFetch(input,{...init,body:JSON.stringify(payload)});if(response.ok){const data=await response.clone().json();sequences[kind].push({...data.video,aspectRatio:payload.aspectRatio});pending[kind]=null;setTimeout(()=>renderSequence(kind),0);}else setTimeout(()=>renderSequence(kind),0);return response;}catch(e){setTimeout(()=>renderSequence(kind),0);throw e;}finally{requestBusy=false;busy.classList.add('hidden');creation.removeAttribute('aria-busy');}};
+    requestBusy=true;showVideoPreview();for(const id of ['mixoDirectVideoOutput','mixoDirectVideoStatus','mixoVideoOutput','mixoVideoStatus']){const isDirect=id.startsWith('mixoDirect');document.getElementById(id)?.classList.toggle('hidden',isDirect !== (kind==='direct'));}busy.classList.remove('hidden');creation.setAttribute('aria-busy','true');document.getElementById('loading')?.classList.add('hidden');busy.scrollIntoView({behavior:'smooth',block:'center'});
+    try{const response=await originalFetch(input,{...init,body:JSON.stringify(payload)});if(response.ok){const data=await response.clone().json();sequences[kind].push({...data.video,aspectRatio:payload.aspectRatio});pending[kind]=null;setTimeout(()=>{renderSequence(kind);showVideoPreview();preview.scrollIntoView({behavior:'smooth',block:'start'});},0);}else setTimeout(()=>renderSequence(kind),0);return response;}catch(e){setTimeout(()=>renderSequence(kind),0);throw e;}finally{requestBusy=false;busy.classList.add('hidden');creation.removeAttribute('aria-busy');}};
 })();

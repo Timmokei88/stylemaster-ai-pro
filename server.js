@@ -3711,7 +3711,8 @@ async function generateOmniImageVideoSegment({
   const sourceRule = imageData
     ? `Use the supplied image as the immutable identity reference. Preserve every visible person's exact facial geometry, proportions, skin tone, eyes, nose, mouth, jaw, hairline and distinguishing features in every frame. Expressions, gaze, lips and head pose may move, but identity must not drift. Preserve every character's species, role, costume, colour, body silhouette and accessories.`
     : `Create the requested cast exactly as described and keep every identity stable from the first frame to the last.`;
-  const timedPrompt = `Create one polished video lasting exactly ${duration} seconds, framed for ${aspectRatio}. ${prompt} ${speechDirection} ${writingDirection} ${sourceRule} First extract and count every named or described character. Maintain a strict one-to-one cast ledger across every frame: never merge, substitute, duplicate, remove, add or morph a character; never swap one species, creature, costume or role into another. Preserve subject identity, design, colours and requested written text. Recompose surroundings naturally for the chosen ratio without stretching or cropping through a main subject. Use coherent physically believable movement, stable anatomy and continuous professional shots. Generate precisely synchronised audio matching every visible action and environment. Every sound must start and stop with its visible cause, with realistic loudness, direction and acoustics. If music is not explicitly requested, generate no music. No unrelated subjects, sounds, text, flicker or unexplained scene cuts.`;
+  const actionDirection = `STORY ACCURACY: Follow the user's events in their stated chronological order. Show every requested cause on screen before its consequence. Do not replace a requested interaction with an unexplained reaction, particle burst, jump cut or aftermath. Allocate enough screen time for each event to be clearly visible. Keep interacting subjects and objects together in the frame at the decisive moment. If an impact or collision is requested, visibly show the approaching object, its movement toward the subject, the moment of contact and then the requested aftermath, in that order, without cutting away or obscuring contact. For a funny animal/cartoon collision and feathers, use non-graphic slapstick with no blood or injury detail: the vehicle must visibly make contact before the feathers appear. Finish requested speech before the punchline when that is the requested order. Do not invent extra events.`;
+  const timedPrompt = `Create one polished video lasting exactly ${duration} seconds, framed for ${aspectRatio}. ${prompt} ${actionDirection} ${speechDirection} ${writingDirection} ${sourceRule} First extract and count every named or described character. Maintain a strict one-to-one cast ledger across every frame: never merge, substitute, duplicate, add or morph a character unless the user explicitly requests that transformation; allow characters to exit, disappear or change only as explicitly required by the described action; never swap one species, creature, costume or role into another. Preserve subject identity, design, colours and requested written text. Recompose surroundings naturally for the chosen ratio without stretching or cropping through a main subject. Use coherent physically believable movement, stable anatomy and continuous professional shots. Generate precisely synchronised audio matching every visible action and environment. Every sound must start and stop with its visible cause, with realistic loudness, direction and acoustics. If music is not explicitly requested, generate no music. No unrelated subjects, sounds, text, flicker or unexplained scene cuts.`;
   const input = [];
   if (imageData)
     input.push({ type: "image", data: imageData, mime_type: mimeType });
@@ -3915,6 +3916,22 @@ async function joinVideoSegments(segments) {
       .catch(() => {});
   }
 }
+const VIDEO_EXPORT_DIMENSIONS = {
+  "16:9":[1280,720], "9:16":[720,1280], "1:1":[720,720],
+  "4:5":[720,900], "5:4":[900,720], "3:2":[1080,720],
+  "2:3":[720,1080], "21:9":[1680,720]
+};
+async function formatGeneratedVideo(buffer, aspectRatio) {
+  const [width,height]=VIDEO_EXPORT_DIMENSIONS[aspectRatio] || VIDEO_EXPORT_DIMENSIONS["16:9"];
+  const folder=await fs.promises.mkdtemp(path.join(os.tmpdir(),"mixo-format-"));
+  try {
+    const input=path.join(folder,"source.mp4"),output=path.join(folder,"formatted.mp4");
+    await fs.promises.writeFile(input,buffer);
+    // Preserve the entire frame and guarantee exact dimensions, without stretching.
+    await runFfmpeg(["-y","-i",input,"-map","0:v:0","-map","0:a?","-vf",`scale=${width}:${height}:force_original_aspect_ratio=decrease:force_divisible_by=2,pad=${width}:${height}:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1`,"-c:v","libx264","-preset","veryfast","-crf","20","-pix_fmt","yuv420p","-c:a","aac","-movflags","+faststart",output]);
+    return await fs.promises.readFile(output);
+  } finally {await fs.promises.rm(folder,{recursive:true,force:true});}
+}
 async function generateOmniImageVideo(options) {
   if (options.duration <= 10) return generateOmniImageVideoSegment(options);
   const count = Math.ceil(options.duration / 10),
@@ -3931,6 +3948,8 @@ async function generateOmniImageVideo(options) {
       (
         await generateOmniImageVideoSegment({
           ...options,
+          imageData: index > 0 ? (await finalVideoFrame(segments[index-1])).toString("base64") : options.imageData,
+          mimeType: index > 0 ? "image/png" : options.mimeType,
           duration: segmentDuration,
           prompt: `${options.prompt}\n${continuation}`,
           dialogue: index === 0 ? options.dialogue : "",
@@ -4462,8 +4481,8 @@ app.post(
           duration,
           aspectRatio,
         }),
-        buffer = generated.buffer,
-        mime = generated.mime;
+        buffer = await formatGeneratedVideo(generated.buffer, aspectRatio),
+        mime = "video/mp4";
       if (!buffer.length)
         throw Object.assign(Error("The provider returned an empty video."), {
           status: 422,
