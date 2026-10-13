@@ -14,7 +14,38 @@
   help.querySelector('[data-stop]').onclick=()=>window.speechSynthesis?.cancel();
   help.querySelector('[data-listen]').onclick=()=>{if(window.mixoTutorialLaunchContext){const title=help.querySelector('h2').textContent,copy=help.querySelector('p').textContent;help.close();window.mixoTutorialLaunchContext(title,copy,activeControl?.id?'#'+activeControl.id:'.mixo-workspace');}else if(window.speechSynthesis){speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(help.querySelector('p').textContent));}else help.querySelector('p').textContent+=' Audio narration is unavailable in this browser. You can read the instructions here.';};
   const tips={prompt:'Describe the subject, setting, action and mood. Choose AI Image or AI Video before generating.',mixoDirectDialogue:'Write [warm, calm British voice] followed by the words to say. Bracketed directions guide the voice and are never included as spoken dialogue. Put different speakers on separate lines.',mixoVideoDialogue:'Write [deep, excited voice] Hello there! Only Hello there is spoken. Leave blank for no dialogue.',generateBtn:'Review the credit cost, then generate. Progress appears in Your Creation. Videos can take several minutes. Keep this page open.',mixoVideoGenerate:'Animate the selected image. Set movement, dialogue, duration and aspect ratio, then review the credit cost.',mixoDirectDuration:'Choose 5–30 seconds per clip. Longer clips cost more credits. Extend a finished clip to continue the story.',mixoVideoDuration:'Choose 5–30 seconds per clip. Extensions use the last frame of the previous clip.',mixoDirectRatio:'Choose landscape for YouTube or vertical for mobile. Every extension keeps the same shape.',mixoVideoRatio:'Choose the output shape. Clips in one complete video must share this shape.'};
-  function installHelp(){workspace.querySelectorAll('input,select,textarea,button,summary').forEach(control=>{if(control.dataset.studioHelp||control.closest('.studio-help')||control.classList.contains('studio-question'))return;control.dataset.studioHelp='1';let name=control.getAttribute('aria-label')||control.closest('label')?.childNodes[0]?.textContent?.trim()||control.textContent.trim()||control.placeholder||control.id||'This setting';name=name.slice(0,100);const q=document.createElement('button');q.type='button';q.className='studio-question';q.textContent='?';q.setAttribute('aria-label','Help: '+name);q.onclick=e=>{e.preventDefault();e.stopPropagation();let copy=tips[control.id];if(!copy&&control.tagName==='SELECT')copy=`${name}: choose an option from the list. Current options: ${Array.from(control.options).map(o=>o.textContent).join(', ')}.`;if(!copy&&control.type==='checkbox')copy=`${name}: tick this option to enable it; untick it to turn it off.`;if(!copy&&control.type==='file')copy=`${name}: choose a reference file from your device. The reference guides your creation.`;if(!copy)copy=`${name}. ${control.getAttribute('title')||control.placeholder||'Use this control to adjust your creation. You can also open the full narrated tutorial for a guided walkthrough.'}`;explain(name,copy,control);};control.after(q);});}
+  // One contextual icon per meaningful video setting; existing image help is retained.
+  const helpFields = new Set([
+    'mixoVideoPrompt','mixoVideoDialogue','mixoDirectDialogue',
+    'mixoVideoDuration','mixoDirectDuration','mixoVideoRatio','mixoDirectRatio',
+    'mixoVoiceStyle-image','mixoVoiceStyle-direct',
+    'mixoVoiceConsent-image','mixoVoiceConsent-direct',
+    'mixoOnScreenText-image','mixoOnScreenText-direct',
+    'mixoAutoProductCopy-image','mixoAutoProductCopy-direct',
+    'mixoProductName-image','mixoProductName-direct',
+    'mixoVoiceScript-image','mixoVoiceScript-direct'
+  ]);
+  function installHelp(){
+    workspace.querySelectorAll('input[id],select[id],textarea[id]').forEach(control=>{
+      if(!helpFields.has(control.id)||control.dataset.studioHelp)return;
+      const label=control.closest('label');if(!label)return;
+      if(label.querySelector('.mixo-help-btn,.studio-question'))return;
+      control.dataset.studioHelp='1';
+      const name=Array.from(label.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent.trim()).join(' ').trim()||control.placeholder||'Video setting';
+      const q=document.createElement('button');q.type='button';q.className='studio-question';q.textContent='?';q.setAttribute('aria-label','Help: '+name);
+      q.onclick=e=>{e.preventDefault();e.stopPropagation();let copy=tips[control.id];
+        if(!copy&&control.id.startsWith('mixoVoiceScript'))copy='Write one spoken line per row. Put voice directions in square brackets before the words: [deep, excited voice] Hello there! Directions guide performance and are not spoken.';
+        if(!copy&&control.id.startsWith('mixoVoiceStyle'))copy='Describe the voice, pitch, accent, emotion and delivery. This is a performance direction, not spoken dialogue.';
+        if(!copy&&control.id.startsWith('mixoVoiceConsent'))copy='Enable only when the recorded voice is yours or you have permission from its speaker. A voice sample requires this confirmation.';
+        if(!copy&&control.id.startsWith('mixoOnScreenText'))copy='Enter the exact words to display inside the video. This controls visible writing, separately from spoken dialogue.';
+        if(!copy&&control.id.startsWith('mixoAutoProductCopy'))copy='Enable to request a short advertising headline for the product. Review the generated wording before publishing.';
+        if(!copy&&control.id.startsWith('mixoProductName'))copy='Enter the product or brand name to guide the optional advertising headline.';
+        if(!copy)copy=control.placeholder||'Describe the movement, camera and sounds you want, in the order they should happen.';
+        explain(name,copy,control);
+      };
+      label.insertBefore(q,control);
+    });
+  }
   toolbar.querySelector('[data-tour]').onclick=()=>{const button=document.getElementById('mixoQuickStartLaunch')||document.getElementById('mixoTutorialButton');if(button)button.click();else explain('Create, extend and download','Choose AI Image or AI Video. Describe your idea, adjust the settings, and generate. Watch progress in Your Creation. For speech, use brackets for voice directions and write the spoken words after them. After a video finishes, choose Extend, describe what happens next, and generate again. Select clips in order and choose Complete video to download one joined MP4.',workspace);};
   setTimeout(installHelp,100);new MutationObserver(installHelp).observe(workspace,{childList:true,subtree:true});
   const creation=document.querySelector('.creation');
@@ -35,7 +66,7 @@
       empty?.classList.toggle('hidden',!!preview.querySelector('video'));
     }
   }));
-  const busy=document.createElement('div');busy.className='studio-progress hidden';busy.setAttribute('role','status');busy.setAttribute('aria-live','polite');busy.innerHTML='<span class="studio-spinner"></span><h3>Creating your video…</h3><p>This can take several minutes. Keep this page open.</p><small>No extra paid retry will be started automatically.</small>';creation.prepend(busy);
+  const busy=document.createElement('div');busy.className='studio-progress hidden';busy.setAttribute('role','status');busy.setAttribute('aria-live','polite');busy.innerHTML='<span class="studio-spinner"></span><h3>Creating your video…</h3><p>Analysing your reference, generating, then checking faces, scenery and action. This can take several minutes. Keep this page open.</p><small>No extra paid retry will be started automatically.</small>';creation.prepend(busy);
   const sequences={direct:[],image:[]},pending={direct:null,image:null};let requestBusy=false;
   function renderSequence(kind){const output=document.getElementById(kind==='direct'?'mixoDirectVideoOutput':'mixoVideoOutput');output.querySelector('.studio-sequence')?.remove();const box=document.createElement('section');box.className='studio-sequence';const h=document.createElement('h3');h.textContent='Your video sequence';box.append(h);
     sequences[kind].forEach((clip,i)=>{const row=document.createElement('div'),check=document.createElement('input');check.type='checkbox';check.checked=true;check.value=clip.id;const label=document.createElement('label');label.append(check,document.createTextNode(` Clip ${i+1} `));const a=document.createElement('a');a.href=clip.url;a.download=`mixolabs-clip-${i+1}.mp4`;a.textContent='Download clip';const extend=document.createElement('button');extend.type='button';extend.textContent='Extend / edit next scene';extend.onclick=()=>{pending[kind]=clip;document.getElementById(kind==='direct'?'mixoDirectRatio':'mixoVideoRatio').value=clip.aspectRatio;const prompt=document.getElementById(kind==='direct'?'prompt':'mixoVideoPrompt');prompt.value='';prompt.placeholder=`Continue from clip ${i+1}: describe what happens next…`;prompt.focus();h.textContent=`Extending clip ${i+1}. Describe the next scene, then Generate. The original clip stays unchanged.`;};row.append(label,a,extend);box.append(row);});

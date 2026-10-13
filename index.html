@@ -10743,6 +10743,8 @@ Original creation description for context: ${original}`;
         map.forEach(([sel, title, text]) => {
           const el = document.querySelector(sel);
           if (!el) return;
+          // Navigation and self-explanatory action buttons do not need adjacent help icons.
+          if (el.matches("button") || el.closest(".mixo-nav")) return;
           const a = bestAnchor(el);
           if (
             a.querySelector?.(`.mixo-help-btn[data-help-target="${sel}"]`) ||
